@@ -1,0 +1,13 @@
+{
+  "kind": "certification",
+  "org": "HackerRank",
+  "title": {
+    "en": "Python (Basic) · SQL (Intermediate)",
+    "es": "Python (Básico) ·  SQL (Intermedio)"
+  },
+  "start": "2024-01",
+  "summary": {
+    "en": "Skill certifications in Python and SQL.",
+    "es": "Certificaciones de habilidad en Python y SQL."
+  }
+}

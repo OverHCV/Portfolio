@@ -1,0 +1,15 @@
+{
+  "kind": "job",
+  "org": "Universidad de Caldas",
+  "title": { "en": "Teaching Assistant — Mathematics", "es": "Monitor — Matemáticas" },
+  "start": "2023-01",
+  "end": "2024-06",
+  "summary": {
+    "en": "Tutorials on differential and integral calculus and computational mathematics.",
+    "es": "Tutorías de cálculo diferencial e integral y matemática computacional."
+  },
+  "details": {
+    "en": "Ran tutorial sessions on differential and integral calculus and the fundamentals of computational mathematics, and designed problem sets bridging abstract theory with algorithmic applications.",
+    "es": "Dicté tutorías de cálculo diferencial e integral y fundamentos de matemática computacional, y diseñé talleres que conectan la teoría abstracta con aplicaciones algorítmicas."
+  }
+}

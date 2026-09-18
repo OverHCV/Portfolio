@@ -1,0 +1,16 @@
+{
+  "order": 5,
+  "tempo": "Con moto",
+  "title": { "en": "Cloud & DevOps", "es": "Cloud y DevOps" },
+  "epigraph": {
+    "en": "Shipping it, and keeping it alive.",
+    "es": "Llevarlo a producción y mantenerlo vivo."
+  },
+  "items": [
+    { "label": "Docker", "level": 3 },
+    { "label": "Git · GitHub", "level": 3 },
+    { "label": "Azure", "level": 2 },
+    { "label": "Google Cloud", "level": 2 },
+    { "label": "N8N", "level": 2 }
+  ]
+}

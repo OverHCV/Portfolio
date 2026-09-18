@@ -1,12 +1,12 @@
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { gsap } from 'gsap';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useWorld, type Focus } from '../store';
 import { useT } from '../../i18n/useT';
-import { prefersReducedMotion, revealText } from '../lib/anim';
-import { DUR, EASE, MILESTONE_COLORS } from '../theme';
+import { revealText } from '../lib/anim';
+import { DUR, MILESTONE_COLORS } from '../theme';
 import { milestoneDates } from '../../i18n/dates';
 import type { Lang } from '../../i18n/langs';
 import type { L10n, WorldContent } from '../types';
+import { useDialog } from './useDialog';
 
 interface PanelItem {
   /** Clave de traducción. */
@@ -18,14 +18,22 @@ interface PanelItem {
   meta?: string;
   body: L10n;
   chips?: string[];
-  link?: { href: string; label: string };
+  links?: { href: string; label: string }[];
 }
 
+type Detail = Exclude<NonNullable<Focus>, { kind: 'contact' } | { kind: 'score' }>;
+
 /**
- * Traduce el `focus` del store al contenido del panel. Cada tipo llega con su acto (proyectos en M4);
- * la bio del Acto 2 no usa panel: se lee en capítulos (FieldOverlay).
+ * Traduce el `focus` del store al contenido del panel. La bio del Acto 2 no usa panel (se lee en
+ * capítulos) y el contacto tiene su propia hoja (ContactSheet).
  */
-function resolve(focus: NonNullable<Focus>, content: WorldContent, lang: Lang, t: (key: string) => string): PanelItem | null {
+function resolve(
+  focus: Detail,
+  content: WorldContent,
+  lang: Lang,
+  t: (key: string) => string,
+  pick: (field: L10n) => string,
+): PanelItem | null {
   if (focus.kind === 'milestone') {
     const m = content.milestones.find((x) => x.id === focus.id);
     if (!m) return null;
@@ -36,110 +44,54 @@ function resolve(focus: NonNullable<Focus>, content: WorldContent, lang: Lang, t
       meta: `${m.org} · ${milestoneDates(m, lang, t('milestone.present'))}`,
       body: m.details ?? m.summary,
       chips: m.stack,
-      link: m.credentialUrl ? { href: m.credentialUrl, label: 'panel.credential' } : undefined,
+      links: m.credentialUrl ? [{ href: m.credentialUrl, label: t('panel.credential') }] : undefined,
     };
   }
-  return null;
+  const p = content.projects.find((x) => x.id === focus.id);
+  if (!p) return null;
+  const links = [
+    p.links.repo && { href: p.links.repo, label: t('project.repo') },
+    p.links.demo && { href: p.links.demo, label: t('project.demo') },
+    ...(p.links.extra ?? []).map((l) => ({ href: l.url, label: typeof l.label === 'string' ? l.label : pick(l.label) })),
+  ].filter((l): l is { href: string; label: string } => Boolean(l));
+  return {
+    eyebrow: 'project.eyebrow',
+    title: p.title,
+    meta: [String(p.year), p.role && pick(p.role)].filter(Boolean).join(' · '),
+    body: p.description,
+    chips: p.stack,
+    links,
+  };
 }
 
-const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-function isDesktop() {
-  return window.matchMedia('(min-width: 768px)').matches;
-}
+const isDetail = (f: Focus): f is Detail => f !== null && (f.kind === 'milestone' || f.kind === 'project');
 
 /**
- * Panel de detalle en DOM (derecha en desktop, hoja inferior en móvil).
- * Mientras está abierto: scroll pausado, foco atrapado, Esc o clic fuera cierra.
+ * Panel de detalle en DOM (derecha en desktop, hoja inferior en móvil): hitos y proyectos.
+ * Mientras está abierto: scroll pausado, foco atrapado, Esc o clic fuera cierra (useDialog).
  */
 export function Panel({ content }: { content: WorldContent }) {
   const { t, pick, lang } = useT();
   const focus = useWorld((s) => s.focus);
-  const [shown, setShown] = useState<NonNullable<Focus> | null>(null);
-  const panel = useRef<HTMLElement>(null);
-  const backdrop = useRef<HTMLDivElement>(null);
-  const title = useRef<HTMLHeadingElement>(null);
-  const closeButton = useRef<HTMLButtonElement>(null);
-  const returnFocus = useRef<HTMLElement | null>(null);
-
-  const close = () => useWorld.getState().setFocus(null);
-
-  // Abrir con el nuevo focus; cerrar animando antes de desmontar.
+  // Se conserva el último contenido mientras el panel anima la salida.
+  const [shown, setShown] = useState<Detail | null>(null);
   useEffect(() => {
-    if (focus) {
-      if (!shown) returnFocus.current = document.activeElement as HTMLElement | null;
-      setShown(focus);
-      return;
-    }
-    if (!shown || !panel.current) return;
-    const reduced = prefersReducedMotion();
-    const tl = gsap.timeline({ onComplete: () => setShown(null) });
-    tl.to(panel.current, {
-      ...(isDesktop() ? { xPercent: 100 } : { yPercent: 100 }),
-      opacity: 0,
-      duration: reduced ? 0 : DUR.base * 0.7,
-      ease: EASE.exit,
-    }).to(backdrop.current, { opacity: 0, duration: reduced ? 0 : DUR.fast }, 0);
-    return () => {
-      tl.kill();
-    };
+    if (isDetail(focus)) setShown(focus);
   }, [focus]);
+  const close = () => useWorld.getState().setFocus(null);
+  const { mounted, panel, backdrop, initialFocus, onKeyDown } = useDialog(isDetail(focus), close);
+  const title = useRef<HTMLHeadingElement>(null);
 
-  // Entrada, bloqueo de scroll y devolución del foco.
-  const isOpen = shown !== null;
-  useLayoutEffect(() => {
-    if (!isOpen || !panel.current) return;
-    const root = document.documentElement;
-    const previousOverflow = root.style.overflow;
-    root.style.overflow = 'hidden';
-    const reduced = prefersReducedMotion();
-    gsap.fromTo(
-      panel.current,
-      { ...(isDesktop() ? { xPercent: 100 } : { yPercent: 100 }), opacity: 0 },
-      { xPercent: 0, yPercent: 0, opacity: 1, duration: reduced ? 0 : DUR.base, ease: EASE.enter },
-    );
-    gsap.fromTo(backdrop.current, { opacity: 0 }, { opacity: 1, duration: reduced ? 0 : DUR.base });
-    closeButton.current?.focus({ preventScroll: true });
-    return () => {
-      root.style.overflow = previousOverflow;
-      returnFocus.current?.focus?.({ preventScroll: true });
-    };
-  }, [isOpen]);
-
-  const item = shown ? resolve(shown, content, lang, t) : null;
+  const item = shown ? resolve(shown, content, lang, t, pick) : null;
   const itemKey = shown ? `${JSON.stringify(shown)}-${lang}` : '';
 
   // Título por palabras cada vez que cambia el contenido o el idioma.
   useLayoutEffect(() => {
     if (!title.current) return;
     return revealText(title.current, { by: 'words', delay: 0.15, duration: DUR.base });
-  }, [itemKey]);
+  }, [itemKey, mounted]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen]);
-
-  function trapTab(e: KeyboardEvent<HTMLElement>) {
-    if (e.key !== 'Tab' || !panel.current) return;
-    const items = [...panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)];
-    if (items.length === 0) return;
-    const first = items[0];
-    const last = items[items.length - 1];
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
-      first.focus();
-    }
-  }
-
-  if (!shown || !item) return null;
+  if (!mounted || !item) return null;
 
   return (
     <>
@@ -149,7 +101,7 @@ export function Panel({ content }: { content: WorldContent }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="panel-title"
-        onKeyDown={trapTab}
+        onKeyDown={onKeyDown}
         className="fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-y-auto rounded-t-2xl border-t border-white/10 bg-void/85 p-6 pb-10 backdrop-blur-xl md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:max-h-none md:w-[440px] md:rounded-none md:border-t-0 md:border-l md:p-10"
       >
         <div className="flex items-start justify-between gap-6">
@@ -157,7 +109,7 @@ export function Panel({ content }: { content: WorldContent }) {
             {t(item.eyebrow)}
           </p>
           <button
-            ref={closeButton}
+            ref={initialFocus}
             type="button"
             onClick={close}
             aria-label={t('panel.close')}
@@ -182,15 +134,20 @@ export function Panel({ content }: { content: WorldContent }) {
             ))}
           </ul>
         )}
-        {item.link && (
-          <a
-            href={item.link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-block text-xs uppercase tracking-[0.25em] text-glow underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-glow"
-          >
-            {t(item.link.label)} ↗
-          </a>
+        {item.links && item.links.length > 0 && (
+          <p className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
+            {item.links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs uppercase tracking-[0.25em] text-glow underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-glow"
+              >
+                {link.label} ↗
+              </a>
+            ))}
+          </p>
         )}
       </aside>
     </>

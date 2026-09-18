@@ -1,0 +1,16 @@
+{
+  "order": 6,
+  "title": { "en": "IoT for the SDGs", "es": "IoT para los ODS" },
+  "role": { "en": "Hackathon winner", "es": "Ganador de la hackathon" },
+  "summary": { "en": "Winning IoT solution at Arduino Days Colombia 2025.", "es": "Solución IoT ganadora en Arduino Days Colombia 2025." },
+  "description": {
+    "en": "An IoT solution addressing the UN Sustainable Development Goals, awarded first place by Universidad de Manizales, Centro de Ciencias Francisco José de Caldas, Seeed Studio and the Young AI Leaders Community.",
+    "es": "Una solución IoT orientada a los Objetivos de Desarrollo Sostenible de la ONU, premiada con el primer lugar por la Universidad de Manizales, el Centro de Ciencias Francisco José de Caldas, Seeed Studio y la comunidad Young AI Leaders."
+  },
+  "stack": ["Arduino", "C++", "IoT", "Seeed Studio"],
+  "links": {
+    "extra": [{ "label": { "en": "Certificate", "es": "Certificado" }, "url": "https://drive.google.com/file/d/1ew0thcQirrNrKjARACCiXNtlMey9og0h/view?usp=drive_link" }]
+  },
+  "building": { "chip": "can", "height": 1.0, "connectsTo": ["micros-learn"] },
+  "year": 2025
+}

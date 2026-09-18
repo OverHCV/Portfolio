@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useWorld, type WorldState } from '../store';
 import { musicAt, pierLocal } from '../acts/Act3Pier/timeline';
+import { audioContext } from './context';
 
 const NOCTURNE_SRC = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}audio/nocturne-op9-1.mp3`;
 /** Constante de tiempo del fundido de volumen (s). */
@@ -23,23 +24,25 @@ class Track {
 
   /** Llamar dentro del gesto del usuario: crea el grafo y "desbloquea" el elemento en Safari. */
   unlock() {
-    if (!this.ctx) {
-      this.ctx = new AudioContext();
-      this.el = new Audio(this.src);
-      this.el.loop = true;
-      this.el.preload = 'none';
-      this.gain = this.ctx.createGain();
-      this.gain.gain.value = 0;
-      this.ctx.createMediaElementSource(this.el).connect(this.gain).connect(this.ctx.destination);
-      const el = this.el;
-      void el.play().then(
-        () => {
-          if (this.target === 0) el.pause();
-        },
-        () => {},
-      );
+    // Ya creado: solo reanuda el contexto si el navegador lo suspendió.
+    if (this.ctx) {
+      audioContext();
+      return;
     }
-    if (this.ctx.state !== 'running') void this.ctx.resume();
+    this.ctx = audioContext();
+    this.el = new Audio(this.src);
+    this.el.loop = true;
+    this.el.preload = 'none';
+    this.gain = this.ctx.createGain();
+    this.gain.gain.value = 0;
+    this.ctx.createMediaElementSource(this.el).connect(this.gain).connect(this.ctx.destination);
+    const el = this.el;
+    void el.play().then(
+      () => {
+        if (this.target === 0) el.pause();
+      },
+      () => {},
+    );
   }
 
   setVolume(volume: number) {

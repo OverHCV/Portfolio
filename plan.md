@@ -66,7 +66,7 @@ Cada sección clásica vive en **un solo** acto. El orden cuenta una historia: q
 Muelle de noche, mar oscuro, medusas bioluminiscentes bajo y sobre el agua, y el faro al fondo. Representa el camino recorrido — *no todo es instantáneo en esta vida*.
 
 - **Qué se muestra:**
-  1. **Llegada y construcción:** flotas sobre el mar abierto bajo la luna; la malla del hiperespacio se disuelve en agua. El faro (el destino) sale del mar a lo lejos y el muelle se arma **rápido**, tabla a tabla, desde el faro hacia la cámara, con un leve efecto ojo de pez, hasta que la última tabla queda bajo tus pies: el primer contacto con tierra.
+  1. **Llegada y construcción:** flotas sobre el mar abierto bajo la luna: el paisaje aplanado se desvaneció y quedó el agua. El faro (el destino) sale del mar a lo lejos y el muelle se arma **rápido**, tabla a tabla, desde el faro hacia la cámara, con un leve efecto ojo de pez, hasta que la última tabla queda bajo tus pies: el primer contacto con tierra.
   2. **Recorrido:** la cámara avanza por el muelle hacia el faro. A los lados flotan las **medusas; cada medusa = un hito de tu trayectoria**, en orden cronológico (el más antiguo primero, el más reciente junto al faro). El color de la medusa indica el tipo: empleo, prácticas, estudios, certificación, reconocimiento.
   3. Los **faroles** del muelle son solo luz: se encienden al pasar, sin contenido.
 - **Qué se hace:**
@@ -75,14 +75,14 @@ Muelle de noche, mar oscuro, medusas bioluminiscentes bajo y sobre el agua, y el
   - Música: Chopin, *Nocturno Op. 9 No. 1* (piano). Arranca casi inaudible al terminar la construcción, sube con el recorrido y se apaga al entrar al faro.
 - **Contenido que carga:** colección `milestones`.
 - **Cámara:** perspectiva a altura de ojos mirando al faro; el mouse deja mirar a los lados (al mar, a las medusas).
-- **Notas técnicas:** tablas y faroles con `InstancedMesh`; medusas = geometría procedural + shader emisivo con pulso; agua con Gerstner ligero o `react-three-ocean`. Luces reales solo en los 2–3 faroles más cercanos; el resto emisivo + bloom.
-- **Transición → 4:** cruzar la puerta del faro: fundido a negro breve y ya estás dentro.
+- **Notas técnicas:** tablas y faroles con `InstancedMesh`; medusas = geometría procedural + shader emisivo con pulso; agua = `Water` de three.js (el de `react-three-ocean`): reflejo planar real + normales animadas. Luces reales solo en los 2–3 faroles más cercanos; el resto emisivo + bloom.
+- **Transición → 4:** al llegar, la puerta del faro se abre hacia el muelle y sale la luz del interior; al cruzarla, fundido a negro breve y ya estás dentro.
 
 ### Acto 4 — El faro (Stack)
 - **Qué se muestra:** el interior del faro: cuarto circular casi vacío, un solo foco de luz, un piano de cola y un violín recostado.
 - **Qué se hace:**
   1. **El piano:** al entrar lo ves completo. Las teclas se pueden tocar (hover/clic suena la nota); no llevan etiquetas — el piano representa dedicación y esfuerzo, no un listado.
-  2. **La partitura:** al seguir haciendo scroll, la cámara se acerca al atril. La partitura se vuelve un **álbum**: arrastras con el mouse para pasar hojas, y cada hoja es una familia de tu stack (lenguajes, frameworks, infraestructura, herramientas…) con sus tecnologías.
+  2. **La partitura:** al seguir haciendo scroll, la cámara se acerca al atril y se queda quieta. La partitura es un **álbum**: clic en la esquina de la hoja la pasa, y arrastrarla la dobla y la pasa (el scroll no pasa hojas). Cada hoja es un "movimiento": una familia de tu stack (lenguajes, web y backend, IA y datos, bases de datos, cloud, arquitectura, idiomas) con cada tecnología como una nota y su dinámica (p / mf / f).
   - Música: *Liebestraum No. 3* (Liszt) en violín. Entra al cruzar la puerta y se apaga en el super zoom de salida.
 - **Contenido que carga:** colección `skills`.
 - **Cámara:** perspectiva; plano general del piano → acercamiento al atril guiado por el scroll.
@@ -90,13 +90,14 @@ Muelle de noche, mar oscuro, medusas bioluminiscentes bajo y sobre el agua, y el
 - **Transición → 5:** la cámara sube a vista superior y hace zoom dentro del piano; se funde a un color plano ("super zoom") y aparece la ciudad-circuito.
 
 ### Acto 5 — Dentro del piano (Projects + Contact)
-- **Qué se muestra:** vista isométrica de una ciudad-circuito. **Edificios = proyectos** (hacer un proyecto es como construir una casa). **Calles = trazas de circuito** por las que viajan pulsos de energía: todo se coordina.
+- **Qué se muestra:** una **PCB vista en isométrico (2.5D)**: máscara negra mate, cobre dorado, serigrafía clara. **Chips = proyectos** (hacer un proyecto es como construir un edificio), cada uno en su distrito de una grilla de 4 × 4 (máximo 16; los zócalos libres quedan como huellas sin poblar). **Calles = pistas de circuito** entre proyectos relacionados, con pulsos de energía: todo se coordina. El resto es una placa realista generada: abanicos de pistas desde los pines, buses, vías, pasivos, conectores en el borde.
 - **Qué se hace:**
-  - Clic en un edificio → detalle del proyecto (problema, stack, arquitectura, links a repo/demo). Los pulsos de las calles conectadas se intensifican.
-  - **Buzón = Contact:** clic → zoom, se abre y sale una hoja de papel con el formulario (nombre / email / asunto / mensaje). Si hay blog, se menciona ahí ("también escribo en…"). Debajo, botones circulares tipo sello postal: GitHub, LinkedIn, Dribbble, Twitter.
-- **Contenido que carga:** `projects`, `posts` (solo para la mención en el buzón), `site.email`, `site.socials`.
-- **Cámara:** ortográfica isométrica fija; el scroll desplaza (pan) sobre la ciudad y termina en el buzón.
-- **Notas técnicas:** pulsos = shader sobre las líneas de las calles. El formulario es HTML real en el overlay.
+  - Tras el fundido dorado se ve la placa entera y se **enciende** desde el centro (las pistas se iluminan, los componentes se levantan); luego la cámara baja y recorre los distritos por filas diagonales.
+  - Hover en un chip → se levanta y sus calles brillan; la tarjeta breve sigue al chip en hover o al más cercano. Clic → panel del proyecto (rol, año, descripción, stack, links a repo/demo/otros).
+  - **Buzón = Contact:** al final del recorrido, en la esquina de la placa. Clic → la tapa se abre y sale una hoja de papel con el formulario (nombre / email / asunto / mensaje). Si hay blog, se menciona ahí. Debajo, sellos postales con las redes.
+- **Contenido que carga:** `projects` (orden por `order`, luego año), `posts` (solo la mención), `site.email`, `site.socials`.
+- **Cámara:** perspectiva **telefoto** (FOV 10°, muy lejos) en ángulo isométrico: se ve casi ortográfica. El scroll hace pan sobre la placa y termina en el buzón.
+- **Notas técnicas:** placa generada de forma determinista desde los proyectos (A* con giros a 45° para las calles; cruzar otra calle baja a la capa inferior con vías). Todo en ~10 draw calls: pistas en una geometría, pads y rótulos instanciados, componentes como cajas y cilindros instanciados con sombreado de 3 tonos por cara. **Paleta cambiable en caliente** (`theme.ts` → `CITY_PALETTES`, `applyCityPalette`). El formulario es HTML real en el overlay.
 
 ---
 
@@ -142,10 +143,11 @@ Solo se monta el acto actual y sus vecinos; instancing para todo lo repetido; mo
 
 ## 5. Preguntas abiertas / próximos pasos
 
-- [ ] Lista real de hitos para las medusas: empleos/prácticas, grado, certificaciones (tipo, institución, título, fechas, 1–2 líneas).
+- [x] Lista real de hitos para las medusas (desde el CV). Pendiente: meses exactos de inicio/fin de empleos y grado.
 - [ ] Los 5–7 fragmentos de tu presentación para los puntos del Acto 2.
-- [ ] Familias del stack y qué tecnologías van en cada hoja de la partitura.
+- [x] Familias del stack y qué tecnologías van en cada hoja de la partitura (siete hojas, desde el CV).
 - [ ] Grabaciones concretas con licencia libre: ~~Chopin~~ (ya está Op. 9 No. 1; falta fuente/licencia en `CREDITS.md`) y Liszt Liebestraum No. 3 (violín).
-- [ ] Proyectos para la ciudad (y qué proyectos se conectan entre sí → calles).
+- [x] Proyectos para la ciudad desde el CV (8, borrador) y sus conexiones. Pendiente: el resto de proyectos (hasta 16) y revisar textos.
+- [ ] Crear la key de Web3Forms (`PUBLIC_WEB3FORMS_KEY`); sin ella el buzón abre el correo (`mailto:`).
 - [ ] Tipografía final del Hero (probar `Fraunces` con tu nombre `Over Haider Castrillón Valencia`).
 - [ ] Orden de construcción: ver hitos en `ARCHITECTURE.md` (Actos 1 + 2 primero para validar la cámara).

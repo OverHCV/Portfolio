@@ -1,0 +1,17 @@
+{
+  "order": 2,
+  "title": { "en": "Complexum / Proyecto-2025A", "es": "Complexum / Proyecto-2025A" },
+  "role": { "en": "Author & maintainer", "es": "Autor y mantenedor" },
+  "summary": { "en": "Open-source framework for the NP-hard MIP problem under IIT 4.0.", "es": "Framework abierto para el problema NP-difícil MIP bajo IIT 4.0." },
+  "description": {
+    "en": "Python framework for the Minimum Information Partition problem in Integrated Information Theory 4.0. Backbone of the university algorithms course: strategies are injected as modules and run concurrently. Adopted by more than 63 student teams and auto-documented on DeepWiki.",
+    "es": "Framework en Python para el problema de la Partición de Mínima Información en la Teoría de la Información Integrada 4.0. Columna vertebral del curso de algoritmos de la universidad: las estrategias se inyectan como módulos y se ejecutan en paralelo. Adoptado por más de 63 equipos de estudiantes y documentado automáticamente en DeepWiki."
+  },
+  "stack": ["Python", "UV", "PyPhi"],
+  "links": {
+    "repo": "https://github.com/Complexum/Proyecto-2025A",
+    "extra": [{ "label": "DeepWiki", "url": "https://deepwiki.com/Complexum/Proyecto-2025A" }]
+  },
+  "building": { "chip": "qfp", "height": 0.9, "connectsTo": ["intel-ii"] },
+  "year": 2025
+}

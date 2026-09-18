@@ -4,26 +4,28 @@ import Base from '../layouts/Base.astro';
 import L from '../components/L.astro';
 import World from '../world/World';
 import { ACTS } from '../world/acts.config';
+import { CITY_SLOTS } from '../world/acts/Act5City/layout';
 import { uiL10n } from '../i18n/translate';
 import site from '../content/site.json';
-import type { Site, SkillFamily, WorldContent } from '../world/types';
+import type { Site, WorldContent } from '../world/types';
 
 const entries = <T,>(list: { id: string; data: T }[]) => list.map(({ id, data }) => ({ id, ...data }));
 
 const bio = entries(await getCollection('bio')).sort((a, b) => a.order - b.order);
 const milestones = entries(await getCollection('milestones')).sort((a, b) => a.start.localeCompare(b.start));
-const skills = entries(await getCollection('skills')).sort((a, b) => a.order - b.order);
-const projects = entries(await getCollection('projects')).sort((a, b) => b.year - a.year);
+const stack = entries(await getCollection('skills')).sort((a, b) => a.order - b.order);
+// La placa del Acto 5 tiene 16 zócalos: con más proyectos no caben (Act5City/layout.ts, CITY_SLOTS).
+const projects = entries(await getCollection('projects')).sort(
+  (a, b) => (a.order ?? Infinity) - (b.order ?? Infinity) || b.year - a.year,
+);
+if (projects.length > CITY_SLOTS) {
+  throw new Error(`src/content/projects: ${projects.length} proyectos; la ciudad del Acto 5 admite ${CITY_SLOTS} como máximo.`);
+}
 const posts = (await getCollection('posts'))
   .map(({ id, data }) => ({ slug: id, ...data }))
   .sort((a, b) => b.date.localeCompare(a.date));
 
-const content: WorldContent = { site: site as Site, bio, milestones, skills, projects, posts };
-
-const families: SkillFamily[] = ['language', 'framework', 'infra', 'data', 'tool'];
-const skillsByFamily = families
-  .map((family) => ({ family, items: skills.filter((s) => s.family === family) }))
-  .filter((g) => g.items.length > 0);
+const content: WorldContent = { site: site as Site, bio, milestones, stack, projects, posts };
 
 const actTitle = (key: string) => uiL10n(`acts.${key}`);
 const [galaxy, field, pier, lighthouse, city] = ACTS;
@@ -77,11 +79,19 @@ const [galaxy, field, pier, lighthouse, city] = ACTS;
     <section id={lighthouse.key}>
       <h2 class="font-display text-3xl"><L text={actTitle(lighthouse.key)} /></h2>
       {
-        skillsByFamily.map((g) => (
+        stack.map((sheet) => (
           <div class="mt-6">
-            <h3 class="text-lg font-medium"><L text={uiL10n(`skills.family.${g.family}`)} /></h3>
+            <h3 class="text-lg font-medium"><L text={sheet.title} /></h3>
+            <p class="text-sm italic text-mist"><L text={sheet.epigraph} /></p>
             <ul class="mt-1 flex flex-wrap gap-x-4 text-mist">
-              {g.items.map((s) => <li>{s.label}</li>)}
+              {
+                sheet.items.map((item) => (
+                  <li>
+                    {typeof item.label === 'string' ? item.label : <L text={item.label} />}
+                    {item.note && <> (<L text={item.note} />)</>}
+                  </li>
+                ))
+              }
             </ul>
           </div>
         ))
@@ -94,11 +104,13 @@ const [galaxy, field, pier, lighthouse, city] = ACTS;
         projects.map((p) => (
           <article class="mt-6">
             <h3 class="text-lg font-medium"><L text={p.title} /> <span class="text-mist">({p.year})</span></h3>
+            {p.role && <p class="text-sm text-mist"><L text={p.role} /></p>}
             <p class="text-mist"><L text={p.description} /></p>
             <p class="text-sm text-mist">{p.stack.join(' · ')}</p>
             <p class="space-x-4 text-sm">
               {p.links.repo && <a class="underline" href={p.links.repo}><L text={uiL10n('project.repo')} /></a>}
               {p.links.demo && <a class="underline" href={p.links.demo}><L text={uiL10n('project.demo')} /></a>}
+              {p.links.extra?.map((link) => <a class="underline" href={link.url}>{typeof link.label === 'string' ? link.label : <L text={link.label} />}</a>)}
             </p>
           </article>
         ))

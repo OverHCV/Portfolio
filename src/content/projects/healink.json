@@ -1,0 +1,17 @@
+{
+  "order": 4,
+  "title": { "en": "Healink", "es": "Healink" },
+  "role": { "en": "Capstone · full-stack lead", "es": "Proyecto de grado · líder full-stack" },
+  "summary": { "en": "Cardiovascular health platform with a multi-agent system.", "es": "Plataforma de salud cardiovascular con un sistema multiagente." },
+  "description": {
+    "en": "Three decoupled services: a Spring Boot 3 backend (DDD, JWT + RBAC), a FastAPI machine-learning engine and a Next.js 14 frontend. A multi-agent system handles triage, risk prediction, recommendations and a chatbot.",
+    "es": "Tres servicios desacoplados: un backend en Spring Boot 3 (DDD, JWT + RBAC), un motor de aprendizaje automático en FastAPI y un frontend en Next.js 14. Un sistema multiagente se encarga del triaje, la predicción de riesgo, las recomendaciones y un chatbot."
+  },
+  "stack": ["Java", "Spring Boot", "Python", "FastAPI", "Next.js", "PostgreSQL", "Docker"],
+  "links": {
+    "repo": "https://github.com/Healink-UC/Spring-Logic",
+    "extra": [{ "label": "FastAPI", "url": "https://github.com/Healink-UC/FastAPI-Back" }]
+  },
+  "building": { "chip": "module", "height": 1.2, "connectsTo": ["homehealtech"] },
+  "year": 2025
+}

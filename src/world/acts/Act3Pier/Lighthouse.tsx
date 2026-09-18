@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { AdditiveBlending, Color, DoubleSide, type Group, type MeshBasicMaterial, ShaderMaterial } from 'three';
+import { AdditiveBlending, Color, type Group, type MeshBasicMaterial, MeshStandardMaterial } from 'three';
 import { COLORS } from '../../theme';
+import { createBeamMaterial } from '../../lib/beamMaterial';
+import { getHaloTexture } from '../../lib/haloTexture';
 import { LIGHTHOUSE, PIER } from './layout';
 import type { PierFrame } from './frame';
 
@@ -9,49 +11,32 @@ const TOWER = { top: 1.55, bottom: LIGHTHOUSE.radius, height: 12.5 };
 const LANTERN_Y = PIER.deck + TOWER.height + 0.95;
 const BEAM_LENGTH = 48;
 const WARM = new Color(COLORS.glow);
-
-// Haz: cono abierto, más intenso junto a la linterna; sin niebla, para que se lea sobre el mar oscuro.
-const beamVertex = /* glsl */ `
-varying float vAlong;
-void main() {
-  vAlong = uv.y;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-const beamFragment = /* glsl */ `
-uniform vec3 uColor;
-uniform float uIntensity;
-varying float vAlong;
-void main() {
-  gl_FragColor = vec4(uColor * pow(vAlong, 3.0) * uIntensity, 1.0);
-}
-`;
+const DOOR = { width: 1.1, height: 2.1 } as const;
+/** Cuánto gira cada hoja al abrirse del todo (rad), hacia el muelle. */
+const DOOR_SWING = 1.75;
 
 /**
  * El faro al final del muelle: base de roca, torre, linterna cálida con un haz que gira despacio y la
- * puerta que lleva al Acto 4. Sale del mar al empezar la construcción (`frame.lighthouse`).
+ * puerta que lleva al Acto 4. Sale del mar al empezar la construcción (`frame.lighthouse`); al final
+ * del recorrido la puerta se abre hacia el muelle y deja salir la luz del interior (`frame.door`).
  */
 export function Lighthouse({ frame }: { frame: PierFrame }) {
   const root = useRef<Group>(null);
   const beams = useRef<Group>(null);
   const lantern = useRef<MeshBasicMaterial>(null);
-  const door = useRef<MeshBasicMaterial>(null);
+  const doorway = useRef<MeshBasicMaterial>(null);
+  const spill = useRef<MeshBasicMaterial>(null);
+  const leaves = useRef<(Group | null)[]>([]);
 
-  const beamMaterial = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader: beamVertex,
-        fragmentShader: beamFragment,
-        uniforms: { uColor: { value: WARM }, uIntensity: { value: 0 } },
-        transparent: true,
-        depthWrite: false,
-        blending: AdditiveBlending,
-        side: DoubleSide,
-        toneMapped: false,
-      }),
-    [],
+  const beamMaterial = useMemo(() => createBeamMaterial(WARM), []);
+  const leafMaterial = useMemo(() => new MeshStandardMaterial({ color: '#2b2019', roughness: 0.8, emissive: WARM.clone() }), []);
+  useEffect(
+    () => () => {
+      beamMaterial.dispose();
+      leafMaterial.dispose();
+    },
+    [beamMaterial, leafMaterial],
   );
-  useEffect(() => () => beamMaterial.dispose(), [beamMaterial]);
 
   useFrame(() => {
     const rise = frame.lighthouse;
@@ -60,9 +45,16 @@ export function Lighthouse({ frame }: { frame: PierFrame }) {
     root.current.position.y = -(1 - rise) * (TOWER.height + 5);
     if (beams.current) beams.current.rotation.y = frame.time * 0.3;
     const light = rise * rise;
-    beamMaterial.uniforms.uIntensity.value = 0.09 * light;
+    beamMaterial.uniforms.uIntensity.value = 0.07 * light;
     lantern.current?.color.copy(WARM).multiplyScalar(0.3 + 2.4 * light);
-    door.current?.color.copy(WARM).multiplyScalar(0.05 + 0.45 * light);
+    // Cerrada, la puerta es un rectángulo cálido tenue (el destino); abierta, la luz del interior sale al muelle.
+    const open = frame.door;
+    doorway.current?.color.copy(WARM).multiplyScalar(0.05 + 0.45 * light + 2.2 * open);
+    leafMaterial.emissive.copy(WARM).multiplyScalar(0.06 + 0.2 * light);
+    if (spill.current) spill.current.opacity = 0.55 * open;
+    leaves.current.forEach((leaf, i) => {
+      if (leaf) leaf.rotation.y = (i === 0 ? -1 : 1) * DOOR_SWING * open * open * (3 - 2 * open);
+    });
   });
 
   return (
@@ -90,20 +82,42 @@ export function Lighthouse({ frame }: { frame: PierFrame }) {
           <coneGeometry args={[1.45, 1.1, 24]} />
           <meshStandardMaterial color="#1a1c20" roughness={0.6} metalness={0.3} />
         </mesh>
-        {/* Dos haces opuestos: el vértice del cono en la linterna. */}
+        {/* Dos haces opuestos. El cono gira +90° en z: su vértice (+y) apunta a −x y, con el
+            desplazamiento +L/2, queda justo en la linterna; la boca se abre hacia +x. */}
         <group ref={beams} position={[0, LANTERN_Y, 0]}>
           {[0, Math.PI].map((yaw) => (
             <group key={yaw} rotation={[0, yaw, 0]}>
-              <mesh rotation={[0, 0, -Math.PI / 2]} position={[BEAM_LENGTH / 2, 0, 0]} material={beamMaterial}>
+              <mesh rotation={[0, 0, Math.PI / 2]} position={[BEAM_LENGTH / 2, 0, 0]} material={beamMaterial}>
                 <coneGeometry args={[4.5, BEAM_LENGTH, 32, 1, true]} />
               </mesh>
             </group>
           ))}
         </group>
-        {/* La puerta mira al muelle; cruzarla es la transición `door` al Acto 4. */}
-        <mesh position={[0, PIER.deck + 1.05, TOWER.bottom + 0.02]}>
-          <planeGeometry args={[1.1, 2.1]} />
-          <meshBasicMaterial ref={door} color={WARM} toneMapped={false} />
+        {/* La puerta mira al muelle; cruzarla es la transición `door` al Acto 4. Detrás de las hojas,
+            el vano iluminado del interior. */}
+        <group position={[0, PIER.deck + DOOR.height / 2, TOWER.bottom]}>
+          <mesh position={[0, 0, 0.01]}>
+            <planeGeometry args={[DOOR.width, DOOR.height]} />
+            <meshBasicMaterial ref={doorway} color={WARM} toneMapped={false} />
+          </mesh>
+          {[-1, 1].map((side, i) => (
+            <group
+              key={side}
+              ref={(g) => {
+                leaves.current[i] = g;
+              }}
+              position={[(side * DOOR.width) / 2, 0, 0.03]}
+            >
+              <mesh position={[(-side * DOOR.width) / 4, 0, 0]} material={leafMaterial}>
+                <boxGeometry args={[DOOR.width / 2 - 0.01, DOOR.height - 0.02, 0.05]} />
+              </mesh>
+            </group>
+          ))}
+        </group>
+        {/* La luz de la puerta abierta sobre las tablas. */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, PIER.deck + 0.02, TOWER.bottom + 1.4]}>
+          <planeGeometry args={[2.6, 3.4]} />
+          <meshBasicMaterial ref={spill} map={getHaloTexture()} color={WARM} transparent opacity={0} blending={AdditiveBlending} depthWrite={false} toneMapped={false} />
         </mesh>
       </group>
     </group>

@@ -1,0 +1,14 @@
+{
+  "order": 5,
+  "title": { "en": "HomeHealTech", "es": "HomeHealTech" },
+  "role": { "en": "Path-planning & developer lead", "es": "Líder de planeación y desarrollo" },
+  "summary": { "en": "Telemedicine with real-time AI disease detection.", "es": "Telemedicina con detección de enfermedades por IA en tiempo real." },
+  "description": {
+    "en": "Telemedicine platform with a real-time AI disease-detection module, built with Juliana Gómez and PhD Reinel Tabares Soto: React frontend, FastAPI backend and a predictive machine-learning pipeline.",
+    "es": "Plataforma de telemedicina con un módulo de detección de enfermedades por IA en tiempo real, construida con Juliana Gómez y el PhD Reinel Tabares Soto: frontend en React, backend en FastAPI y un pipeline predictivo de aprendizaje automático."
+  },
+  "stack": ["React", "FastAPI", "Python", "scikit-learn"],
+  "links": {},
+  "building": { "chip": "qfp", "height": 0.8, "connectsTo": [] },
+  "year": 2024
+}

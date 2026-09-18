@@ -14,6 +14,9 @@ import { Starfield } from './sky/Starfield';
 import { HeroOverlay } from './overlay/HeroOverlay';
 import { FieldOverlay } from './overlay/FieldOverlay';
 import { JourneyOverlay } from './overlay/JourneyOverlay';
+import { LighthouseOverlay } from './overlay/LighthouseOverlay';
+import { CityOverlay } from './overlay/CityOverlay';
+import { ContactSheet } from './overlay/ContactSheet';
 import { Navbar } from './overlay/Navbar';
 import { Panel } from './overlay/Panel';
 import { TransitionVeil } from './overlay/TransitionVeil';
@@ -79,8 +82,11 @@ function WorldScene({ content }: { content: WorldContent }) {
       <HeroOverlay site={content.site} />
       <FieldOverlay bio={content.bio} />
       <JourneyOverlay milestones={content.milestones} />
+      <LighthouseOverlay stack={content.stack} />
+      <CityOverlay projects={content.projects} />
       <Navbar />
       <Panel content={content} />
+      <ContactSheet site={content.site} posts={content.posts} />
     </>
   );
 }

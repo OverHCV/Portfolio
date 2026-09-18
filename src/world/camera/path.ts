@@ -2,6 +2,10 @@ import { CatmullRomCurve3, Vector3 } from 'three';
 import { ACTS, type ActId } from '../acts.config';
 import { EYE, PIER, PIER_FAR } from '../acts/Act3Pier/layout';
 import { ARRIVE_END, BUILD_END, WALK_END, fisheyeAt, pierLocal } from '../acts/Act3Pier/timeline';
+import { BOOK_AIM, BOOK_DISTANCE, BOOK_NORMAL, PAGE } from '../acts/Act4Lighthouse/layout';
+import { ALBUM_END, ENTER_END, PIANO_END, STAND, albumAt, lighthouseLocal } from '../acts/Act4Lighthouse/timeline';
+import { CITY_DISTANCE, CITY_FOV, CITY_NEAR, ISO_DIR, MAILBOX, ROUTE, type XZ } from '../acts/Act5City/layout';
+import { BOOT_END, MAIL_AT, PAN_END, PAN_START } from '../acts/Act5City/timeline';
 
 /** Centro de cada acto en el mundo. Las escenas se construyen alrededor de su ancla. */
 export const ACT_ANCHORS: Record<ActId, Vector3> = {
@@ -21,6 +25,20 @@ interface Shot {
   t: number;
   position: Vec;
   target: Vec;
+}
+
+/** Toma frente al libro del atril (Acto 4): mira perpendicular a la página desde `distance`. */
+function bookShot(t: number, distance: number): Shot {
+  return { t, position: [0, 1, 2].map((i) => BOOK_AIM[i] + BOOK_NORMAL[i] * distance) as Vec, target: BOOK_AIM };
+}
+
+/**
+ * Toma isométrica del Acto 5: mira `target` sobre la placa desde la diagonal (ISO_DIR), a
+ * `CITY_DISTANCE × zoom`. Con el FOV telefoto se ve casi ortográfica.
+ */
+function isoShot(t: number, [x, z]: XZ, zoom = 1): Shot {
+  const d = CITY_DISTANCE * zoom;
+  return { t, position: [x + ISO_DIR[0] * d, ISO_DIR[1] * d, z + ISO_DIR[2] * d], target: [x, 0, z] };
 }
 
 /** Cuánto se corre el encuadre hacia la izquierda de la cámara: deja libre la columna de texto. */
@@ -65,17 +83,26 @@ const SHOTS: Record<ActId, Shot[]> = {
     { t: WALK_END, position: [0, EYE, PIER_FAR + 2.5], target: [0, EYE + 0.2, PIER_FAR - 8] },
     { t: 1, position: [0, EYE - 0.05, PIER_FAR + 0.6], target: [0, EYE, PIER_FAR - 8] },
   ],
-  // Plano del piano → vista cenital → picado dentro del piano (transición `dive`).
+  // Recién cruzada la puerta → rodea despacio el piano (teclas tocables) → se acerca al atril y se
+  // queda quieta frente al álbum → sube a vista cenital y pica dentro del piano (transición `dive`).
   4: [
-    { t: 0, position: [0, 1.5, 8], target: [0, 0, 0] },
-    { t: 0.45, position: [0, 1.2, 4.5], target: [0, 0, 0] },
-    { t: 0.8, position: [0, 7, 0.6], target: [0, -0.4, 0] },
-    { t: 1, position: [0, 0.6, 0.1], target: [0, -0.5, 0] },
+    { t: 0, position: [0, 1.7, 5.4], target: [0, 0.95, 0] },
+    { t: ENTER_END, position: [0.5, 1.65, 4.5], target: [0, 0.9, 0] },
+    { t: (ENTER_END + PIANO_END) / 2, position: [1.5, 1.6, 3.3], target: [0, 0.85, 0.3] },
+    { t: PIANO_END, position: [0.7, 1.5, 2.3], target: [0, 0.95, 0.5] },
+    bookShot(STAND, BOOK_DISTANCE),
+    bookShot(ALBUM_END, BOOK_DISTANCE - 0.03),
+    { t: 0.93, position: [0.3, 4.6, 0.5], target: [0, 0.8, -0.1] },
+    { t: 1, position: [0, 1.3, 0], target: [0, 0.2, -0.1] },
   ],
-  // Casi isométrica desde arriba; la cámara ortográfica llega en M4.
+  // Tras el fundido dorado se ve la placa entera mientras se enciende → baja al primer distrito →
+  // recorre las filas diagonales (layout.ts, ROUTE) → se acerca al buzón y se queda frente a él.
   5: [
-    { t: 0, position: [0, 10, 10], target: [0, 0, 0] },
-    { t: 1, position: [4, 7, 7], target: [2, 0, 0] },
+    isoShot(0, [0, 2], 2.9),
+    isoShot(BOOT_END, [-2, -1], 2.6),
+    ...ROUTE.map((p, i) => isoShot(PAN_START + ((PAN_END - PAN_START) * i) / (ROUTE.length - 1), p)),
+    isoShot(MAIL_AT, [MAILBOX[0] - 1.5, MAILBOX[1] - 1.5], 0.62),
+    isoShot(1, [MAILBOX[0] - 1.5, MAILBOX[1] - 1.5], 0.6),
   ],
 };
 
@@ -137,6 +164,37 @@ export function sampleCamera(progress: number, outPosition: Vector3, outTarget: 
 export const BASE_FOV = 55;
 const FISHEYE_FOV = 72;
 
+/** Desde aquí la cámara es la telefoto casi ortográfica del Acto 5 (el cambio queda bajo el velo `dive`). */
+const CITY_START = ACTS[4].start;
+
 export function fovAt(progress: number): number {
+  if (progress >= CITY_START) return CITY_FOV;
   return BASE_FOV + (FISHEYE_FOV - BASE_FOV) * fisheyeAt(pierLocal(progress));
+}
+
+/** Plano cercano: la cámara del Acto 5 está muy lejos y necesita la precisión de profundidad. */
+export const BASE_NEAR = 0.1;
+export function nearAt(progress: number): number {
+  return progress >= CITY_START ? CITY_NEAR : BASE_NEAR;
+}
+
+/**
+ * Factor de alejamiento de la ciudad en pantallas angostas: la toma se calcula para 16:9 y en
+ * vertical dejaría fuera medio distrito. 1 fuera del Acto 5.
+ */
+export function cityFitAt(progress: number, aspect: number): number {
+  if (progress < CITY_START || aspect >= 1.3) return 1;
+  return Math.sqrt(1.3 / aspect);
+}
+
+/**
+ * Factor de alejamiento de la toma del atril para que el libro abierto quepa a lo ancho en pantallas
+ * angostas (la toma está calculada para 16:9). 1 fuera del álbum.
+ */
+export function albumFitAt(progress: number, aspect: number, fov = BASE_FOV): number {
+  const album = albumAt(lighthouseLocal(progress));
+  if (album <= 0) return 1;
+  const halfWidth = PAGE.width * 1.25;
+  const needed = halfWidth / (Math.tan(((fov / 2) * Math.PI) / 180) * aspect);
+  return 1 + album * Math.max(0, needed / BOOK_DISTANCE - 1);
 }

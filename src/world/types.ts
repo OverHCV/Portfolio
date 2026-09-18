@@ -34,25 +34,39 @@ export interface Milestone {
   credentialUrl?: string;
 }
 
-export type SkillFamily = 'language' | 'framework' | 'infra' | 'data' | 'tool';
-
-export interface Skill {
-  id: string;
-  label: string;
-  family: SkillFamily;
-  level?: 1 | 2 | 3;
-  order: number;
+/** Una tecnología en una hoja del álbum; el nombre se traduce solo si hace falta. */
+export interface StackItem {
+  label: string | L10n;
+  /** Dominio, dibujado como dinámica musical: 1 = p, 2 = mf, 3 = f. */
+  level: 1 | 2 | 3;
+  note?: L10n;
 }
 
+/** Acto 4 — una hoja del álbum: una familia del stack. */
+export interface StackSheet {
+  id: string;
+  order: number;
+  /** Indicación de tempo (Allegro, Andante…), como el encabezado de un movimiento. */
+  tempo: string;
+  title: L10n;
+  epigraph: L10n;
+  items: StackItem[];
+}
+
+export type ChipKind = 'qfp' | 'bga' | 'dip' | 'can' | 'module';
+
+/** Acto 5 — un chip de la placa. */
 export interface Project {
   id: string;
+  order?: number;
   title: L10n;
+  role?: L10n;
   summary: L10n;
   description: L10n;
   image?: string;
   stack: string[];
-  links: { repo?: string; demo?: string };
-  building: { plot: [number, number]; height: number; connectsTo: string[] };
+  links: { repo?: string; demo?: string; extra?: { label: string | L10n; url: string }[] };
+  building: { chip: ChipKind; height?: number; connectsTo: string[] };
   year: number;
 }
 
@@ -68,7 +82,7 @@ export interface WorldContent {
   site: Site;
   bio: BioFragment[];
   milestones: Milestone[];
-  skills: Skill[];
+  stack: StackSheet[];
   projects: Project[];
   posts: Post[];
 }

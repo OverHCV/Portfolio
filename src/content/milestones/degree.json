@@ -1,11 +1,15 @@
 {
   "kind": "education",
-  "org": "Placeholder university",
-  "title": { "en": "B.Sc. — placeholder", "es": "Pregrado — placeholder" },
+  "org": "Universidad de Caldas",
+  "title": { "en": "B.Sc. — Systems and Computing Engineering", "es": "Pregrado — Ingeniería de Sistemas y Computación" },
   "start": "2021-01",
   "end": "2026-06",
   "summary": {
-    "en": "Placeholder — degree and focus area.",
-    "es": "Placeholder — carrera y énfasis."
+    "en": "GPA 4.2 / 5.0 (major 4.5). Algorithms, intelligent systems, software engineering and mathematics.",
+    "es": "Promedio 4.2 / 5.0 (carrera 4.5). Algoritmos, sistemas inteligentes, ingeniería de software y matemáticas."
+  },
+  "details": {
+    "en": "Cumulative GPA 4.2 / 5.0, major GPA 4.5 / 5.0. Coursework in Analysis & Design of Algorithms, Intelligent Systems, Software Engineering I–III, Operating Systems, Computer Architecture, Calculus I–III, Operations Research, Databases and Computer Networks. Member of the research hotbeds SIMatComPy (computational mathematics with Python) and MatEstApp (mathematics and applied statistics).",
+    "es": "Promedio acumulado 4.2 / 5.0, promedio de carrera 4.5 / 5.0. Cursos de Análisis y Diseño de Algoritmos, Sistemas Inteligentes, Ingeniería de Software I–III, Sistemas Operativos, Arquitectura de Computadores, Cálculo I–III, Investigación de Operaciones, Bases de Datos y Redes. Miembro de los semilleros SIMatComPy (matemática computacional con Python) y MatEstApp (matemáticas y estadística aplicada)."
   }
 }

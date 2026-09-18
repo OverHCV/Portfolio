@@ -1,4 +1,3 @@
-// @ts-check
 import { createRequire } from 'node:module';
 import { defineConfig } from 'astro/config';
 
@@ -28,6 +27,13 @@ export default defineConfig({
         'mathjax-full/js/adaptors/browserAdaptor.js',
         'mathjax-full/js/handlers/html.js',
         'mathjax-full/js/input/tex/AllPackages.js',
+        // Mismo problema con los módulos de three/examples que solo importan los chunks perezosos:
+        // descubrirlos tarde re-optimiza y el import() del acto falla con 504 "Outdated Optimize Dep".
+        'three/examples/jsm/lines/Line2.js',
+        'three/examples/jsm/lines/LineGeometry.js',
+        'three/examples/jsm/lines/LineMaterial.js',
+        'three/examples/jsm/objects/Water.js',
+        'three/examples/jsm/environments/RoomEnvironment.js',
       ],
       esbuildOptions: { define: { PACKAGE_VERSION: MATHJAX_VERSION } },
     },

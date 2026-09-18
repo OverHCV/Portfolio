@@ -4,6 +4,8 @@
 - **blackhole-ts** — Roberto Marchetti, licencia MIT. Shaders de ray marching del agujero negro en modo HD
   (`src/world/acts/Act1Galaxy/hd/`) y texturas en `public/textures/blackhole/`.
   https://github.com/rmarchet/blackhole-ts
+- **three.js** — licencia MIT. `Water` (examples/jsm/objects) para el mar del Acto 3 y su textura de
+  normales `public/textures/water/waternormals.jpg`. https://github.com/mrdoob/three.js
 
 ## Modelos 3D
 - **Low Poly Grand Piano** — Printables #1287354, CC-BY 4.0. Autor: @3DPrintbles_600339.

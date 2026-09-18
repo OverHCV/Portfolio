@@ -3,7 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import { MathUtils, PerspectiveCamera, Vector2, Vector3 } from 'three';
 import { useWorld } from '../store';
 import { useReducedMotion } from '../lib/motion';
-import { BASE_FOV, fovAt, sampleCamera } from './path';
+import { BASE_FOV, albumFitAt, cityFitAt, fovAt, nearAt, sampleCamera } from './path';
+import { albumAt, lighthouseLocal } from '../acts/Act4Lighthouse/timeline';
 import { veilAt } from '../transitions.config';
 
 /** Cuánto gira la cámara con el mouse en los bordes de la pantalla (radianes). */
@@ -23,6 +24,10 @@ export function CameraRig() {
     const delta = Math.min(rawDelta, 0.1);
     const { progress } = useWorld.getState();
     sampleCamera(progress, goalPosition.current, goalTarget.current);
+    // En pantallas angostas la toma del atril y la de la ciudad se alejan para que quepan.
+    const aspect = state.size.width / state.size.height;
+    const fit = albumFitAt(progress, aspect) * cityFitAt(progress, aspect);
+    if (fit !== 1) goalPosition.current.sub(goalTarget.current).multiplyScalar(fit).add(goalTarget.current);
 
     // Bajo el velo opaco la cámara salta a su pose: el suavizado no debe dejar ver el viaje entre actos.
     // Con reduced motion se mantiene el suavizado (evita saltos al navegar); solo se quita el mirar con el mouse.
@@ -42,19 +47,27 @@ export function CameraRig() {
     camera.lookAt(target.current);
 
     // Ojo de pez de la construcción del muelle (Acto 3); con reduced motion el FOV no cambia.
+    // En el Acto 5 la cámara pasa a telefoto (casi ortográfica), sin importar reduced motion.
     if (camera instanceof PerspectiveCamera) {
-      const fov = reducedMotion ? BASE_FOV : fovAt(progress);
-      if (Math.abs(camera.fov - fov) > 1e-3) {
+      const zoomed = fovAt(progress);
+      const fov = reducedMotion && zoomed > BASE_FOV ? BASE_FOV : zoomed;
+      const near = nearAt(progress);
+      if (Math.abs(camera.fov - fov) > 1e-3 || camera.near !== near) {
         camera.fov = fov;
+        camera.near = near;
         camera.updateProjectionMatrix();
       }
     }
 
     if (!reducedMotion) {
-      look.current.x = MathUtils.damp(look.current.x, pointer.x, 3, delta);
-      look.current.y = MathUtils.damp(look.current.y, pointer.y, 3, delta);
-      camera.rotateY(-look.current.x * LOOK_YAW);
-      camera.rotateX(look.current.y * LOOK_PITCH);
+      // Frente al álbum el puntero pasa hojas: la cámara deja de seguirlo.
+      const free = 1 - albumAt(lighthouseLocal(progress));
+      look.current.x = MathUtils.damp(look.current.x, pointer.x * free, 3, delta);
+      look.current.y = MathUtils.damp(look.current.y, pointer.y * free, 3, delta);
+      // Con la telefoto del Acto 5 el mismo giro movería media ciudad: se escala con el FOV.
+      const scale = camera instanceof PerspectiveCamera ? Math.min(1, camera.fov / BASE_FOV) : 1;
+      camera.rotateY(-look.current.x * LOOK_YAW * scale);
+      camera.rotateX(look.current.y * LOOK_PITCH * scale);
     }
   });
 

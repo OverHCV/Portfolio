@@ -1,0 +1,14 @@
+{
+  "order": 1,
+  "title": { "en": "Alter — core AI product", "es": "Alter — producto de IA principal" },
+  "role": { "en": "Founding engineer", "es": "Ingeniero fundador" },
+  "summary": { "en": "End-to-end architecture, backend and cloud of an AI product.", "es": "Arquitectura, backend y nube de punta a punta de un producto de IA." },
+  "description": {
+    "en": "Owned the whole stack of the company's core product: LLM pipelines with RAG and tool-using agents, vector stores and embedding workflows, a layered backend following Screaming Architecture, cloud deployment on Azure and GCP, and N8N automations for business processes.",
+    "es": "A cargo de todo el stack del producto principal de la empresa: pipelines LLM con RAG y agentes con herramientas, bases vectoriales y flujos de embeddings, un backend por capas con Screaming Architecture, despliegue en Azure y GCP, y automatizaciones de procesos de negocio con N8N."
+  },
+  "stack": ["Next.js", "FastAPI", "Node.js", "Docker", "Supabase", "ChromaDB", "Azure", "GCP", "N8N"],
+  "links": {},
+  "building": { "chip": "bga", "height": 1.4, "connectsTo": ["healink", "portfolio-3d"] },
+  "year": 2025
+}

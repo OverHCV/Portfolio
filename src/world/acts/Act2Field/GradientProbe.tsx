@@ -172,7 +172,8 @@ export function GradientProbe({ landscape, chapter, anchor }: { landscape: Lands
         <sphereGeometry args={[0.045, 12, 12]} />
         <meshBasicMaterial color={GLOW.clone().multiplyScalar(2.5)} toneMapped={false} />
       </mesh>
-      <Html position={[0, 0.35, 0]} zIndexRange={[12, 8]} style={{ pointerEvents: 'none' }}>
+      {/* Por encima de todo el overlay: texto (z-10), navbar (z-20), panel (z-30/40). */}
+      <Html position={[0, 0.35, 0]} zIndexRange={[60, 50]} style={{ pointerEvents: 'none' }}>
         <div
           ref={label}
           className="ml-3 text-[12px] text-glow opacity-0 transition-opacity duration-200 [text-shadow:0_1px_3px_#05060a,0_2px_12px_rgba(5,6,10,0.95)]"

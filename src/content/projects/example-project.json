@@ -1,9 +1,0 @@
-{
-  "title": { "en": "Example project", "es": "Proyecto de ejemplo" },
-  "summary": { "en": "Placeholder.", "es": "Placeholder." },
-  "description": { "en": "Placeholder.", "es": "Placeholder." },
-  "stack": ["python", "docker"],
-  "links": {},
-  "building": { "plot": [3, 1], "height": 2, "connectsTo": [] },
-  "year": 2025
-}

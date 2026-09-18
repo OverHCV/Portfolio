@@ -17,7 +17,8 @@ import { EXTENT, type Landscape } from './landscape';
 /**
  * Notación que flota sobre el paisaje. Es decoración (igual en todos los idiomas), no contenido.
  * Cada entrada es TeX real: MathJax la compila a SVG (glifos como trazados, sin fuentes web)
- * y se hornea en un atlas con sombra negra para que se lea al cruzar la malla.
+ * y se hornea en un atlas con una placa oscura por detrás para que las letras
+ * no se mezclen con la malla del paisaje.
  */
 const ENTRIES = [
   String.raw`\mathbb{R}`,
@@ -28,10 +29,9 @@ const ENTRIES = [
   String.raw`\mathbb{Q}`,
   String.raw`\nabla f`,
   String.raw`\frac{\partial f}{\partial x}`,
-  String.raw`\int`,
+  String.raw`\int_{\inf}^{\inf}e^{-x}^2=\sqrt{\pi}`,
   String.raw`\sum_{i=1}^{n}`,
   String.raw`\infty`,
-  String.raw`\pi`,
   String.raw`\lambda`,
   String.raw`\varepsilon`,
   String.raw`\delta`,
@@ -39,22 +39,23 @@ const ENTRIES = [
   String.raw`x_{k+1} = x_k - \eta\,\nabla f(x_k)`,
   String.raw`\nabla f(x^{*}) = 0`,
   String.raw`\hat{f}(x) = \frac{1}{nh} \sum_{i=1}^{n} K\!\left(\frac{x - x_i}{h}\right)`,
-  String.raw`\lVert x \rVert_2`,
-  String.raw`Ax = b`,
   String.raw`d^2(x) = (x - \bar{x})^{\top} S^{-1} (x - \bar{x})`,
   String.raw`\det(A) \ne 0`,
-  String.raw`\mathbb{R}^{n}`,
   String.raw`f : \mathbb{R}^{n} \to \mathbb{R}`,
   String.raw`H(f) \succeq 0`,
 ];
+// String.raw`\mathbb{R}^{n}`,
+// String.raw`\lVert x \rVert_2`,
 
 /** Tamaño tipográfico (em/ex) con el que MathJax compila cada fórmula. */
 const FONT_PX = 64;
 const EX_PX = FONT_PX / 2;
 const ATLAS_WIDTH = 2048;
-const PAD = 16;
-/** Sombra horneada bajo cada fórmula: halo oscuro para separarla de la malla. */
-const SHADOW = { blur: 10, offsetY: 3, alpha: 0.9 };
+/**
+ * Placa oscura horneada detrás de cada fórmula: sin ella, las letras se mezclan con la malla.
+ * `pad` margen interior alrededor de la fórmula; `bleed` alcance del difuminado exterior.
+ */
+const PLATE = { pad: 18, bleed: 16, radius: 12, fill: 0.62, glow: 0.85 };
 
 interface AtlasEntry {
   /** Rect UV (u, v, ancho, alto) con v hacia arriba. */
@@ -124,13 +125,15 @@ async function buildAtlas(): Promise<Atlas> {
   const glyphs = await Promise.all(ENTRIES.map((tex) => rasterize(doc, tex)));
 
   // Empaquetado por filas con alturas reales (fracciones y límites son altos).
+  // Cada celda incluye la placa (pad) y su difuminado (bleed) para que no se corten.
+  const margin = PLATE.pad + PLATE.bleed;
   const placed: { x: number; y: number; w: number; h: number }[] = [];
   let x = 0;
   let y = 0;
   let rowH = 0;
   for (const g of glyphs) {
-    const w = g.w + PAD * 2;
-    const h = g.h + PAD * 2;
+    const w = g.w + margin * 2;
+    const h = g.h + margin * 2;
     if (x + w > ATLAS_WIDTH && x > 0) {
       x = 0;
       y += rowH;
@@ -146,14 +149,22 @@ async function buildAtlas(): Promise<Atlas> {
   canvas.width = ATLAS_WIDTH;
   canvas.height = height;
   const ctx = canvas.getContext('2d')!;
-  ctx.shadowColor = `rgba(0, 0, 0, ${SHADOW.alpha})`;
-  ctx.shadowBlur = SHADOW.blur;
-  ctx.shadowOffsetY = SHADOW.offsetY;
-  glyphs.forEach((g, i) => ctx.drawImage(g.img, placed[i].x + PAD, placed[i].y + PAD, g.w, g.h));
+  // Placa: rectángulo redondeado oscuro con borde exterior suave (la sombra negra por detrás).
+  ctx.shadowColor = `rgba(0, 0, 0, ${PLATE.glow})`;
+  ctx.shadowBlur = PLATE.bleed;
+  ctx.fillStyle = `rgba(0, 0, 0, ${PLATE.fill})`;
+  for (const p of placed) {
+    ctx.beginPath();
+    ctx.roundRect(p.x + PLATE.bleed, p.y + PLATE.bleed, p.w - PLATE.bleed * 2, p.h - PLATE.bleed * 8, PLATE.radius);
+    ctx.fill();
+  }
+  // Fórmula blanca encima de su placa.
+  ctx.shadowColor = 'transparent';
+  glyphs.forEach((g, i) => ctx.drawImage(g.img, placed[i].x + margin, placed[i].y + margin, g.w, g.h));
 
-  const entries = placed.map(({ x: px, y: py, w, h }, i) => ({
+  const entries = placed.map(({ x: px, y: py, w, h }) => ({
     rect: [px / ATLAS_WIDTH, 1 - (py + h) / height, w / ATLAS_WIDTH, h / height] as AtlasEntry['rect'],
-    aspect: glyphs[i].w / glyphs[i].h,
+    aspect: w / h,
   }));
   return { texture: new CanvasTexture(canvas), entries };
 }
@@ -185,7 +196,7 @@ void main() {
   float ends = smoothstep(0.0, 0.2, rise / h) * (1.0 - smoothstep(0.75, 1.0, rise / h));
   // Los que pasan muy cerca de la cámara se apagan: no deben tapar el texto ni el paisaje.
   float near = smoothstep(6.0, 12.0, -mv.z);
-  vAlpha = ends * near * (0.35 + 0.65 * aSeed);
+  vAlpha = ends * near * (0.6 + 0.4 * aSeed);
 }
 `;
 
@@ -199,9 +210,9 @@ varying vec2 vUv;
 varying float vAlpha;
 
 void main() {
-  // Glifo blanco (teñido con uColor) sobre la sombra negra horneada en el atlas.
+  // Fórmula blanca (teñida con uColor) sobre su placa negra horneada en el atlas.
   vec4 t = texture2D(uAtlas, vUv);
-  float a = t.a * vAlpha * uOpacity * uReveal * (1.0 - uCalm) * 0.55;
+  float a = t.a * vAlpha * uOpacity * uReveal * (1.0 - uCalm) * 0.9;
   if (a < 0.004) discard;
   gl_FragColor = vec4(t.rgb * uColor, a);
 }
@@ -219,11 +230,8 @@ export function MathGlyphs({ landscape }: { landscape: Landscape }) {
   useEffect(() => {
     let alive = true;
     buildAtlas().then((a) => {
-      if (alive) {
-        setAtlas(a);
-        // TEMP: gancho de depuración (verificar atlas desde puppeteer).
-        (window as unknown as { __mathAtlas?: Atlas }).__mathAtlas = a;
-      } else a.texture.dispose();
+      if (alive) setAtlas(a);
+      else a.texture.dispose();
     });
     return () => {
       alive = false;

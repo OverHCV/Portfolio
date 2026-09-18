@@ -1,0 +1,14 @@
+{
+  "kind": "certification",
+  "org": "Anthropic",
+  "title": {
+    "en": "Claude Code in Action",
+    "es": "Claude Code in Action"
+  },
+  "start": "2026-03",
+  "summary": {
+    "en": "Agentic software development with Claude Code.",
+    "es": "Desarrollo de software agéntico con Claude Code."
+  },
+  "credentialUrl": "https://drive.google.com/file/d/1LyM5v5Y_OZ5x2E-DWXNzbGXqTmzguMQL/view?usp=sharing"
+}

@@ -11,12 +11,12 @@ export interface PierFrame {
   local: number;
   /** Opacidad del mar: 0 → 1 mientras el paisaje del Acto 2 se funde con él. */
   sea: number;
-  /** Malla del hiperespacio que queda sobre el agua. */
-  grid: number;
   /** Avance de la construcción del muelle. */
   build: { value: number };
   /** El faro saliendo del mar. */
   lighthouse: number;
+  /** Apertura de la puerta del faro (0..1). */
+  door: number;
   /** z de la cámara en coordenadas del acto. */
   cameraZ: number;
   /** Luz de cada farol (0..1), ya multiplicada por lo armado que está. */
@@ -28,15 +28,15 @@ export function createPierFrame(): PierFrame {
     time: 0,
     local: 0,
     sea: 0,
-    grid: 1,
     build: { value: 0 },
     lighthouse: 0,
+    door: 0,
     cameraZ: 0,
     lampGlow: new Float32Array(LAMPS.length),
   };
 }
 
-/** Índices de los `k` faroles encendidos más cercanos a la cámara (para luces reales y reflejos). */
+/** Índices de los `k` faroles encendidos más cercanos a la cámara (para las luces reales). */
 export function nearestLamps(frame: PierFrame, k: number, out: number[]): number[] {
   out.length = 0;
   const order = LAMPS.map((_, i) => i)

@@ -7,7 +7,7 @@ import { useReducedMotion } from '../../lib/motion';
 import type { ActProps } from '../types';
 import { seaHandoff } from '../Act2Field/chapters';
 import { LAMPS, jellyAt } from './layout';
-import { BUILD_END, WALK_END, buildAt, builtAt, gridAt, lampGlow, lighthouseAt, orderAt, pierLocal } from './timeline';
+import { BUILD_END, WALK_END, buildAt, builtAt, doorOpenAt, lampGlow, lighthouseAt, orderAt, pierLocal } from './timeline';
 import { createPierFrame } from './frame';
 import { Ocean } from './Ocean';
 import { Moon } from './Moon';
@@ -39,9 +39,9 @@ export default function Act3Pier({ content }: ActProps) {
     const local = pierLocal(progress);
     frame.local = local;
     frame.sea = seaHandoff(progress);
-    frame.grid = gridAt(local);
     frame.build.value = buildAt(local);
     frame.lighthouse = lighthouseAt(local);
+    frame.door = doorOpenAt(local);
     frame.cameraZ = camera.position.z - anchor.z;
     LAMPS.forEach((lamp, i) => {
       frame.lampGlow[i] = builtAt(orderAt(lamp.z), frame.build.value) * lampGlow(lamp.z, frame.cameraZ);

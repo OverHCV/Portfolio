@@ -34,20 +34,34 @@ const milestones = defineCollection({
   }),
 });
 
+// Una hoja del álbum del Acto 4 por archivo (una familia del stack).
 const skills = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/skills' }),
   schema: z.object({
-    label: z.string(),
-    family: z.enum(['language', 'framework', 'infra', 'data', 'tool']),
-    level: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
     order: z.number(),
+    /** Indicación de tempo de la hoja, como el encabezado de un movimiento (no se traduce). */
+    tempo: z.string(),
+    title: l10n,
+    epigraph: l10n,
+    items: z.array(
+      z.object({
+        label: z.union([z.string(), l10n]),
+        /** Dominio, dibujado como dinámica: 1 = p, 2 = mf, 3 = f. */
+        level: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+        note: l10n.optional(),
+      }),
+    ),
   }),
 });
 
+// Un edificio (chip) de la ciudad-circuito del Acto 5 por archivo; máximo 16 (ver index.astro).
 const projects = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/projects' }),
   schema: z.object({
+    /** Orden en la placa (menor = primero en el recorrido); sin él, por año descendente. */
+    order: z.number().optional(),
     title: l10n,
+    role: l10n.optional(),
     summary: l10n,
     description: l10n,
     image: z.string().optional(),
@@ -55,10 +69,14 @@ const projects = defineCollection({
     links: z.object({
       repo: z.string().url().optional(),
       demo: z.string().url().optional(),
+      extra: z.array(z.object({ label: z.union([z.string(), l10n]), url: z.string().url() })).optional(),
     }),
     building: z.object({
-      plot: z.tuple([z.number(), z.number()]),
-      height: z.number(),
+      /** Encapsulado del chip que lo dibuja. La posición en la placa es automática. */
+      chip: z.enum(['qfp', 'bga', 'dip', 'can', 'module']),
+      /** Altura relativa (≈ 0.5–1.5); por defecto 1. */
+      height: z.number().optional(),
+      /** Ids de proyectos con los que comparte calle (traza). */
       connectsTo: z.array(z.string()),
     }),
     year: z.number(),

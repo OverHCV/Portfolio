@@ -1,0 +1,13 @@
+{
+  "kind": "certification",
+  "org": "IBM Academy",
+  "title": {
+    "en": "Retrieval-Augmented Generation for Enhanced AI Outputs",
+    "es": "Generación Aumentada por Recuperación (RAG)"
+  },
+  "start": "2026-03",
+  "summary": {
+    "en": "Grounding LLM outputs with retrieval.",
+    "es": "Respuestas de LLM ancladas con recuperación."
+  }
+}

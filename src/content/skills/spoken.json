@@ -1,0 +1,13 @@
+{
+  "order": 7,
+  "tempo": "Cantabile",
+  "title": { "en": "Spoken languages", "es": "Idiomas" },
+  "epigraph": {
+    "en": "The languages I think and work in.",
+    "es": "Las lenguas en las que pienso y trabajo."
+  },
+  "items": [
+    { "label": { "en": "Spanish", "es": "Español" }, "note": { "en": "native", "es": "nativo" }, "level": 3 },
+    { "label": { "en": "English", "es": "Inglés" }, "note": { "en": "professional working proficiency", "es": "competencia profesional" }, "level": 2 }
+  ]
+}

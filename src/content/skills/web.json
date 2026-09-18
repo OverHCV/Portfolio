@@ -1,0 +1,23 @@
+{
+  "order": 2,
+  "tempo": "Vivace",
+  "title": { "en": "Web & backend", "es": "Web y backend" },
+  "epigraph": {
+    "en": "From the API to the last pixel.",
+    "es": "De la API al último píxel."
+  },
+  "items": [
+    { "label": "Next.js", "level": 3 },
+    { "label": "React", "level": 3 },
+    { "label": "FastAPI", "level": 3 },
+    { "label": "Node.js", "level": 3 },
+    { "label": "Spring Boot", "level": 3 },
+    { "label": "Astro", "level": 3 },
+    { "label": "Vue", "level": 2 },
+    { "label": "Angular", "level": 2 },
+    { "label": "SolidJS", "level": 2 },
+    { "label": "Axum", "level": 2 },
+    { "label": "Streamlit", "level": 2 },
+    { "label": "Unity (C#)", "level": 2 }
+  ]
+}

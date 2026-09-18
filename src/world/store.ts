@@ -22,6 +22,10 @@ export interface WorldState {
   focus: Focus;
   /** Hito de la tarjeta breve del Acto 3 (medusa en hover o la más cercana). Cambia pocas veces. */
   nearMilestone: string | null;
+  /** Proyecto de la tarjeta breve del Acto 5 (chip en hover o el más cercano al centro). */
+  nearProject: string | null;
+  /** Hoja abierta del álbum del Acto 4 (0 = primera familia del stack). La pasan el álbum y el overlay. */
+  albumPage: number;
   audio: { unlocked: boolean; muted: boolean };
   quality: Quality;
   /** Agujero negro físico (ray marching). Apagado por defecto; se guarda entre visitas. */
@@ -29,6 +33,8 @@ export interface WorldState {
   setProgress(p: number): void;
   setFocus(f: Focus): void;
   setNearMilestone(id: string | null): void;
+  setNearProject(id: string | null): void;
+  setAlbumPage(page: number): void;
   setLang(l: ActiveLang): void;
   setQuality(q: Quality): void;
   toggleMute(): void;
@@ -62,6 +68,8 @@ export const useWorld = create<WorldState>()((set, get) => ({
   lang: initialLang(),
   focus: null,
   nearMilestone: null,
+  nearProject: null,
+  albumPage: 0,
   audio: { unlocked: false, muted: true },
   quality: 'high',
   hd: readFlag(HD_STORAGE_KEY),
@@ -75,6 +83,12 @@ export const useWorld = create<WorldState>()((set, get) => ({
   },
   setNearMilestone(nearMilestone) {
     if (get().nearMilestone !== nearMilestone) set({ nearMilestone });
+  },
+  setNearProject(nearProject) {
+    if (get().nearProject !== nearProject) set({ nearProject });
+  },
+  setAlbumPage(albumPage) {
+    if (get().albumPage !== albumPage) set({ albumPage });
   },
   /** Elección manual del usuario: se guarda y actualiza <html lang>. */
   setLang(lang) {

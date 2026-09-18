@@ -12,7 +12,7 @@ import { smoothstep } from '../../lib/motion';
  */
 export const INTRO_END = 0.08;
 export const OUTRO_START = 0.87;
-export const OUTRO_END = 0.93;
+export const OUTRO_END = 1.1;
 
 /**
  * Largo (en progreso global) del fundido paisaje → mar, que termina justo en la frontera.

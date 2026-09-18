@@ -1,0 +1,14 @@
+{
+  "kind": "certification",
+  "org": "Google",
+  "title": {
+    "en": "Google Cloud Computing Foundations",
+    "es": "Google Cloud Computing Foundations"
+  },
+  "start": "2026-04",
+  "summary": {
+    "en": "Core Google Cloud infrastructure, networking, storage and security.",
+    "es": "Infraestructura, redes, almacenamiento y seguridad base de Google Cloud."
+  },
+  "credentialUrl": "https://www.credly.com/badges/d2b19097-4da6-4550-8240-95f434a6d757"
+}

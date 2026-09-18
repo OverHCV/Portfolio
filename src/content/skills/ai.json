@@ -1,0 +1,21 @@
+{
+  "order": 3,
+  "tempo": "Andante",
+  "title": { "en": "AI & data", "es": "IA y datos" },
+  "epigraph": {
+    "en": "Models that learn, pipelines that remember.",
+    "es": "Modelos que aprenden, pipelines que recuerdan."
+  },
+  "items": [
+    { "label": { "en": "LLM pipelines (RAG, agents)", "es": "Pipelines LLM (RAG, agentes)" }, "level": 3 },
+    { "label": "PyTorch", "level": 3 },
+    { "label": "scikit-learn", "level": 3 },
+    { "label": "NumPy", "level": 3 },
+    { "label": "Pandas", "level": 3 },
+    { "label": "TensorFlow", "level": 2 },
+    { "label": "Keras", "level": 2 },
+    { "label": "XGBoost", "level": 2 },
+    { "label": "Plotly", "level": 2 },
+    { "label": "PyPhi (IIT 4.0)", "level": 2 }
+  ]
+}

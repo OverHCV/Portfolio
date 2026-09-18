@@ -1,0 +1,13 @@
+{
+  "kind": "certification",
+  "org": "IE University",
+  "title": {
+    "en": "Introduction to Data Science",
+    "es": "Introducción a la Ciencia de Datos"
+  },
+  "start": "2024-07",
+  "summary": {
+    "en": "The data science workflow, from question to model. Credential OA-2024-0716000043897.",
+    "es": "El flujo de la ciencia de datos, de la pregunta al modelo. Credencial OA-2024-0716000043897."
+  }
+}

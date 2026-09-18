@@ -11,7 +11,7 @@
 | 2   | Espacio de soluciones  | Sobre mí                          | `bio`        |
 | 3   | Muelle y mar           | Trayectoria (medusas)             | `milestones` |
 | 4   | El faro                | Piano → partitura con el stack    | `skills`     |
-| 5   | Dentro del piano       | Proyectos (ciudad) + buzón        | `projects`, `posts`, `site` |
+| 5   | Dentro del piano       | Proyectos (PCB isométrica) + buzón | `projects`, `posts`, `site` |
 
 ---
 
@@ -81,7 +81,7 @@ Portfolio/
     │   ├── site.json             # nombre, rol, tagline, socials, email (import directo, no colección)
     │   ├── bio/*.json            # Acto 2 — fragmentos "sobre mí"
     │   ├── milestones/*.json     # Acto 3 — un hito por archivo → una medusa
-    │   ├── skills/*.json         # Acto 4 — tecnologías → hojas de la partitura
+    │   ├── skills/*.json         # Acto 4 — una familia del stack por archivo → una hoja del álbum
     │   ├── projects/*.json       # Acto 5 — proyectos → edificios
     │   └── posts/*.md            # Acto 5 — blog, mencionado en el buzón (puede estar vacío)
     ├── i18n/
@@ -109,16 +109,20 @@ Portfolio/
     │   │   ├── Act2Field/        # paisaje f(x, z, t): malla + puntos + glifos, sonda −∇f
     │   │   ├── Act3Pier/         # mar, muelle, faroles, medusas, exterior del faro
     │   │   ├── Act4Lighthouse/   # interior del faro, piano, violín, partitura
-    │   │   └── Act5City/         # ciudad-circuito, edificios, pulsos, buzón
+    │   │   └── Act5City/         # PCB isométrica: board.ts (generador), chips, pistas, buzón
     │   ├── overlay/
     │   │   ├── Navbar.tsx        # navbar flotante inferior: actos + progreso + idioma + HD + sonido
     │   │   ├── HeroOverlay.tsx   # título/rol del Acto 1 (DOM)
 │   │   ├── FieldOverlay.tsx  # capítulos de bio del Acto 2 (DOM)
     │   │   ├── TransitionVeil.tsx # velo que cubre el viaje entre actos
     │   │   ├── Panel.tsx         # panel de detalle (hito, proyecto)
-    │   │   └── ContactSheet.tsx  # formulario del buzón
+    │   │   ├── CityOverlay.tsx   # tarjeta del chip cercano, invitación del buzón, índice por teclado
+    │   │   ├── ContactSheet.tsx  # formulario del buzón (hoja de papel)
+    │   │   └── useDialog.ts      # animación, bloqueo de scroll, foco y Esc de Panel y ContactSheet
     │   ├── audio/
-    │   │   └── AudioEngine.ts    # contexto, desbloqueo, música por acto, notas del piano
+    │   │   ├── AudioEngine.ts    # desbloqueo y música por acto
+    │   │   ├── context.ts        # AudioContext único
+    │   │   └── pianoSynth.ts     # teclas del piano (síntesis)
     │   └── lib/
     │       ├── anim.ts           # helpers GSAP (reveal por letras/palabras) con los tokens de theme.ts
     │       ├── ActGate.tsx       # un acto montado solo se dibuja dentro de su ventana de progreso
@@ -165,23 +169,23 @@ flowchart TD
 
 ### 4.2 Rangos por acto (`acts.config.ts`)
 
-Cada acto declara un **peso** (1, 3, 3, 2, 2.2); los rangos se derivan y siempre son contiguos. Para alargar o acortar un acto se cambia su peso, nunca `start`/`end` a mano. Con los pesos actuales:
+Cada acto declara un **peso** (1, 3, 3, 3, 4); los rangos se derivan y siempre son contiguos, y el largo total del scroll sale de los pesos (82 vh por unidad). Para alargar o acortar un acto se cambia su peso, nunca `start`/`end` a mano. Con los pesos actuales:
 
 | Acto                                              | Rango de `progress` | Peso narrativo                 |
 | ------------------------------------------------- | ------------------- | ------------------------------ |
-| 1 — Galaxia                                       | 0.00 – 0.09         | corto: solo título             |
-| 2 — Espacio de soluciones                         | 0.09 – 0.36         | largo: un capítulo por fragmento de bio |
-| 3 — Muelle y mar (construcción ~15%, recorrido ~85%) | 0.36 – 0.63      | largo: música + N medusas      |
-| 4 — El faro (piano → partitura)                   | 0.63 – 0.80         | medio                          |
-| 5 — Dentro del piano (ciudad → buzón)             | 0.80 – 1.00         | medio                          |
+| 1 — Galaxia                                       | 0.00 – 0.07         | corto: solo título             |
+| 2 — Espacio de soluciones                         | 0.07 – 0.29         | largo: un capítulo por fragmento de bio |
+| 3 — Muelle y mar (construcción ~15%, recorrido ~85%) | 0.29 – 0.50      | largo: música + N medusas      |
+| 4 — El faro (piano → partitura)                   | 0.50 – 0.71         | largo: el álbum necesita un tramo quieto |
+| 5 — Dentro del piano (placa → buzón)              | 0.71 – 1.00         | largo: encendido + 16 distritos + buzón |
 
-De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del acto. En el Acto 2, `acts/Act2Field/chapters.ts` reparte el progreso local: entrada (~8%), un capítulo por fragmento de bio y calma final (~15%); lo leen la escena, `FieldOverlay` y el cielo. En el Acto 3, `acts/Act3Pier/timeline.ts` reparte el progreso local: llegada (~7%, solo mar bajo los pies), construcción del muelle (~15%, rápida, del faro hacia la cámara), recorrido y puerta del faro; las medusas se distribuyen a lo largo del recorrido según `milestones.length` (`layout.ts`, `jellyAt`), alternando lados del muelle. El largo del muelle es fijo para que el camino de cámara no dependa del contenido. En el Acto 4, la primera mitad es el plano del piano y la segunda el acercamiento al atril.
+De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del acto. En el Acto 2, `acts/Act2Field/chapters.ts` reparte el progreso local: entrada (~8%), un capítulo por fragmento de bio y calma final (~15%); lo leen la escena, `FieldOverlay` y el cielo. En el Acto 3, `acts/Act3Pier/timeline.ts` reparte el progreso local: llegada (~7%, solo mar bajo los pies), construcción del muelle (~15%, rápida, del faro hacia la cámara), recorrido y puerta del faro; las medusas se distribuyen a lo largo del recorrido según `milestones.length` (`layout.ts`, `jellyAt`), alternando lados del muelle. El largo del muelle es fijo para que el camino de cámara no dependa del contenido. En el Acto 4, `acts/Act4Lighthouse/timeline.ts` reparte el progreso local: entrada (~8%, bajo el velo `door`), plano del piano con teclas tocables (hasta ~35%), acercamiento al atril (~13%), cámara **quieta** frente al álbum (~37%: el scroll no pasa hojas, solo el clic o el arrastre) y subida a vista cenital con el picado dentro del piano. `albumAt(local)` habilita el álbum y su overlay; `keysAt(local)`, las teclas. En el Acto 5, `acts/Act5City/timeline.ts`: bajo el velo `dive` (~10%), encendido de la placa entera (`bootAt`, hasta ~22%), bajada al primer distrito, recorrido por las filas diagonales de la grilla 4 × 4 (`layout.ts` → `ROUTE`, fijo: no depende de cuántos proyectos haya) hasta ~86%, y acercamiento al buzón (`mailboxAt`).
 
 ### 4.3 Cámara
 - `path.ts` define waypoints por acto; se unen en una sola `CatmullRomCurve3`. `CameraRig` hace `getPointAt(progress)` y mira hacia un segundo punto adelantado de la curva (o a un `lookAt` fijo por acto).
 - Offset de yaw/pitch según la posición del mouse, suavizado con `damp` en `useFrame`.
 - **Ojo de pez (Acto 3, construcción):** FOV animado (`fovAt` en `path.ts`: 55° → 72° → 55°) + pass de distorsión barrel (`fx/Fisheye.ts`), ambos atados al progreso de la construcción y a 0 al empezar el recorrido. Con reduced motion, ninguno de los dos.
-- El Acto 5 cambia a cámara ortográfica: `CameraRig` alterna la cámara activa al cruzar el umbral (la transición queda tapada por el fundido del "super zoom").
+- **Acto 5, telefoto casi ortográfica:** en vez de cambiar a `OrthographicCamera` (habría que recrear el `EffectComposer` y sus passes), la misma cámara pasa a FOV 10° y se aleja ~125 unidades en la diagonal isométrica (`fovAt`, `nearAt` y `cityFitAt` en `path.ts`); el cambio ocurre bajo el velo `dive`. El plano cercano sube a 10 para la precisión de profundidad, el mirar con el mouse se escala con el FOV y en pantallas angostas la toma se aleja. Los materiales de la placa llevan su propia niebla por profundidad (bordes que se funden al vacío).
 
 ### 4.4 Montaje por proximidad
 - `World.tsx` monta solo `activeAct - 1 … activeAct + 1`, cada acto como `lazy(() => import('./acts/ActN'))` dentro de `Suspense`.
@@ -194,7 +198,7 @@ De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del act
 | Paso  | Técnica                                                                        |
 | ----- | ------------------------------------------------------------------------------ |
 | 1 → 2 | La cámara atraviesa el agujero negro; distorsión al máximo + fundido           |
-| 2 → 3 | **Sin velo.** El paisaje se calma como un mar y vuelven las estrellas; el Acto 3 está anclado junto al Acto 2 con el mar a la altura del paisaje en calma, así que la malla se funde con el agua en el mismo sitio (`seaHandoff`) y la cámara pasa del picado a flotar sobre el mar sin viaje |
+| 2 → 3 | **Sin velo.** El paisaje se calma como un mar y vuelven las estrellas; el Acto 3 está anclado junto al Acto 2 con el mar a la altura del paisaje en calma, así que el paisaje aplanado se desvanece mientras aparece el mar en el mismo sitio, sin volver a dibujar la malla (`seaHandoff`) y la cámara pasa del picado a flotar sobre el mar sin viaje |
 | 3 → 4 | Cruzar la puerta del faro: fundido a negro de ~200 ms, cambio de escena        |
 | 4 → 5 | Zoom vertical dentro del piano, fundido a color plano, revelado de la ciudad   |
 
@@ -239,27 +243,38 @@ interface Milestone {               // Acto 3 — una medusa
   end?: string;                     // ausente = actual / no aplica
   summary: L10n;                    // 1–2 líneas para la tarjeta
   details?: L10n;                   // panel
-  stack?: string[];                 // ids de Skill
+  stack?: string[];                 // tecnologías (chips del panel)
   credentialUrl?: string;           // link verificable (certificaciones)
 }
 
-interface Skill {                   // Acto 4 — una entrada en una hoja de la partitura
+interface StackSheet {              // Acto 4 — una hoja del álbum (un archivo = una familia del stack)
   id: string;
-  label: string;                    // "TypeScript"
-  family: 'language' | 'framework' | 'infra' | 'data' | 'tool'; // una hoja por familia
-  level?: 1 | 2 | 3;                // opcional: dominio (se puede dibujar como dinámica musical p/mf/f)
   order: number;
+  tempo: string;                    // "Allegro": encabezado del movimiento, no se traduce
+  title: L10n;                      // "Lenguajes"
+  epigraph: L10n;                   // una línea bajo el título
+  items: {
+    label: string | L10n;           // "TypeScript"; L10n solo si el nombre se traduce ("Inglés")
+    level: 1 | 2 | 3;               // dominio, dibujado como dinámica musical: p / mf / f
+    note?: L10n;                    // aclaración corta ("nativo")
+  }[];
 }
 
-interface Project {                 // Acto 5 — un edificio
+interface Project {                 // Acto 5 — un chip de la placa (máximo 16)
   id: string;
+  order?: number;                   // orden en el recorrido; sin él, por año descendente
   title: L10n;
-  summary: L10n;                    // tooltip al hover
+  role?: L10n;                      // "Autor", "Líder full-stack"
+  summary: L10n;                    // tarjeta breve
   description: L10n;                // panel de detalle
   image?: string;                   // captura para el panel
-  stack: string[];                  // ids de Skill
-  links: { repo?: string; demo?: string };
-  building: { plot: [number, number]; height: number; connectsTo: string[] }; // calles = conexiones tipo circuito
+  stack: string[];                  // tecnologías
+  links: { repo?: string; demo?: string; extra?: { label: string | L10n; url: string }[] };
+  building: {
+    chip: 'qfp' | 'bga' | 'dip' | 'can' | 'module'; // encapsulado que lo dibuja
+    height?: number;                // altura relativa (1 por defecto)
+    connectsTo: string[];           // calles = pistas hacia otros proyectos
+  };
   year: number;
 }
 
@@ -271,7 +286,7 @@ interface Post {                    // Acto 5 — mencionado en el buzón
 }
 ```
 
-`Project.building.connectsTo` define las calles de la ciudad: la topología del circuito sale de los datos, no se modela a mano.
+`Project.building.connectsTo` define las calles de la ciudad: la topología del circuito sale de los datos, no se modela a mano. La posición también es automática: el proyecto n ocupa el zócalo n de la grilla (`Act5City/layout.ts`, `SLOTS`); `index.astro` falla el build con más de 16.
 
 ### 5.2 Carga
 - `content.config.ts` define cada colección con `defineCollection({ loader: glob(...), schema: z.object(...) })`; los esquemas Zod replican los tipos de arriba y fallan el build si falta un campo.
@@ -331,7 +346,6 @@ interface WorldState {
   lang: Lang;
   focus: null
     | { kind: 'milestone'; id: string }
-    | { kind: 'score' }             // álbum de la partitura abierto
     | { kind: 'project'; id: string }
     | { kind: 'contact' };
   audio: { unlocked: boolean; muted: boolean };
@@ -355,8 +369,12 @@ interface WorldState {
 ### 8.3 Interacciones especiales
 - **Medusas (Acto 3):** tarjeta breve por proximidad (la medusa más cercana a la cámara en el recorrido) o por hover; clic → `focus = { kind: 'milestone', id }`.
 - **Piano (Acto 4):** hover/clic en teclas → nota; sin `focus`, no interrumpe el scroll.
-- **Partitura (Acto 4):** `focus = { kind: 'score' }` → la cámara enfoca el atril; el drag horizontal (pointer events sobre el plano) curva la hoja y, al soltar pasado el 50%, cambia de página. Cada página = una familia de `skills`.
-- **Buzón (Acto 5):** `focus = { kind: 'contact' }` → animación de apertura del buzón y `ContactSheet` aparece como hoja de papel en el overlay.
+- **Álbum (Acto 4):** sin `focus` ni pausa del scroll: el tramo del atril es largo y la cámara se queda quieta (y deja de seguir al mouse). La hoja abierta es `albumPage` en el store; la cambian el álbum y `overlay/LighthouseOverlay.tsx` (botones ← →, flechas del teclado y la lista de la hoja en `aria-live`, porque el texto de las páginas está en un canvas).
+  - **Clic** en la mitad exterior de una página → la pasa (derecha: siguiente, izquierda: anterior). Al pasar el puntero por esa zona la esquina se levanta.
+  - **Arrastre** (`album/Album.tsx`): el pointerdown sobre un plano invisible toma la hoja; los movimientos se siguen en `window` con un raycast propio contra el plano del libro, y el punto tomado hace de borde libre (`θ = acos(x/W)`). Al soltar, pasa si supera π/2 o si el gesto fue rápido. Con el dedo se bloquea el scroll mientras se arrastra.
+  - **Hoja** (`album/pageMaterial.ts`): plano subdividido que se dobla en el vertex shader (rotación sobre el lomo + rizo hacia el borde libre + la altura tomada va por delante), frente = recto y reverso = verso de la página siguiente. Páginas en canvas (`album/pageTexture.ts`): portada con índice, verso con número romano y "melodía" de la familia, recto con cada tecnología como nota y su dinámica.
+- **Chips (Acto 5):** cajas de hover invisibles sobre cada chip (`Buildings.tsx`); hover → el chip se levanta y sus calles brillan (`uLift`/`uGlow` por proyecto, uniforms compartidos); clic → `focus = { kind: 'project', id }`. Sin hover, la tarjeta breve (`nearProject`) sigue al chip más cercano al centro de la pantalla. `CityOverlay` expone además la lista de proyectos como botones para teclado.
+- **Buzón (Acto 5):** `focus = { kind: 'contact' }` → la tapa se abre, asoma la carta y `ContactSheet` aparece como hoja de papel en el overlay (misma lógica de diálogo que el Panel: `overlay/useDialog.ts`).
 
 ---
 
@@ -371,7 +389,7 @@ interface WorldState {
 | Liszt, Liebestraum No. 3 (violín)       | 4 — Faro      | Fade-in al entrar al faro                  | Fade-out en el super zoom hacia el Acto 5 |
 
   `gain = curve(localProgress)` por pista, aplicado con `setTargetAtTime` para evitar saltos. Si el usuario vuelve hacia atrás con el scroll, las curvas se recorren al revés.
-- **Teclas del piano (Acto 4):** 4–6 samples (uno por octava) precargados como `AudioBuffer`; cada tecla toca el sample más cercano con `playbackRate = 2^(semitonos/12)`. Van por un bus propio para que se oigan sobre el violín (el violín baja ~3 dB mientras se toca).
+- **Teclas del piano (Acto 4):** por ahora sin samples: `audio/pianoSynth.ts` suma parciales senoidales con leve inarmonicidad y decaimiento exponencial, por un bus propio con compresor (polifonía acotada). Suenan solo con el sonido activado. Más adelante: 4–6 samples (uno por octava) con `playbackRate = 2^(semitonos/12)` y el violín bajando ~3 dB mientras se toca. Música y teclas comparten un único `AudioContext` (`audio/context.ts`).
 - **Mute global** en la navbar, guardado en `localStorage`.
 - `prefers-reduced-motion` no afecta al audio.
 - **Estado (M2):** implementado el Nocturno (`useNocturne` en `audio/AudioEngine.ts`, montado en `World.tsx`): `<audio>` en streaming desde `public/audio/` → `GainNode` (en iOS `audio.volume` no funciona), volumen = `musicAt(localProgress)` de `acts/Act3Pier/timeline.ts`, pausa tras quedar en silencio. Se desbloquea con el botón de sonido de la navbar; el desbloqueo por `pointerdown` global y el mute en `localStorage` quedan para M3.
@@ -409,15 +427,17 @@ interface WorldState {
 | **Piano de cola**              | 4    | ✅ Ya descargado — `low-poly-grand-piano.zip` (ver §11.2) | ≤ 50k tris, ≤ 1.5 MB   |
 | **Violín**                     | 4    | ✅ Ya descargado — `low-poly-violin.zip` (ver §11.2) | ≤ 15k tris, ≤ 0.5 MB   |
 | Partitura / álbum              | 4    | Procedural (plano curvado + textura de canvas con el texto) | —        |
-| Ciudad + calles                | 5    | Procedural desde `projects.building`          | ≤ 100 draw calls       |
-| **Buzón**                      | 5    | Descargado (CC0 / CC-BY) o procedural simple  | ≤ 10k tris             |
+| Placa + calles                 | 5    | Procedural determinista desde `projects` (`Act5City/board.ts`): chips, ~900 pistas, ~2k pads, ~400 pasivos × densidad | ~12 draw calls |
+| Buzón                          | 5    | Procedural en el mismo estilo isométrico      | —                      |
 
 ### 11.2 Modelos ya disponibles
 
+**Estado (M3):** ambos convertidos con Blender 5.1 en modo headless (los comandos están en la cabecera de cada script de `scripts/models/`). El STL resultó venir casi en metros (teclado de 1.20 m, teclas a 0.76 m del suelo): solo se gira a Y-up, se apoya en el suelo y se centra. El decoder Draco se sirve desde `public/draco/` (copiado de `three/examples/jsm/libs/draco/gltf/`), sin CDN. Las medidas del teclado y del atril que usa la escena están en `acts/Act4Lighthouse/layout.ts`.
+
 | Modelo  | Archivo fuente                                   | Formato                                   | Tamaño real                     | Licencia                                   | Trabajo pendiente |
 | ------- | ------------------------------------------------ | ----------------------------------------- | ------------------------------- | ------------------------------------------ | ----------------- |
-| Piano   | `low-poly-grand-piano.zip` → `.stl` + ficha PDF  | STL binario (figurita para impresión 3D)  | 40 000 tris ✅ dentro del presupuesto | **CC-BY 4.0** — Printables, modelo #1287354 → exige crédito | Convertir STL → GLB, escalar/orientar, materiales propios |
-| Violín  | `low-poly-violin.zip` → `Violin/violin.blend` + texturas PNG + HDRI | `.blend` (Blender 2.79, Cycles) | **~516 000 tris ❌ (34× el presupuesto)** | **CC0** — Blend Swap #92873 → sin requisitos | Decimar, hornear texturas, exportar GLB |
+| Piano   | `low-poly-grand-piano.zip` → `.stl` + ficha PDF  | STL binario (figurita para impresión 3D)  | 40 000 tris ✅ dentro del presupuesto | **CC-BY 4.0** — Printables, modelo #1287354 → exige crédito | ✅ `public/models/piano.glb` (106 KB, Draco) vía `scripts/models/piano.py` |
+| Violín  | `low-poly-violin.zip` → `Violin/violin.blend` + texturas PNG + HDRI | `.blend` (Blender 2.79, Cycles) | **~516 000 tris ❌ (34× el presupuesto)** | **CC0** — Blend Swap #92873 → sin requisitos | ✅ `public/models/violin.glb` (12k tris, 62 KB) vía `scripts/models/violin.py`: sin arco, cuerdas ni partituras, decimado; materiales por nombre en R3F, sin texturas |
 
 **Piano (STL):**
 - El STL trae **solo geometría**: sin UVs, sin materiales, sin mallas separadas (teclas, tapa y patas son una sola pieza). Al ser una figurita para impresión, puede venir en Z-up y con escala arbitraria (bbox ≈ 1.42 × 1.96 × 1.96 unidades).
@@ -485,6 +505,8 @@ bunx @gltf-transform/cli inspect public/models/piano.glb
 | high | `min(devicePixelRatio, 2)` | bloom + distorsión + ojo de pez | completas                      |
 | mid  | 1.5                        | solo bloom                     | 70%                             |
 | low  | 1                          | ninguno                        | 40% (estrellas, paisaje, medusas) |
+
+**Agua del Acto 3:** el `Water` de three.js hace un render espejo extra de la escena (512² en high, 256² en el resto), solo mientras el mar es visible.
 
 **Otras reglas:** instancing para todo lo repetido; `frameloop="demand"` cuando hay un panel abierto y nada se anima; los shaders reciben `uTime` y `uProgress` como uniforms en lugar de recrear materiales.
 
