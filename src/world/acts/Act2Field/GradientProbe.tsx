@@ -52,6 +52,9 @@ function canHover(): boolean {
   return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 }
 
+/** Números del letrero con el menos tipográfico (no el guion). */
+const fmt = (v: number) => v.toFixed(2).replace(/-/g, '−');
+
 /**
  * Sonda del cursor: bajo el puntero, los dos cortes ortogonales de la malla (x fija y z fija)
  * y, en su cruce, la dirección de máximo descenso −∇f sobre la superficie, con el valor de f.
@@ -60,6 +63,10 @@ export function GradientProbe({ landscape, chapter, anchor }: { landscape: Lands
   const root = useRef<Group>(null);
   const arrowHead = useRef<Mesh>(null);
   const label = useRef<HTMLDivElement>(null);
+  // Valores vivos del letrero (MathML): solo se muta el texto de los <mn>.
+  const fVal = useRef<HTMLElement>(null);
+  const gxVal = useRef<HTMLElement>(null);
+  const gzVal = useRef<HTMLElement>(null);
   const hover = useMemo(canHover, []);
   // Sin puntero sobre la página (aún no se movió, o salió de la ventana) no hay sonda.
   const pointerIn = useRef(false);
@@ -147,9 +154,9 @@ export function GradientProbe({ landscape, chapter, anchor }: { landscape: Lands
       arrowHead.current.quaternion.copy(tmp.quat.setFromUnitVectors(UP, dir));
     }
 
-    if (label.current) {
-      label.current.textContent = `f = ${f0.toFixed(2)}   −∇f = (${(-grad.x).toFixed(2)}, ${(-grad.y).toFixed(2)})`.replace(/-/g, '−');
-    }
+    if (fVal.current) fVal.current.textContent = fmt(f0);
+    if (gxVal.current) gxVal.current.textContent = fmt(-grad.x);
+    if (gzVal.current) gzVal.current.textContent = fmt(-grad.y);
   });
 
   return (
@@ -168,8 +175,28 @@ export function GradientProbe({ landscape, chapter, anchor }: { landscape: Lands
       <Html position={[0, 0.35, 0]} zIndexRange={[12, 8]} style={{ pointerEvents: 'none' }}>
         <div
           ref={label}
-          className="ml-3 whitespace-pre font-mono text-[11px] tracking-wide text-glow opacity-0 transition-opacity duration-200 [text-shadow:0_1px_8px_rgba(5,6,10,0.9)]"
-        />
+          className="ml-3 text-[12px] text-glow opacity-0 transition-opacity duration-200 [text-shadow:0_1px_3px_#05060a,0_2px_12px_rgba(5,6,10,0.95)]"
+        >
+          {/* MathML nativo: matemática real sin dependencias, actualizable por frame. */}
+          <math>
+            <mi>f</mi>
+            <mo>(</mo>
+            <mi>x</mi>
+            <mo>)</mo>
+            <mo>=</mo>
+            <mn ref={fVal} />
+            <mspace width="1.6em" />
+            <mo>−</mo>
+            <mo>∇</mo>
+            <mi>f</mi>
+            <mo>=</mo>
+            <mo>(</mo>
+            <mn ref={gxVal} />
+            <mo>,</mo>
+            <mn ref={gzVal} />
+            <mo>)</mo>
+          </math>
+        </div>
       </Html>
     </group>
   );

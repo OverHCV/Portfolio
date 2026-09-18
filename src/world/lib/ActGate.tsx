@@ -5,10 +5,13 @@ import { ACTS, type ActId } from '../acts.config';
 import { TRANSITIONS } from '../transitions.config';
 import { useWorld } from '../store';
 
-/** Margen de visibilidad a cada lado de un acto: solo la zona opaca del velo, donde viaja la cámara. */
+/**
+ * Margen de visibilidad a cada lado de un acto: la zona opaca del velo, donde viaja la cámara,
+ * o el fundido a la vista si la frontera no tiene velo (2→3).
+ */
 function marginAt(boundary: number): number {
   const tr = TRANSITIONS.find((t) => Math.abs(t.at - boundary) < 1e-6);
-  return tr ? tr.hold : 0;
+  return tr ? tr.overlap : 0;
 }
 
 /**

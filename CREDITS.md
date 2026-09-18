@@ -11,4 +11,5 @@
 - **Violin** — Blend Swap #92873, CC0. https://www.blendswap.com/blends/view/92873
 
 ## Música
-- _Pendiente: grabaciones de Chopin Op. 9 No. 2 y Liszt Liebestraum No. 3 con licencia libre._
+- **Chopin — Nocturno Op. 9 No. 1** (`public/audio/nocturne-op9-1.mp3`). _Pendiente: intérprete, fuente y licencia._
+- _Pendiente: grabación de Liszt, Liebestraum No. 3 con licencia libre._

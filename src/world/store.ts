@@ -20,12 +20,15 @@ export interface WorldState {
   localProgress: number;
   lang: ActiveLang;
   focus: Focus;
+  /** Hito de la tarjeta breve del Acto 3 (medusa en hover o la más cercana). Cambia pocas veces. */
+  nearMilestone: string | null;
   audio: { unlocked: boolean; muted: boolean };
   quality: Quality;
   /** Agujero negro físico (ray marching). Apagado por defecto; se guarda entre visitas. */
   hd: boolean;
   setProgress(p: number): void;
   setFocus(f: Focus): void;
+  setNearMilestone(id: string | null): void;
   setLang(l: ActiveLang): void;
   setQuality(q: Quality): void;
   toggleMute(): void;
@@ -58,6 +61,7 @@ export const useWorld = create<WorldState>()((set, get) => ({
   // La isla es client:only, así que el store siempre se crea en el navegador.
   lang: initialLang(),
   focus: null,
+  nearMilestone: null,
   audio: { unlocked: false, muted: true },
   quality: 'high',
   hd: readFlag(HD_STORAGE_KEY),
@@ -68,6 +72,9 @@ export const useWorld = create<WorldState>()((set, get) => ({
   },
   setFocus(focus) {
     set({ focus });
+  },
+  setNearMilestone(nearMilestone) {
+    if (get().nearMilestone !== nearMilestone) set({ nearMilestone });
   },
   /** Elección manual del usuario: se guarda y actualiza <html lang>. */
   setLang(lang) {

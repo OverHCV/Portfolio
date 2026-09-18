@@ -13,10 +13,12 @@ import { ActGate } from './lib/ActGate';
 import { Starfield } from './sky/Starfield';
 import { HeroOverlay } from './overlay/HeroOverlay';
 import { FieldOverlay } from './overlay/FieldOverlay';
+import { JourneyOverlay } from './overlay/JourneyOverlay';
 import { Navbar } from './overlay/Navbar';
 import { Panel } from './overlay/Panel';
 import { TransitionVeil } from './overlay/TransitionVeil';
 import { useWorld } from './store';
+import { useNocturne } from './audio/AudioEngine';
 import { COLORS } from './theme';
 import type { WorldContent } from './types';
 
@@ -36,6 +38,7 @@ function WorldScene({ content }: { content: WorldContent }) {
   // El ray marching del modo HD cuesta por píxel: resolución contenida mientras se ve.
   const hdActive = useWorld((s) => s.hd && s.activeAct === 1);
   const dpr: [number, number] = hdActive ? [1, Math.min(1.25, QUALITY[quality].dpr[1])] : QUALITY[quality].dpr;
+  useNocturne();
 
   // Sin WebGL (lo detecta el script inline de Base.astro) queda solo el HTML semántico.
   if (!document.documentElement.classList.contains('webgl')) return null;
@@ -75,6 +78,7 @@ function WorldScene({ content }: { content: WorldContent }) {
       <TransitionVeil />
       <HeroOverlay site={content.site} />
       <FieldOverlay bio={content.bio} />
+      <JourneyOverlay milestones={content.milestones} />
       <Navbar />
       <Panel content={content} />
     </>

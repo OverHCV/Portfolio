@@ -60,19 +60,19 @@ Cada sección clásica vive en **un solo** acto. El orden cuenta una historia: q
 - **Contenido que carga:** colección `bio` (`gridPos` = posición (x, z) del pozo en el paisaje).
 - **Cámara:** sale del negro mirando desde arriba; órbita lenta a tres cuartos con el paisaje a la derecha del texto; al final baja la mirada hacia la superficie.
 - **Notas técnicas:** f se define una sola vez y se genera en GLSL (desplaza malla y puntos en GPU) y en TS (esferas y sonda, con raycast propio contra la altura). Malla con líneas por shader (`fract` + `fwidth`), puntos con `Points`, glifos en un atlas de canvas con un solo draw call.
-- **Transición → 3:** el paisaje se **calma** hasta ser un mar suave, la cámara pica hacia abajo, el paisaje se apaga mientras vuelven las estrellas (salimos del agujero negro) y el velo `horizon` da paso al muelle, que se construye rápido desde el faro hacia nosotros.
+- **Transición → 3 (sin velo, sin volver al negro):** el paisaje se **calma** hasta ser un mar suave mientras vuelven las estrellas (salimos del agujero negro) y la cámara pica hacia abajo. La malla aplanada **se vuelve el océano** en el mismo sitio: quedamos flotando a la altura de los ojos sobre mar abierto, sin nada más.
 
 ### Acto 3 — Muelle y mar (Trayectoria)
 Muelle de noche, mar oscuro, medusas bioluminiscentes bajo y sobre el agua, y el faro al fondo. Representa el camino recorrido — *no todo es instantáneo en esta vida*.
 
 - **Qué se muestra:**
-  1. **Construcción:** estás en la orilla. El muelle se arma **rápido**, tabla a tabla, desde el faro (el destino) hacia la cámara, con un leve efecto ojo de pez, hasta que la última tabla queda frente a ti.
+  1. **Llegada y construcción:** flotas sobre el mar abierto bajo la luna; la malla del hiperespacio se disuelve en agua. El faro (el destino) sale del mar a lo lejos y el muelle se arma **rápido**, tabla a tabla, desde el faro hacia la cámara, con un leve efecto ojo de pez, hasta que la última tabla queda bajo tus pies: el primer contacto con tierra.
   2. **Recorrido:** la cámara avanza por el muelle hacia el faro. A los lados flotan las **medusas; cada medusa = un hito de tu trayectoria**, en orden cronológico (el más antiguo primero, el más reciente junto al faro). El color de la medusa indica el tipo: empleo, prácticas, estudios, certificación, reconocimiento.
   3. Los **faroles** del muelle son solo luz: se encienden al pasar, sin contenido.
 - **Qué se hace:**
   - Al acercarte a una medusa (o con hover) aparece una tarjeta breve: tipo, empresa/institución, título, fechas.
   - Clic en la medusa → panel con el detalle (qué hiciste, tecnologías, link a la credencial si es certificación).
-  - Música: Chopin, *Nocturno Op. 9 No. 2* (piano). Arranca casi inaudible al terminar la construcción, sube con el recorrido y se apaga al entrar al faro.
+  - Música: Chopin, *Nocturno Op. 9 No. 1* (piano). Arranca casi inaudible al terminar la construcción, sube con el recorrido y se apaga al entrar al faro.
 - **Contenido que carga:** colección `milestones`.
 - **Cámara:** perspectiva a altura de ojos mirando al faro; el mouse deja mirar a los lados (al mar, a las medusas).
 - **Notas técnicas:** tablas y faroles con `InstancedMesh`; medusas = geometría procedural + shader emisivo con pulso; agua con Gerstner ligero o `react-three-ocean`. Luces reales solo en los 2–3 faroles más cercanos; el resto emisivo + bloom.
@@ -108,7 +108,7 @@ Muelle de noche, mar oscuro, medusas bioluminiscentes bajo y sobre el agua, y el
 
 ### Audio
 - El navegador no deja sonar nada hasta el primer clic/tecla del usuario → botón de sonido visible en la navbar desde el Hero.
-- Acto 3: Chopin, Op. 9 No. 2 (piano), volumen atado al recorrido del muelle; se apaga al entrar al faro.
+- Acto 3: Chopin, Op. 9 No. 1 (piano), volumen atado al recorrido del muelle; se apaga al entrar al faro.
 - Acto 4: Liszt, Liebestraum No. 3 (violín) de fondo + teclas del piano tocables encima.
 
 ### Idioma (i18n)
@@ -145,7 +145,7 @@ Solo se monta el acto actual y sus vecinos; instancing para todo lo repetido; mo
 - [ ] Lista real de hitos para las medusas: empleos/prácticas, grado, certificaciones (tipo, institución, título, fechas, 1–2 líneas).
 - [ ] Los 5–7 fragmentos de tu presentación para los puntos del Acto 2.
 - [ ] Familias del stack y qué tecnologías van en cada hoja de la partitura.
-- [ ] Grabaciones concretas con licencia libre: Chopin Op. 9 No. 2 (piano) y Liszt Liebestraum No. 3 (violín).
+- [ ] Grabaciones concretas con licencia libre: ~~Chopin~~ (ya está Op. 9 No. 1; falta fuente/licencia en `CREDITS.md`) y Liszt Liebestraum No. 3 (violín).
 - [ ] Proyectos para la ciudad (y qué proyectos se conectan entre sí → calles).
 - [ ] Tipografía final del Hero (probar `Fraunces` con tu nombre `Over Haider Castrillón Valencia`).
 - [ ] Orden de construcción: ver hitos en `ARCHITECTURE.md` (Actos 1 + 2 primero para validar la cámara).

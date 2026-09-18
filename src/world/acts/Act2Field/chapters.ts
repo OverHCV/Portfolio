@@ -7,15 +7,23 @@ import { smoothstep } from '../../lib/motion';
  *
  *   0 ─ INTRO_END            salida del agujero negro: negro → el paisaje se revela
  *   INTRO_END ─ OUTRO_START  un capítulo por fragmento de bio, todos del mismo largo
- *   OUTRO_START ─ OUTRO_END  calma: el paisaje se aplana, se apaga y vuelven las estrellas
- *   OUTRO_END ─ 1            solo estrellas: el velo hacia el muelle cubre el viaje de cámara
+ *   OUTRO_START ─ OUTRO_END  calma: el paisaje se aplana como un mar y vuelven las estrellas
+ *   OUTRO_END ─ 1            la malla plana se funde con el mar del Acto 3 (sin velo: `seaHandoff`)
  */
 export const INTRO_END = 0.08;
-export const OUTRO_START = 0.85;
-export const OUTRO_END = 0.94;
+export const OUTRO_START = 0.87;
+export const OUTRO_END = 0.93;
+
+/**
+ * Largo (en progreso global) del fundido paisaje → mar, que termina justo en la frontera.
+ * Ambos actos se dibujan a la vez durante ese tramo (transitions.config.ts, `overlap`).
+ */
+export const SEA_HANDOFF = 0.008;
 
 const ACT = ACTS[1];
 const SPAN = OUTRO_START - INTRO_END;
+/** El mismo fundido en progreso local del acto. */
+const HANDOFF_LOCAL = SEA_HANDOFF / (ACT.end - ACT.start);
 
 export interface ChapterState {
   /** Capítulo más cercano (0..n-1). */
@@ -44,7 +52,7 @@ export function chapterAt(local: number, n: number, out?: ChapterState): Chapter
   s.index = Math.min(Math.max(Math.floor(c), 0), Math.max(n - 1, 0));
   s.reveal = smoothstep(0, INTRO_END + 0.05, local);
   s.calm = smoothstep(OUTRO_START, OUTRO_END - 0.02, local);
-  s.opacity = 1 - smoothstep(OUTRO_START + 0.03, OUTRO_END, local);
+  s.opacity = 1 - smoothstep(1 - HANDOFF_LOCAL, 1, local);
   s.text = smoothstep(INTRO_END - 0.02, INTRO_END + 0.03, local) * (1 - smoothstep(OUTRO_START - 0.03, OUTRO_START + 0.01, local));
   s.focus.length = n;
   for (let i = 0; i < n; i++) s.focus[i] = smoothstep(0, 1, 1 - Math.abs(c - (i + 0.5)) * 1.4) * s.text;
@@ -54,6 +62,11 @@ export function chapterAt(local: number, n: number, out?: ChapterState): Chapter
 /** Opacidad del cielo en el Acto 2: sin estrellas dentro del agujero negro, vuelven al salir. */
 export function starsAt(local: number): number {
   return smoothstep(OUTRO_START, OUTRO_END, local);
+}
+
+/** 0 → 1 mientras el paisaje en calma se vuelve el mar del Acto 3 (progreso global). */
+export function seaHandoff(progress: number): number {
+  return smoothstep(ACT.end - SEA_HANDOFF, ACT.end, progress);
 }
 
 /** Progreso global donde el capítulo `i` queda centrado (para navegar hacia él). */

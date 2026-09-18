@@ -3,20 +3,42 @@ import { gsap } from 'gsap';
 import { useWorld, type Focus } from '../store';
 import { useT } from '../../i18n/useT';
 import { prefersReducedMotion, revealText } from '../lib/anim';
-import { DUR, EASE } from '../theme';
+import { DUR, EASE, MILESTONE_COLORS } from '../theme';
+import { milestoneDates } from '../../i18n/dates';
+import type { Lang } from '../../i18n/langs';
 import type { L10n, WorldContent } from '../types';
 
 interface PanelItem {
+  /** Clave de traducción. */
   eyebrow: string;
+  /** Color del eyebrow (p. ej. el de la medusa). */
+  accent?: string;
   title: L10n;
+  /** Línea bajo el título: organización, fechas. */
+  meta?: string;
   body: L10n;
+  chips?: string[];
+  link?: { href: string; label: string };
 }
 
 /**
- * Traduce el `focus` del store al contenido del panel. Cada tipo llega con su acto (hitos en M2,
- * proyectos en M4); la bio del Acto 2 ya no usa panel: se lee en capítulos (FieldOverlay).
+ * Traduce el `focus` del store al contenido del panel. Cada tipo llega con su acto (proyectos en M4);
+ * la bio del Acto 2 no usa panel: se lee en capítulos (FieldOverlay).
  */
-function resolve(_focus: NonNullable<Focus>, _content: WorldContent): PanelItem | null {
+function resolve(focus: NonNullable<Focus>, content: WorldContent, lang: Lang, t: (key: string) => string): PanelItem | null {
+  if (focus.kind === 'milestone') {
+    const m = content.milestones.find((x) => x.id === focus.id);
+    if (!m) return null;
+    return {
+      eyebrow: `milestone.kind.${m.kind}`,
+      accent: MILESTONE_COLORS[m.kind],
+      title: m.title,
+      meta: `${m.org} · ${milestoneDates(m, lang, t('milestone.present'))}`,
+      body: m.details ?? m.summary,
+      chips: m.stack,
+      link: m.credentialUrl ? { href: m.credentialUrl, label: 'panel.credential' } : undefined,
+    };
+  }
   return null;
 }
 
@@ -84,7 +106,7 @@ export function Panel({ content }: { content: WorldContent }) {
     };
   }, [isOpen]);
 
-  const item = shown ? resolve(shown, content) : null;
+  const item = shown ? resolve(shown, content, lang, t) : null;
   const itemKey = shown ? `${JSON.stringify(shown)}-${lang}` : '';
 
   // Título por palabras cada vez que cambia el contenido o el idioma.
@@ -131,7 +153,9 @@ export function Panel({ content }: { content: WorldContent }) {
         className="fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-y-auto rounded-t-2xl border-t border-white/10 bg-void/85 p-6 pb-10 backdrop-blur-xl md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:max-h-none md:w-[440px] md:rounded-none md:border-t-0 md:border-l md:p-10"
       >
         <div className="flex items-start justify-between gap-6">
-          <p className="text-xs uppercase tracking-[0.3em] text-glow">{t(item.eyebrow)}</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-glow" style={item.accent ? { color: item.accent } : undefined}>
+            {t(item.eyebrow)}
+          </p>
           <button
             ref={closeButton}
             type="button"
@@ -147,7 +171,27 @@ export function Panel({ content }: { content: WorldContent }) {
         <h2 key={itemKey} ref={title} id="panel-title" className="mt-6 font-display text-3xl leading-tight text-ink md:text-4xl">
           {pick(item.title)}
         </h2>
+        {item.meta && <p className="mt-3 font-mono text-xs tracking-wide text-mist">{item.meta}</p>}
         <p className="mt-6 leading-relaxed text-mist">{pick(item.body)}</p>
+        {item.chips && item.chips.length > 0 && (
+          <ul className="mt-6 flex flex-wrap gap-2">
+            {item.chips.map((chip) => (
+              <li key={chip} className="rounded-full border border-white/15 px-3 py-1 font-mono text-xs text-ink/80">
+                {chip}
+              </li>
+            ))}
+          </ul>
+        )}
+        {item.link && (
+          <a
+            href={item.link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 inline-block text-xs uppercase tracking-[0.25em] text-glow underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-glow"
+          >
+            {t(item.link.label)} ↗
+          </a>
+        )}
       </aside>
     </>
   );

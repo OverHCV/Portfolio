@@ -9,6 +9,9 @@ import { ACT_ANCHORS } from '../camera/path';
 import { HORIZON_RADIUS } from '../acts/Act1Galaxy/constants';
 import { smoothstep } from '../lib/motion';
 import { GravitationalLensEffect } from './GravitationalLens';
+import { FisheyeEffect } from './Fisheye';
+import { useReducedMotion } from '../lib/motion';
+import { fisheyeAt, pierLocal } from '../acts/Act3Pier/timeline';
 
 const center = new Vector2();
 const projected = new Vector3();
@@ -40,6 +43,18 @@ function useLensUniforms(lens: GravitationalLensEffect) {
   });
 }
 
+/** Ojo de pez de la construcción del muelle (Acto 3); sin él con reduced motion. */
+const FISHEYE_STRENGTH = 0.55;
+
+function useFisheyeUniforms(fisheye: FisheyeEffect) {
+  const reducedMotion = useReducedMotion();
+  useFrame(({ size }) => {
+    const { progress } = useWorld.getState();
+    const strength = reducedMotion ? 0 : FISHEYE_STRENGTH * fisheyeAt(pierLocal(progress));
+    fisheye.set(strength, size.width / size.height);
+  });
+}
+
 export function Effects() {
   const quality = useWorld((s) => s.quality);
   const settings = QUALITY[quality];
@@ -47,11 +62,15 @@ export function Effects() {
   const lens = useMemo(() => new GravitationalLensEffect(), []);
   // Pass propio: un efecto que deforma el UV no puede fusionarse con el bloom.
   const lensPass = useMemo(() => new EffectPass(camera, lens), [camera, lens]);
+  const fisheye = useMemo(() => new FisheyeEffect(), []);
+  const fisheyePass = useMemo(() => new EffectPass(camera, fisheye), [camera, fisheye]);
   useLensUniforms(lens);
+  useFisheyeUniforms(fisheye);
 
   return (
     <EffectComposer multisampling={settings.fullFx ? 4 : 0}>
       <>{settings.fullFx && <primitive object={lensPass} dispose={null} />}</>
+      <>{settings.fullFx && <primitive object={fisheyePass} dispose={null} />}</>
       <>{settings.bloom && <Bloom mipmapBlur luminanceThreshold={0.95} luminanceSmoothing={0.15} intensity={0.7} radius={0.55} />}</>
       <>{settings.fullFx && <Noise premultiply blendFunction={BlendFunction.SCREEN} opacity={0.35} />}</>
       <>{settings.fullFx && <Vignette offset={0.25} darkness={0.75} />}</>

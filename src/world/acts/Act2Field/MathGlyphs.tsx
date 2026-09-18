@@ -1,10 +1,10 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  AdditiveBlending,
   CanvasTexture,
   Color,
   InstancedBufferAttribute,
   InstancedBufferGeometry,
+  NormalBlending,
   PlaneGeometry,
   ShaderMaterial,
   Vector2,
@@ -16,30 +16,45 @@ import { EXTENT, type Landscape } from './landscape';
 
 /**
  * Notación que flota sobre el paisaje. Es decoración (igual en todos los idiomas), no contenido.
- * Un tramo `{ sup }` se dibuja como superíndice.
+ * Cada entrada es TeX real: MathJax la compila a SVG (glifos como trazados, sin fuentes web)
+ * y se hornea en un atlas con sombra negra para que se lea al cruzar la malla.
  */
-type Piece = string | { sup: string };
-const ENTRIES: Piece[][] = [
-  ['ℝ'], ['ℂ'], ['ℍ'], ['ℕ'], ['ℤ'], ['ℚ'], ['∇f'], ['∂f/∂x'], ['∫'], ['∑'], ['∞'], ['π'], ['λ'], ['ε'], ['δ'],
-  ['e', { sup: 'iπ' }, ' + 1 = 0'],
-  ['xₖ₊₁ = xₖ − η∇f(xₖ)'],
-  ['∇f(x*) = 0'],
-  ['argmin f(x)'],
-  ['‖x‖₂'],
-  ['Ax = b'],
-  ['∀ε > 0 ∃δ > 0'],
-  ['det(A) ≠ 0'],
-  ['ℝ', { sup: 'n' }],
-  ['f : ℝ', { sup: 'n' }, ' → ℝ'],
-  ['H(f) ⪰ 0'],
+const ENTRIES = [
+  String.raw`\mathbb{R}`,
+  String.raw`\mathbb{C}`,
+  String.raw`\mathbb{H}`,
+  String.raw`\mathbb{N}`,
+  String.raw`\mathbb{Z}`,
+  String.raw`\mathbb{Q}`,
+  String.raw`\nabla f`,
+  String.raw`\frac{\partial f}{\partial x}`,
+  String.raw`\int`,
+  String.raw`\sum_{i=1}^{n}`,
+  String.raw`\infty`,
+  String.raw`\pi`,
+  String.raw`\lambda`,
+  String.raw`\varepsilon`,
+  String.raw`\delta`,
+  String.raw`e^{i\pi} + 1 = 0`,
+  String.raw`x_{k+1} = x_k - \eta\,\nabla f(x_k)`,
+  String.raw`\nabla f(x^{*}) = 0`,
+  String.raw`\hat{f}(x) = \frac{1}{nh} \sum_{i=1}^{n} K\!\left(\frac{x - x_i}{h}\right)`,
+  String.raw`\lVert x \rVert_2`,
+  String.raw`Ax = b`,
+  String.raw`d^2(x) = (x - \bar{x})^{\top} S^{-1} (x - \bar{x})`,
+  String.raw`\det(A) \ne 0`,
+  String.raw`\mathbb{R}^{n}`,
+  String.raw`f : \mathbb{R}^{n} \to \mathbb{R}`,
+  String.raw`H(f) \succeq 0`,
 ];
 
+/** Tamaño tipográfico (em/ex) con el que MathJax compila cada fórmula. */
 const FONT_PX = 64;
-const SUP_SCALE = 0.62;
-const ROW = Math.round(FONT_PX * 1.5);
-const ATLAS_WIDTH = 1024;
-const PAD = 12;
-const FONT = `"STIX Two Math", "Cambria Math", "Latin Modern Math", "Times New Roman", serif`;
+const EX_PX = FONT_PX / 2;
+const ATLAS_WIDTH = 2048;
+const PAD = 16;
+/** Sombra horneada bajo cada fórmula: halo oscuro para separarla de la malla. */
+const SHADOW = { blur: 10, offsetY: 3, alpha: 0.9 };
 
 interface AtlasEntry {
   /** Rect UV (u, v, ancho, alto) con v hacia arriba. */
@@ -47,51 +62,98 @@ interface AtlasEntry {
   aspect: number;
 }
 
-/** Dibuja todas las entradas en un canvas por filas; una textura para todo. */
-function buildAtlas(): { texture: CanvasTexture; entries: AtlasEntry[] } {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d')!;
-  const font = (scale: number) => `${Math.round(FONT_PX * scale)}px ${FONT}`;
-  const widthOf = (pieces: Piece[]) =>
-    pieces.reduce((w, p) => {
-      ctx.font = font(typeof p === 'string' ? 1 : SUP_SCALE);
-      return w + ctx.measureText(typeof p === 'string' ? p : p.sup).width;
-    }, 0);
+interface Atlas {
+  texture: CanvasTexture;
+  entries: AtlasEntry[];
+}
 
-  // Empaquetado por filas.
-  const placed: { x: number; y: number; w: number }[] = [];
+/** Documento MathJax: módulo pesado que se carga como chunk aparte y se crea una sola vez. */
+async function createCompiler() {
+  const [{ mathjax }, { TeX }, { SVG }, { browserAdaptor }, { RegisterHTMLHandler }, { AllPackages }] =
+    await Promise.all([
+      import('mathjax-full/js/mathjax.js'),
+      import('mathjax-full/js/input/tex.js'),
+      import('mathjax-full/js/output/svg.js'),
+      import('mathjax-full/js/adaptors/browserAdaptor.js'),
+      import('mathjax-full/js/handlers/html.js'),
+      import('mathjax-full/js/input/tex/AllPackages.js'),
+    ]);
+  RegisterHTMLHandler(browserAdaptor());
+  return mathjax.document('', {
+    InputJax: new TeX({ packages: AllPackages }),
+    // fontCache local: cada SVG lleva sus trazados dentro (autosuficiente para rasterizar).
+    OutputJax: new SVG({ fontCache: 'local' }),
+  });
+}
+type Compiler = Awaited<ReturnType<typeof createCompiler>>;
+let compiler: Promise<Compiler> | null = null;
+
+/** El SVG llega con width/height en ex/em: los pasa a px con la escala de FONT_PX. */
+function toPx(attr: string | null): number {
+  const m = attr?.match(/^([\d.]+)(em|ex|px)?$/);
+  if (!m) return 0;
+  const v = parseFloat(m[1]);
+  return m[2] === 'em' ? v * FONT_PX : m[2] === 'ex' ? v * EX_PX : v;
+}
+
+async function rasterize(doc: Compiler, tex: string) {
+  const node = doc.convert(tex, { display: true, em: FONT_PX, ex: EX_PX, containerWidth: ATLAS_WIDTH });
+  const svg = (node as unknown as Element).firstElementChild as SVGSVGElement | null;
+  if (!svg) throw new Error(`MathJax no produjo SVG para: ${tex}`);
+  // Los trazados usan fill="currentColor": se tiñen de blanco (el color definitivo llega por shader).
+  svg.style.color = '#ffffff';
+  let w = toPx(svg.getAttribute('width'));
+  let h = toPx(svg.getAttribute('height'));
+  svg.setAttribute('width', `${Math.max(w, 1)}px`);
+  svg.setAttribute('height', `${Math.max(h, 1)}px`);
+  const url = URL.createObjectURL(new Blob([svg.outerHTML], { type: 'image/svg+xml' }));
+  try {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    return { img, w: Math.ceil(w || img.naturalWidth), h: Math.ceil(h || img.naturalHeight) };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+/** Compila todas las fórmulas y las empaqueta por filas en un canvas; una textura para todo. */
+async function buildAtlas(): Promise<Atlas> {
+  compiler ??= createCompiler();
+  const doc = await compiler;
+  const glyphs = await Promise.all(ENTRIES.map((tex) => rasterize(doc, tex)));
+
+  // Empaquetado por filas con alturas reales (fracciones y límites son altos).
+  const placed: { x: number; y: number; w: number; h: number }[] = [];
   let x = 0;
   let y = 0;
-  for (const pieces of ENTRIES) {
-    const w = Math.ceil(widthOf(pieces)) + PAD * 2;
-    if (x + w > ATLAS_WIDTH) {
+  let rowH = 0;
+  for (const g of glyphs) {
+    const w = g.w + PAD * 2;
+    const h = g.h + PAD * 2;
+    if (x + w > ATLAS_WIDTH && x > 0) {
       x = 0;
-      y += ROW;
+      y += rowH;
+      rowH = 0;
     }
-    placed.push({ x, y, w });
+    placed.push({ x, y, w, h });
     x += w;
+    rowH = Math.max(rowH, h);
   }
-  const height = y + ROW;
+  const height = Math.max(Math.ceil(y + rowH), 1);
+
+  const canvas = document.createElement('canvas');
   canvas.width = ATLAS_WIDTH;
   canvas.height = height;
+  const ctx = canvas.getContext('2d')!;
+  ctx.shadowColor = `rgba(0, 0, 0, ${SHADOW.alpha})`;
+  ctx.shadowBlur = SHADOW.blur;
+  ctx.shadowOffsetY = SHADOW.offsetY;
+  glyphs.forEach((g, i) => ctx.drawImage(g.img, placed[i].x + PAD, placed[i].y + PAD, g.w, g.h));
 
-  ctx.fillStyle = '#ffffff';
-  ctx.textBaseline = 'alphabetic';
-  const baseline = ROW * 0.68;
-  ENTRIES.forEach((pieces, i) => {
-    let cx = placed[i].x + PAD;
-    for (const p of pieces) {
-      const sup = typeof p !== 'string';
-      ctx.font = font(sup ? SUP_SCALE : 1);
-      const text = sup ? p.sup : p;
-      ctx.fillText(text, cx, placed[i].y + baseline - (sup ? FONT_PX * 0.42 : 0));
-      cx += ctx.measureText(text).width;
-    }
-  });
-
-  const entries = placed.map(({ x: px, y: py, w }) => ({
-    rect: [px / ATLAS_WIDTH, 1 - (py + ROW) / height, w / ATLAS_WIDTH, ROW / height] as AtlasEntry['rect'],
-    aspect: w / ROW,
+  const entries = placed.map(({ x: px, y: py, w, h }, i) => ({
+    rect: [px / ATLAS_WIDTH, 1 - (py + h) / height, w / ATLAS_WIDTH, h / height] as AtlasEntry['rect'],
+    aspect: glyphs[i].w / glyphs[i].h,
   }));
   return { texture: new CanvasTexture(canvas), entries };
 }
@@ -137,9 +199,11 @@ varying vec2 vUv;
 varying float vAlpha;
 
 void main() {
-  float a = texture2D(uAtlas, vUv).a * vAlpha * uOpacity * uReveal * (1.0 - uCalm) * 0.35;
+  // Glifo blanco (teñido con uColor) sobre la sombra negra horneada en el atlas.
+  vec4 t = texture2D(uAtlas, vUv);
+  float a = t.a * vAlpha * uOpacity * uReveal * (1.0 - uCalm) * 0.55;
   if (a < 0.004) discard;
-  gl_FragColor = vec4(uColor, a);
+  gl_FragColor = vec4(t.rgb * uColor, a);
 }
 `;
 
@@ -149,9 +213,26 @@ const VOLUME = { height: 6, bottom: 0.5 };
 
 export function MathGlyphs({ landscape }: { landscape: Landscape }) {
   const quality = useWorld((s) => s.quality);
-  const atlas = useMemo(buildAtlas, []);
+  // El atlas llega async (MathJax se descarga aparte); hasta entonces no hay glifos.
+  const [atlas, setAtlas] = useState<Atlas | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    buildAtlas().then((a) => {
+      if (alive) {
+        setAtlas(a);
+        // TEMP: gancho de depuración (verificar atlas desde puppeteer).
+        (window as unknown as { __mathAtlas?: Atlas }).__mathAtlas = a;
+      } else a.texture.dispose();
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  useEffect(() => () => atlas?.texture.dispose(), [atlas]);
 
   const geometry = useMemo(() => {
+    if (!atlas) return null;
     const count = Math.round(COUNT * QUALITY[quality].density);
     const quad = new PlaneGeometry(1, 1);
     const g = new InstancedBufferGeometry();
@@ -181,32 +262,32 @@ export function MathGlyphs({ landscape }: { landscape: Landscape }) {
     return g;
   }, [quality, atlas]);
 
-  useEffect(() => () => geometry.dispose(), [geometry]);
-  useEffect(() => () => atlas.texture.dispose(), [atlas]);
+  useEffect(() => () => geometry?.dispose(), [geometry]);
 
   // Material a mano (ver Surface.tsx): comparte los uniforms del paisaje sin copiarlos.
-  const material = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader,
-        fragmentShader,
-        uniforms: {
-          uTime: landscape.uniforms.uTime,
-          uOpacity: landscape.uniforms.uOpacity,
-          uReveal: landscape.uniforms.uReveal,
-          uCalm: landscape.uniforms.uCalm,
-          uAtlas: { value: atlas.texture },
-          uColor: { value: new Color(COLORS.ink) },
-          uVolume: { value: new Vector2(VOLUME.height, VOLUME.bottom) },
-        },
-        transparent: true,
-        depthWrite: false,
-        blending: AdditiveBlending,
-        toneMapped: false,
-      }),
-    [landscape, atlas],
-  );
-  useEffect(() => () => material.dispose(), [material]);
+  const material = useMemo(() => {
+    if (!atlas) return null;
+    return new ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        uTime: landscape.uniforms.uTime,
+        uOpacity: landscape.uniforms.uOpacity,
+        uReveal: landscape.uniforms.uReveal,
+        uCalm: landscape.uniforms.uCalm,
+        uAtlas: { value: atlas.texture },
+        uColor: { value: new Color(COLORS.ink) },
+        uVolume: { value: new Vector2(VOLUME.height, VOLUME.bottom) },
+      },
+      transparent: true,
+      depthWrite: false,
+      // Mezcla normal (no aditiva): la sombra negra horneada tiene que poder oscurecer.
+      blending: NormalBlending,
+      toneMapped: false,
+    });
+  }, [landscape, atlas]);
+  useEffect(() => () => material?.dispose(), [material]);
 
+  if (!geometry || !material) return null;
   return <mesh geometry={geometry} material={material} frustumCulled={false} />;
 }

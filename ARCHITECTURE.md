@@ -67,7 +67,7 @@ Portfolio/
 ├── public/
 │   ├── models/                   # solo hero assets: piano, violin, mailbox (.glb, Draco + KTX2)
 │   ├── audio/
-│   │   ├── chopin-op9-2.mp3      # Acto 3 (piano)
+│   │   ├── nocturne-op9-1.mp3    # Acto 3 (piano)
 │   │   ├── liszt-liebestraum-3.mp3  # Acto 4 (violín)
 │   │   └── piano/                # samples para las teclas (C2, C3, C4…)
 │   └── fonts/                    # Fraunces, Space Grotesk (subset)
@@ -96,7 +96,7 @@ Portfolio/
     │   ├── store.ts              # estado global (zustand)
     │   ├── theme.ts              # paleta + tokens de movimiento (espejo en global.css)
     │   ├── acts.config.ts        # pesos por acto → rangos de progreso contiguos
-    │   ├── transitions.config.ts # una transición por frontera (lens, horizon, door, dive)
+    │   ├── transitions.config.ts # una transición por frontera (lens, sea, door, dive)
     │   ├── fx/                   # EffectComposer + lente gravitacional (versión ligera)
     │   ├── sky/                  # cielo estrellado de los Actos 1–2
     │   ├── scroll/
@@ -175,18 +175,18 @@ Cada acto declara un **peso** (1, 3, 3, 2, 2.2); los rangos se derivan y siempre
 | 4 — El faro (piano → partitura)                   | 0.63 – 0.80         | medio                          |
 | 5 — Dentro del piano (ciudad → buzón)             | 0.80 – 1.00         | medio                          |
 
-De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del acto. En el Acto 2, `acts/Act2Field/chapters.ts` reparte el progreso local: entrada (~8%), un capítulo por fragmento de bio y calma final (~15%); lo leen la escena, `FieldOverlay` y el cielo. En el Acto 3, la construcción del muelle ocupa el primer ~15% (rápida) y el recorrido el resto; las medusas se distribuyen a lo largo del recorrido según `milestones.length`, alternando lados del muelle. En el Acto 4, la primera mitad es el plano del piano y la segunda el acercamiento al atril.
+De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del acto. En el Acto 2, `acts/Act2Field/chapters.ts` reparte el progreso local: entrada (~8%), un capítulo por fragmento de bio y calma final (~15%); lo leen la escena, `FieldOverlay` y el cielo. En el Acto 3, `acts/Act3Pier/timeline.ts` reparte el progreso local: llegada (~7%, solo mar bajo los pies), construcción del muelle (~15%, rápida, del faro hacia la cámara), recorrido y puerta del faro; las medusas se distribuyen a lo largo del recorrido según `milestones.length` (`layout.ts`, `jellyAt`), alternando lados del muelle. El largo del muelle es fijo para que el camino de cámara no dependa del contenido. En el Acto 4, la primera mitad es el plano del piano y la segunda el acercamiento al atril.
 
 ### 4.3 Cámara
 - `path.ts` define waypoints por acto; se unen en una sola `CatmullRomCurve3`. `CameraRig` hace `getPointAt(progress)` y mira hacia un segundo punto adelantado de la curva (o a un `lookAt` fijo por acto).
 - Offset de yaw/pitch según la posición del mouse, suavizado con `damp` en `useFrame`.
-- **Ojo de pez (Acto 3, construcción):** FOV animado (p. ej. 75° → 50°) + pass de distorsión barrel en postprocesado, ambos atados a `localProgress` y a 0 al empezar el recorrido.
+- **Ojo de pez (Acto 3, construcción):** FOV animado (`fovAt` en `path.ts`: 55° → 72° → 55°) + pass de distorsión barrel (`fx/Fisheye.ts`), ambos atados al progreso de la construcción y a 0 al empezar el recorrido. Con reduced motion, ninguno de los dos.
 - El Acto 5 cambia a cámara ortográfica: `CameraRig` alterna la cámara activa al cruzar el umbral (la transición queda tapada por el fundido del "super zoom").
 
 ### 4.4 Montaje por proximidad
 - `World.tsx` monta solo `activeAct - 1 … activeAct + 1`, cada acto como `lazy(() => import('./acts/ActN'))` dentro de `Suspense`.
 - Precarga: cuando `localProgress > 0.8` se dispara el `import()` y los `useGLTF.preload` del acto siguiente.
-- Montado no es visible: `ActGate` solo dibuja un acto dentro de su rango más la zona **opaca** (`hold`) de sus transiciones, nunca durante el fundido (evita, p. ej., ver el Acto 2 al fondo del agujero negro).
+- Montado no es visible: `ActGate` solo dibuja un acto dentro de su rango más el `overlap` de sus transiciones: con velo es la zona **opaca** (`hold`), nunca el fundido (evita, p. ej., ver el Acto 2 al fondo del agujero negro); sin velo (2 → 3) es el tramo en que ambos actos se funden a la vista.
 - Al desmontar, R3F libera geometrías y materiales propios; los assets cacheados (`useGLTF`, `useTexture`) se liberan a mano cuando lleguen los modelos.
 
 ### 4.5 Transiciones
@@ -194,11 +194,11 @@ De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del act
 | Paso  | Técnica                                                                        |
 | ----- | ------------------------------------------------------------------------------ |
 | 1 → 2 | La cámara atraviesa el agujero negro; distorsión al máximo + fundido           |
-| 2 → 3 | El paisaje se calma como un mar, la cámara pica hacia abajo, vuelven las estrellas; velo con la línea del horizonte |
+| 2 → 3 | **Sin velo.** El paisaje se calma como un mar y vuelven las estrellas; el Acto 3 está anclado junto al Acto 2 con el mar a la altura del paisaje en calma, así que la malla se funde con el agua en el mismo sitio (`seaHandoff`) y la cámara pasa del picado a flotar sobre el mar sin viaje |
 | 3 → 4 | Cruzar la puerta del faro: fundido a negro de ~200 ms, cambio de escena        |
 | 4 → 5 | Zoom vertical dentro del piano, fundido a color plano, revelado de la ciudad   |
 
-Implementado en `transitions.config.ts` + `overlay/TransitionVeil.tsx`: cada frontera tiene una zona opaca (`hold`, cubre el viaje de cámara entre actos, `TRAVEL_HALF_WINDOW` en `path.ts`) y un fundido (`fade`). Todo depende de `progress`, no de timers, así que es reversible al volver con el scroll. Con reduced motion el velo es un corte.
+Implementado en `transitions.config.ts` + `overlay/TransitionVeil.tsx`: cada frontera con velo tiene una zona opaca (`hold`, cubre el viaje de cámara entre actos, `travelHalfWindow` en `path.ts`) y un fundido (`fade`); la 2 → 3 no tiene velo (`veil: false`). Todo depende de `progress`, no de timers, así que es reversible al volver con el scroll. Con reduced motion el velo es un corte.
 
 ### 4.6 Agujero negro: ligero y HD
 - **Ligero (por defecto):** disco con shader, halo lenteado (la parte trasera del disco que se curva sobre la sombra) y lente de pantalla (`fx/GravitationalLens.ts`, en su propio `EffectPass` porque deforma el UV).
@@ -367,13 +367,14 @@ interface WorldState {
 
 | Pista                                   | Acto          | Entrada                                    | Salida                                  |
 | --------------------------------------- | ------------- | ------------------------------------------ | --------------------------------------- |
-| Chopin, Nocturno Op. 9 No. 2 (piano)    | 3 — Muelle    | Empieza al terminar la construcción, casi inaudible; sube (ease-in) con el recorrido | Se minimiza y se detiene al cruzar la puerta del faro |
+| Chopin, Nocturno Op. 9 No. 1 (piano)    | 3 — Muelle    | Empieza al terminar la construcción, casi inaudible; sube (ease-in) con el recorrido | Se minimiza y se detiene al cruzar la puerta del faro |
 | Liszt, Liebestraum No. 3 (violín)       | 4 — Faro      | Fade-in al entrar al faro                  | Fade-out en el super zoom hacia el Acto 5 |
 
   `gain = curve(localProgress)` por pista, aplicado con `setTargetAtTime` para evitar saltos. Si el usuario vuelve hacia atrás con el scroll, las curvas se recorren al revés.
 - **Teclas del piano (Acto 4):** 4–6 samples (uno por octava) precargados como `AudioBuffer`; cada tecla toca el sample más cercano con `playbackRate = 2^(semitonos/12)`. Van por un bus propio para que se oigan sobre el violín (el violín baja ~3 dB mientras se toca).
 - **Mute global** en la navbar, guardado en `localStorage`.
 - `prefers-reduced-motion` no afecta al audio.
+- **Estado (M2):** implementado el Nocturno (`useNocturne` en `audio/AudioEngine.ts`, montado en `World.tsx`): `<audio>` en streaming desde `public/audio/` → `GainNode` (en iOS `audio.volume` no funciona), volumen = `musicAt(localProgress)` de `acts/Act3Pier/timeline.ts`, pausa tras quedar en silencio. Se desbloquea con el botón de sonido de la navbar; el desbloqueo por `pointerdown` global y el mute en `localStorage` quedan para M3.
 
 ---
 

@@ -23,12 +23,14 @@
   "milestone.kind.certification": "Certificación",
   "milestone.kind.award": "Reconocimiento",
   "milestone.present": "actualidad",
+  "journey.open": "Ver detalle",
   "contact.title": "Contacto",
   "contact.email": "Escríbeme",
   "blog.title": "Escritos",
   "project.repo": "Código",
   "project.demo": "Demo",
   "panel.close": "Cerrar",
+  "panel.credential": "Ver credencial",
   "nav.hd.on": "Agujero negro en alta definición: activado (más exigente)",
   "nav.hd.off": "Agujero negro en alta definición: desactivado"
 }

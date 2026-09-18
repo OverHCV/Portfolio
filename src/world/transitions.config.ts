@@ -1,8 +1,9 @@
 import { ACTS, type ActId } from './acts.config';
-import { TRAVEL_HALF_WINDOW } from './camera/path';
+import { travelHalfWindow } from './camera/path';
+import { SEA_HANDOFF } from './acts/Act2Field/chapters';
 import { COLORS } from './theme';
 
-export type TransitionKind = 'lens' | 'horizon' | 'door' | 'dive';
+export type TransitionKind = 'lens' | 'sea' | 'door' | 'dive';
 
 export interface TransitionDef {
   from: ActId;
@@ -10,31 +11,39 @@ export interface TransitionDef {
   kind: TransitionKind;
   /** Progreso global del límite entre actos. */
   at: number;
+  /** false: no hay velo, los actos se funden a la vista (2→3: el paisaje se vuelve mar). */
+  veil: boolean;
   /** Distancia a `at` durante la que el velo está totalmente opaco (cubre el viaje de cámara). */
   hold: number;
+  /** Distancia a `at` durante la que se dibujan ambos actos (ActGate). */
+  overlap: number;
   /** Largo del fundido de entrada/salida alrededor de la zona opaca. */
   fade: number;
   color: string;
 }
 
-const KINDS: Record<string, { kind: TransitionKind; fade: number; color: string }> = {
-  '1-2': { kind: 'lens', fade: 0.02, color: COLORS.void },
-  // Corto: la salida del Acto 2 ya termina en negro con estrellas; el velo solo tapa el viaje.
-  '2-3': { kind: 'horizon', fade: 0.008, color: COLORS.void },
-  '3-4': { kind: 'door', fade: 0.006, color: '#000000' },
-  '4-5': { kind: 'dive', fade: 0.018, color: COLORS.glow },
+type KindDef = Pick<TransitionDef, 'kind' | 'veil' | 'fade' | 'color'> & { overlap?: number };
+
+const KINDS: Record<string, KindDef> = {
+  '1-2': { kind: 'lens', veil: true, fade: 0.02, color: COLORS.void },
+  // Sin velo: la malla del paisaje en calma se funde con el mar en el mismo sitio (chapters.ts).
+  '2-3': { kind: 'sea', veil: false, fade: 0, color: COLORS.void, overlap: SEA_HANDOFF },
+  '3-4': { kind: 'door', veil: true, fade: 0.006, color: '#000000' },
+  '4-5': { kind: 'dive', veil: true, fade: 0.018, color: COLORS.glow },
 };
 
 /** ARCHITECTURE.md §4.5: una transición por frontera entre actos. */
 export const TRANSITIONS: TransitionDef[] = ACTS.slice(0, -1).map((act, i) => {
   const next = ACTS[i + 1];
-  const def = KINDS[`${act.id}-${next.id}`];
-  return { from: act.id, to: next.id, at: act.end, hold: TRAVEL_HALF_WINDOW, ...def };
+  const { overlap, ...def } = KINDS[`${act.id}-${next.id}`];
+  const hold = travelHalfWindow(act.id);
+  return { from: act.id, to: next.id, at: act.end, hold, overlap: overlap ?? hold, ...def };
 });
 
 /** Opacidad del velo (0..1) y la transición activa para un progreso dado. */
 export function veilAt(progress: number): { transition: TransitionDef | null; opacity: number } {
   for (const tr of TRANSITIONS) {
+    if (!tr.veil) continue;
     const d = Math.abs(progress - tr.at);
     if (d <= tr.hold + tr.fade) {
       const x = Math.max(0, d - tr.hold) / tr.fade;

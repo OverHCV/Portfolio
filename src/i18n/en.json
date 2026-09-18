@@ -23,12 +23,14 @@
   "milestone.kind.certification": "Certification",
   "milestone.kind.award": "Award",
   "milestone.present": "present",
+  "journey.open": "Open details",
   "contact.title": "Contact",
   "contact.email": "Write to me",
   "blog.title": "Writing",
   "project.repo": "Code",
   "project.demo": "Demo",
   "panel.close": "Close",
+  "panel.credential": "View credential",
   "nav.hd.on": "High-definition black hole: on (more demanding)",
   "nav.hd.off": "High-definition black hole: off"
 }

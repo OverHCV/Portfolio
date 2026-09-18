@@ -1,3 +1,5 @@
+import type { MilestoneKind } from './types';
+
 /**
  * Paleta y tokens de movimiento compartidos por el mundo 3D y la interfaz 2D.
  * `src/styles/global.css` (@theme) es un espejo de estos valores: si cambias uno, cambia el otro.
@@ -11,6 +13,15 @@ export const COLORS = {
   cyan: '#7fe3ff',
   violet: '#c9a7ff',
 } as const;
+
+/** Color de medusa (Acto 3) y de su tarjeta, por tipo de hito. */
+export const MILESTONE_COLORS = {
+  job: '#7fe3ff',
+  internship: '#9fffd2',
+  education: '#c9a7ff',
+  certification: '#ffd28a',
+  award: '#ff9fc6',
+} as const satisfies Record<MilestoneKind, string>;
 
 export const EASE = {
   enter: 'expo.out',

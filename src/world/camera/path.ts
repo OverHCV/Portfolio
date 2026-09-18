@@ -1,11 +1,15 @@
 import { CatmullRomCurve3, Vector3 } from 'three';
 import { ACTS, type ActId } from '../acts.config';
+import { EYE, PIER, PIER_FAR } from '../acts/Act3Pier/layout';
+import { ARRIVE_END, BUILD_END, WALK_END, fisheyeAt, pierLocal } from '../acts/Act3Pier/timeline';
 
 /** Centro de cada acto en el mundo. Las escenas se construyen alrededor de su ancla. */
 export const ACT_ANCHORS: Record<ActId, Vector3> = {
   1: new Vector3(0, 0, 0),
   2: new Vector3(0, 0, -80),
-  3: new Vector3(12, -2, -170),
+  // Junto al Acto 2 y con el mar a la altura del paisaje en calma: la frontera 2→3 no tiene viaje.
+  // El desfase es múltiplo de la celda del paisaje, así su malla y la del mar coinciden.
+  3: new Vector3(-3, 0, -78),
   4: new Vector3(12, 0, -260),
   5: new Vector3(0, 0, -340),
 };
@@ -51,10 +55,15 @@ const SHOTS: Record<ActId, Shot[]> = {
     framed(0.82, [-7, 7.5, 14]),
     { t: 1, position: [-3, 2.4, 6], target: [-3.5, -1.4, -1.5] },
   ],
-  // Provisional hasta M2.
+  // Flotando sobre el mar, aún mirando hacia abajo (sigue el picado del Acto 2) → levanta la vista
+  // al horizonte → quieta mientras el muelle llega bajo ella → camina hasta la puerta del faro.
   3: [
-    { t: 0, position: [0, 1.2, 10], target: [0, 0, 0] },
-    { t: 1, position: [0, 0.6, 5], target: [0, 0, 0] },
+    { t: 0, position: [0, EYE, PIER.near - 0.7], target: [0, -0.4, PIER.near - 8] },
+    { t: ARRIVE_END, position: [0, EYE, PIER.near - 0.8], target: [0, 1.2, PIER.near - 40] },
+    { t: BUILD_END, position: [0, EYE, PIER.near - 1], target: [0, 1.5, PIER.near - 40] },
+    { t: (BUILD_END + WALK_END) / 2, position: [0, EYE, (PIER.near - 1 + PIER_FAR + 2.5) / 2], target: [0, 1.6, PIER_FAR - 20] },
+    { t: WALK_END, position: [0, EYE, PIER_FAR + 2.5], target: [0, EYE + 0.2, PIER_FAR - 8] },
+    { t: 1, position: [0, EYE - 0.05, PIER_FAR + 0.6], target: [0, EYE, PIER_FAR - 8] },
   ],
   // Plano del piano → vista cenital → picado dentro del piano (transición `dive`).
   4: [
@@ -76,6 +85,14 @@ const SHOTS: Record<ActId, Shot[]> = {
  */
 export const TRAVEL_HALF_WINDOW = 0.015;
 
+/**
+ * Ventana de viaje de la frontera que sale del acto `from`. La 2→3 casi no tiene: los actos están
+ * pegados y la cámara pasa del picado sobre el paisaje a flotar sobre el mar a la vista, sin velo.
+ */
+export function travelHalfWindow(from: ActId): number {
+  return from === 2 ? 0.004 : TRAVEL_HALF_WINDOW;
+}
+
 interface Keyframe {
   p: number;
   position: Vector3;
@@ -83,8 +100,8 @@ interface Keyframe {
 }
 
 const KEYFRAMES: Keyframe[] = ACTS.flatMap((act, i) => {
-  const from = i === 0 ? act.start : act.start + TRAVEL_HALF_WINDOW;
-  const to = i === ACTS.length - 1 ? act.end : act.end - TRAVEL_HALF_WINDOW;
+  const from = i === 0 ? act.start : act.start + travelHalfWindow(ACTS[i - 1].id);
+  const to = i === ACTS.length - 1 ? act.end : act.end - travelHalfWindow(act.id);
   const anchor = ACT_ANCHORS[act.id];
   return SHOTS[act.id].map((shot) => ({
     p: from + shot.t * (to - from),
@@ -114,4 +131,12 @@ export function sampleCamera(progress: number, outPosition: Vector3, outTarget: 
   const t = progressToT(progress);
   positionCurve.getPoint(t, outPosition);
   targetCurve.getPoint(t, outTarget);
+}
+
+/** FOV normal y el máximo del ojo de pez durante la construcción del muelle. */
+export const BASE_FOV = 55;
+const FISHEYE_FOV = 72;
+
+export function fovAt(progress: number): number {
+  return BASE_FOV + (FISHEYE_FOV - BASE_FOV) * fisheyeAt(pierLocal(progress));
 }

@@ -4,7 +4,7 @@ import { AdditiveBlending, DoubleSide, type ShaderMaterial } from 'three';
 import { HORIZON_RADIUS } from './constants';
 
 export const DISK_INNER = HORIZON_RADIUS * 1.15;
-export const DISK_OUTER = HORIZON_RADIUS * 3.6;
+export const DISK_OUTER = HORIZON_RADIUS * 6.6;
 
 export const vertexShader = /* glsl */ `
 varying vec2 vPos;
@@ -19,12 +19,12 @@ export const NOISE_GLSL = /* glsl */ `
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
   vec2 i = floor(p), f = fract(p);
-  vec2 u = f * f * (3.0 - 2.0 * f);
+  vec2 u = f * f * (3.0 - 1.5 * f);
   return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
 }
 float fbm(vec2 p) {
   float v = 0.0, a = 0.5;
-  for (int i = 0; i < 5; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }
+  for (int i = 0; i < 2; i++) { v += a * noise(p); p *= 12.03; a *= 0.5; }
   return v;
 }
 `;
@@ -72,8 +72,8 @@ export function AccretionDisk() {
   });
 
   return (
-    <mesh rotation={[Math.PI / 2 - 0.2, 0, 0.12]}>
-      <ringGeometry args={[DISK_INNER, DISK_OUTER, 256, 16]} />
+    <mesh rotation={[Math.PI / 2 + 0.2, 0, 9.82]}>
+      <ringGeometry args={[DISK_INNER, DISK_OUTER, 6, 6]} />
       <shaderMaterial
         ref={material}
         vertexShader={vertexShader}
@@ -82,7 +82,7 @@ export function AccretionDisk() {
           uTime: { value: 0 },
           uInner: { value: DISK_INNER },
           uOuter: { value: DISK_OUTER },
-          uHot: { value: [1.9, 1.75, 1.5] },
+          uHot: { value: [2.9, 1.75, 1.5] },
           uWarm: { value: [1.35, 0.85, 0.4] },
           uCool: { value: [0.55, 0.18, 0.05] },
         }}

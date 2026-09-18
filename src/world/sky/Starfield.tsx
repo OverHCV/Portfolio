@@ -102,10 +102,15 @@ export function Starfield() {
   const geometry = useMemo(() => buildGeometry(QUALITY[quality].density), [quality]);
   const material = useRef<ShaderMaterial>(null);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }) => {
     if (material.current) material.current.uniforms.uTime.value = clock.elapsedTime;
     if (points.current && material.current) {
       const { progress, activeAct, localProgress, hd } = useWorld.getState();
+      // En el Acto 1 las cáscaras quedan fijas: la paralaje con la cámara es el efecto. Después el
+      // cielo va con la cámara (el muelle queda lejos del origen); el cambio ocurre dentro del
+      // agujero negro, donde no hay estrellas, así que no se ve.
+      if (activeAct === 1) points.current.position.set(0, 0, 0);
+      else points.current.position.copy(camera.position);
       const fade = activeAct === 2 ? starsAt(localProgress) : 1;
       material.current.uniforms.uFade.value = fade;
       // En HD el shader del Acto 1 dibuja su propio cielo, ya lenteado.
@@ -114,7 +119,8 @@ export function Starfield() {
   });
 
   return (
-    <points ref={points} geometry={geometry} frustumCulled={false}>
+    // Antes que el mar del Acto 3 (renderOrder −1): el agua las cubre por alfa mientras aparece.
+    <points ref={points} geometry={geometry} frustumCulled={false} renderOrder={-2}>
       <shaderMaterial
         ref={material}
         vertexShader={vertexShader}

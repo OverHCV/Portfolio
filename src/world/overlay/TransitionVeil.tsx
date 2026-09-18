@@ -4,10 +4,9 @@ import { veilAt, type TransitionKind } from '../transitions.config';
 import { useReducedMotion } from '../lib/motion';
 import { COLORS } from '../theme';
 
-const BACKGROUNDS: Record<TransitionKind, string> = {
+// 'sea' (2→3) no tiene velo: el paisaje se funde con el mar a la vista.
+const BACKGROUNDS: Record<Exclude<TransitionKind, 'sea'>, string> = {
   lens: COLORS.void,
-  // Vacío liso: el "mirar hacia abajo" lo hace la cámara al final del Acto 2.
-  horizon: COLORS.void,
   door: '#000000',
   dive: `radial-gradient(circle at 50% 50%, #fff4da 0%, ${COLORS.glow} 45%, #9c6a2c 100%)`,
 };
@@ -26,9 +25,9 @@ export function TransitionVeil() {
       const node = el.current;
       if (!node) return;
       const { transition, opacity } = veilAt(progress);
-      if (transition && transition.kind !== kind) {
+      if (transition && transition.kind !== 'sea' && transition.kind !== kind) {
         kind = transition.kind;
-        node.style.background = BACKGROUNDS[kind];
+        node.style.background = BACKGROUNDS[transition.kind];
       }
       // Con reduced motion, cortes: el velo solo aparece mientras cubre el viaje.
       const value = reducedMotion ? (opacity >= 1 ? 1 : 0) : opacity;

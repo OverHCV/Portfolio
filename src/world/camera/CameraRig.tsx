@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { MathUtils, Vector2, Vector3 } from 'three';
+import { MathUtils, PerspectiveCamera, Vector2, Vector3 } from 'three';
 import { useWorld } from '../store';
 import { useReducedMotion } from '../lib/motion';
-import { sampleCamera } from './path';
+import { BASE_FOV, fovAt, sampleCamera } from './path';
 import { veilAt } from '../transitions.config';
 
 /** Cuánto gira la cámara con el mouse en los bordes de la pantalla (radianes). */
@@ -40,6 +40,15 @@ export function CameraRig() {
     const { camera, pointer } = state;
     camera.position.copy(position.current);
     camera.lookAt(target.current);
+
+    // Ojo de pez de la construcción del muelle (Acto 3); con reduced motion el FOV no cambia.
+    if (camera instanceof PerspectiveCamera) {
+      const fov = reducedMotion ? BASE_FOV : fovAt(progress);
+      if (Math.abs(camera.fov - fov) > 1e-3) {
+        camera.fov = fov;
+        camera.updateProjectionMatrix();
+      }
+    }
 
     if (!reducedMotion) {
       look.current.x = MathUtils.damp(look.current.x, pointer.x, 3, delta);
