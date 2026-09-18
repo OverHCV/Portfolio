@@ -844,8 +844,8 @@ export function buildBoard(projects: Project[], density: number, seed = 7): Boar
       occ.fillRect(0, fx, fz, 0.7, 0.7, BLOCK);
     }
 
-    rect(0, 0, HALF - 0.6, HALF - 0.6);
-    labels.push({ text: 'OHCV · PORTFOLIO', x: -HALF + 4.2, y: 0, z: -HALF + 1.7, size: 1.05, align: 'left', owner: -1, tone: 0 });
+    rect(10, 0, HALF - 0.6, HALF - 0.6);
+    labels.push({ text: 'OHCV · PROJECTS', x: -HALF + 4.2, y: 0, z: -HALF + 1.7, size: 1.05, align: 'left', owner: -1, tone: 0 });
     labels.push({ text: 'REV 5.0 · 2026 · MANIZALES, CO', x: -HALF + 4.2, y: 0, z: -HALF + 3.1, size: 0.42, align: 'left', owner: -1, tone: 0 });
     occ.fillRect(0, -HALF + 12, -HALF + 2.4, 8.5, 1.4, BLOCK);
   }
