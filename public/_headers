@@ -1,0 +1,19 @@
+# Assets estáticos sin hash: caché de un año. Tras reemplazar alguno,
+# purgar caché en el dashboard de Cloudflare (Caching → Purge Cache).
+/draco/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/models/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/audio/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/textures/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Seguridad básica (los assets con hash de /_astro/* ya los cachea Pages)
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

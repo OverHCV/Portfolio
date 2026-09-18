@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import site from '../content/site.json';
+---
+<Base title={`404 — ${site.name}`} description="Page not found.">
+  <main class="flex min-h-screen flex-col items-center justify-center gap-5 px-6 text-center">
+    <p class="font-display text-8xl text-glow">404</p>
+    <h1 class="font-display text-2xl">Lost in space</h1>
+    <p class="max-w-md text-mist">
+      This page drifted off the map. The five acts still wait for you at the start.
+    </p>
+    <a
+      href="/"
+      class="rounded-full border border-mist/40 px-6 py-3 transition-colors hover:border-glow hover:text-glow"
+    >
+      ← Back to the galaxy
+    </a>
+  </main>
+</Base>

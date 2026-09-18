@@ -1,4 +1,6 @@
 ---
+import site from '../content/site.json';
+
 import '../styles/global.css';
 
 interface Props {
@@ -7,6 +9,22 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+
+// Canonical absoluto. Descarta ?lang= a propósito: la variante ES es la misma
+// página (§14 de ARCHITECTURE.md); el ruteo /es/ estático queda como follow-up.
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og.jpg', Astro.site);
+const sameAs = Object.values(site.socials).filter((url): url is string => typeof url === 'string');
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: canonical.origin,
+  email: `mailto:${site.email}`,
+  jobTitle: site.role.en,
+  sameAs,
+};
 ---
 
 <!doctype html>
@@ -17,9 +35,23 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#05060a" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en" />
+    <meta property="og:locale:alternate" content="es" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name} — ${site.role.en}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 
 // mathjax-full/js/components/version.js hace eval('require') si PACKAGE_VERSION no está
 // definida (sus bundles oficiales la inyectan en build). Se define en dev y en build.
@@ -11,6 +12,7 @@ const MATHJAX_VERSION = JSON.stringify(require('mathjax-full/package.json').vers
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://overhcv.com',
   output: 'static',
   // La barra de dev de Astro ocupa el mismo sitio que la navbar flotante inferior.
   devToolbar: { enabled: false },
@@ -38,5 +40,5 @@ export default defineConfig({
       esbuildOptions: { define: { PACKAGE_VERSION: MATHJAX_VERSION } },
     },
   },
-  integrations: [react()],
+  integrations: [react(), sitemap()],
 });
