@@ -1,0 +1,12 @@
+{
+  "title": { "en": "3D Portfolio", "es": "Portafolio 3D" },
+  "summary": { "en": "This site.", "es": "Este sitio." },
+  "description": {
+    "en": "Placeholder — scroll-driven narrative in a single WebGL canvas.",
+    "es": "Placeholder — narrativa guiada por scroll en un solo canvas WebGL."
+  },
+  "stack": ["typescript", "astro", "react", "threejs"],
+  "links": {},
+  "building": { "plot": [0, 0], "height": 3, "connectsTo": ["example-project"] },
+  "year": 2026
+}

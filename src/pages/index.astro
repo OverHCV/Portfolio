@@ -1,0 +1,126 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import L from '../components/L.astro';
+import World from '../world/World';
+import { ACTS } from '../world/acts.config';
+import { uiL10n } from '../i18n/translate';
+import site from '../content/site.json';
+import type { Site, SkillFamily, WorldContent } from '../world/types';
+
+const entries = <T,>(list: { id: string; data: T }[]) => list.map(({ id, data }) => ({ id, ...data }));
+
+const bio = entries(await getCollection('bio')).sort((a, b) => a.order - b.order);
+const milestones = entries(await getCollection('milestones')).sort((a, b) => a.start.localeCompare(b.start));
+const skills = entries(await getCollection('skills')).sort((a, b) => a.order - b.order);
+const projects = entries(await getCollection('projects')).sort((a, b) => b.year - a.year);
+const posts = (await getCollection('posts'))
+  .map(({ id, data }) => ({ slug: id, ...data }))
+  .sort((a, b) => b.date.localeCompare(a.date));
+
+const content: WorldContent = { site: site as Site, bio, milestones, skills, projects, posts };
+
+const families: SkillFamily[] = ['language', 'framework', 'infra', 'data', 'tool'];
+const skillsByFamily = families
+  .map((family) => ({ family, items: skills.filter((s) => s.family === family) }))
+  .filter((g) => g.items.length > 0);
+
+const actTitle = (key: string) => uiL10n(`acts.${key}`);
+const [galaxy, field, pier, lighthouse, city] = ACTS;
+---
+
+<Base title={`${site.name} — ${site.role.en}`} description={site.tagline.en}>
+  <!-- Versión semántica: SEO, lectores de pantalla y página completa si no hay WebGL. -->
+  <main class="semantic mx-auto max-w-2xl space-y-16 px-4 py-16 pb-32 leading-relaxed">
+    <header id={galaxy.key}>
+      <h1 class="font-display text-5xl">{site.name}</h1>
+      <p class="mt-2 text-mist"><L text={site.role} /></p>
+      <p class="mt-4"><L text={site.tagline} /></p>
+    </header>
+
+    <section id={field.key}>
+      <h2 class="font-display text-3xl"><L text={actTitle(field.key)} /></h2>
+      {
+        bio.map((b) => (
+          <article class="mt-6">
+            <h3 class="text-lg font-medium"><L text={b.title} /></h3>
+            <p class="text-mist"><L text={b.body} /></p>
+          </article>
+        ))
+      }
+    </section>
+
+    <section id={pier.key}>
+      <h2 class="font-display text-3xl"><L text={actTitle(pier.key)} /></h2>
+      <ol class="mt-6 space-y-6">
+        {
+          milestones.map((m) => (
+            <li>
+              <p class="text-xs uppercase tracking-widest text-mist">
+                <L text={uiL10n(`milestone.kind.${m.kind}`)} /> · {m.start}
+                {/* Certificaciones y reconocimientos tienen fecha de emisión, no un periodo. */}
+                {(m.kind === 'certification' || m.kind === 'award') && !m.end ? null : (
+                  <> – {m.end ?? <L text={uiL10n('milestone.present')} />}</>
+                )}
+              </p>
+              <h3 class="text-lg font-medium">
+                <L text={m.title} /> — {m.org}
+              </h3>
+              <p class="text-mist"><L text={m.summary} /></p>
+              {m.credentialUrl && <a class="underline" href={m.credentialUrl}>{m.credentialUrl}</a>}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section id={lighthouse.key}>
+      <h2 class="font-display text-3xl"><L text={actTitle(lighthouse.key)} /></h2>
+      {
+        skillsByFamily.map((g) => (
+          <div class="mt-6">
+            <h3 class="text-lg font-medium"><L text={uiL10n(`skills.family.${g.family}`)} /></h3>
+            <ul class="mt-1 flex flex-wrap gap-x-4 text-mist">
+              {g.items.map((s) => <li>{s.label}</li>)}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <section id={city.key}>
+      <h2 class="font-display text-3xl"><L text={actTitle(city.key)} /></h2>
+      {
+        projects.map((p) => (
+          <article class="mt-6">
+            <h3 class="text-lg font-medium"><L text={p.title} /> <span class="text-mist">({p.year})</span></h3>
+            <p class="text-mist"><L text={p.description} /></p>
+            <p class="text-sm text-mist">{p.stack.join(' · ')}</p>
+            <p class="space-x-4 text-sm">
+              {p.links.repo && <a class="underline" href={p.links.repo}><L text={uiL10n('project.repo')} /></a>}
+              {p.links.demo && <a class="underline" href={p.links.demo}><L text={uiL10n('project.demo')} /></a>}
+            </p>
+          </article>
+        ))
+      }
+
+      <div id="contact" class="mt-12">
+        <h3 class="text-lg font-medium"><L text={uiL10n('contact.title')} /></h3>
+        <p><a class="underline" href={`mailto:${site.email}`}><L text={uiL10n('contact.email')} /></a></p>
+        <ul class="mt-2 flex gap-4 text-sm">
+          {Object.entries(site.socials).map(([name, url]) => <li><a class="underline capitalize" href={url}>{name}</a></li>)}
+        </ul>
+        {
+          posts.length > 0 && (
+            <div class="mt-6">
+              <h4 class="font-medium"><L text={uiL10n('blog.title')} /></h4>
+              <ul>{posts.slice(0, 3).map((post) => <li><L text={post.title} /></li>)}</ul>
+            </div>
+          )
+        }
+      </div>
+    </section>
+  </main>
+
+  <World client:only="react" content={content} />
+</Base>

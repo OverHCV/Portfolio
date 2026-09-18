@@ -1,0 +1,11 @@
+{
+  "kind": "education",
+  "org": "Placeholder university",
+  "title": { "en": "B.Sc. — placeholder", "es": "Pregrado — placeholder" },
+  "start": "2021-01",
+  "end": "2026-06",
+  "summary": {
+    "en": "Placeholder — degree and focus area.",
+    "es": "Placeholder — carrera y énfasis."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Over Valencia",
+  "role": { "en": "Software Engineer", "es": "Ingeniero de Sistemas" },
+  "tagline": {
+    "en": "Systems, mathematics and music — built from first principles.",
+    "es": "Sistemas, matemática y música — construidos desde los principios."
+  },
+  "email": "hello@example.com",
+  "socials": {
+    "github": "https://github.com/",
+    "linkedin": "https://www.linkedin.com/in/over-haider-castrill%C3%B3n-valencia-37ba3b213"
+  }
+}

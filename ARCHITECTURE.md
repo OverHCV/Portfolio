@@ -1,7 +1,7 @@
 # Arquitectura — Portafolio 3D
 
 > Complemento técnico de [`plan.md`](./plan.md) (guion narrativo). Aquí se define **cómo** se construye; allá, **qué** se cuenta en cada acto.
-> El prototipo anterior en `.temp/` (glassmorphism por secciones) queda superado; solo se reutiliza su stack y configuración pues era horrible y no tenía identidad.
+> El prototipo anterior en `.temp/` (glassmorphism por secciones) queda superado; solo se reutiliza su stack y configuración pues era horrible en su paleta de colores y no tenía identidad. Es importante definir esta paleta para poder cambiar los colores, para empezar con tonos de blanco y negro (quizás gris) que permita contrastar bien.
 
 **Los 5 actos** (ver `plan.md` → "Resumen en 5 líneas"):
 
@@ -78,7 +78,7 @@ Portfolio/
     │   └── Base.astro            # <html lang>, meta/OG, fuentes, script de detección de idioma
     ├── content.config.ts         # definición de colecciones + esquemas
     ├── content/
-    │   ├── site.json             # nombre, rol, tagline, socials, email de contacto
+    │   ├── site.json             # nombre, rol, tagline, socials, email (import directo, no colección)
     │   ├── bio/*.json            # Acto 2 — fragmentos "sobre mí"
     │   ├── milestones/*.json     # Acto 3 — un hito por archivo → una medusa
     │   ├── skills/*.json         # Acto 4 — tecnologías → hojas de la partitura
@@ -88,8 +88,9 @@ Portfolio/
     │   ├── en.json               # cadenas de UI
     │   ├── es.json
     │   ├── detect.ts             # resolución del idioma inicial
-    │   ├── I18nProvider.tsx      # contexto React
-    │   └── useT.ts               # hook t() + pick() para campos localizados
+    │   ├── langs.ts              # idiomas activos
+    │   ├── translate.ts          # t()/pick() puros (Astro en build + isla)
+    │   └── useT.ts               # hook: t() + pick() en el idioma activo del store
     ├── world/
     │   ├── World.tsx             # raíz de la isla: Canvas + overlay + providers
     │   ├── store.ts              # estado global (zustand)
@@ -141,7 +142,7 @@ flowchart TD
     A -->|clic / hover raycast| Z
     Z -->|focus| P[Panel DOM]
     Z -->|activeAct, localProgress| AU[AudioEngine]
-    Z -->|lang| I[I18nProvider]
+    Z -->|lang| I[useT]
     I --> P
     I --> A
     I --> N
@@ -486,7 +487,7 @@ Todos se cubren con **Astro + el stack actual**; no hace falta otro framework. A
 
 | Requisito           | Cómo se cumple                                                                                             | Capa            |
 | ------------------- | ---------------------------------------------------------------------------------------------------------- | --------------- |
-| Internacionalización | Script de detección en `Base.astro` antes del primer paint + `I18nProvider` en la isla + textos `L10n` en colecciones | Astro + React |
+| Internacionalización | Script de detección en `Base.astro` antes del primer paint + `lang` en el store (`useT`) + textos `L10n` en colecciones | Astro + React |
 | SEO                 | HTML estático con todo el contenido, `<title>`/meta/Open Graph por idioma, `sitemap`, `hreflang` con `?lang=` | Astro           |
 | Rendimiento         | Islas de Astro (cero JS fuera del mundo 3D), chunk por acto, lazy loading, calidad adaptativa (§12)         | Astro + R3F     |
 | Accesibilidad       | HTML semántico, navbar con teclado, paneles DOM, reduced motion, contraste (§13)                           | Astro + React   |

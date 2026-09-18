@@ -1,0 +1,13 @@
+---
+import { SUPPORTED_LANGS } from '../i18n/langs';
+import type { L10n } from '../world/types';
+
+interface Props {
+  text: L10n;
+}
+
+// Emite el texto en todos los idiomas activos; el CSS global muestra solo el de <html lang>.
+const { text } = Astro.props;
+---
+
+{SUPPORTED_LANGS.map((lang) => <span data-l10n={lang} lang={lang}>{text[lang] ?? text.en}</span>)}

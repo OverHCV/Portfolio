@@ -1,0 +1,142 @@
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { ACTS, type ActDef } from '../acts.config';
+import { useWorld } from '../store';
+import { useT } from '../../i18n/useT';
+import { SUPPORTED_LANGS } from '../../i18n/langs';
+import { useReducedMotion } from '../lib/motion';
+import { revealBlock } from '../lib/anim';
+import { DUR, EASE } from '../theme';
+import { ACT_ICONS, SoundIcon } from './icons';
+
+gsap.registerPlugin(ScrollToPlugin);
+
+/** Posición de scroll donde empieza un acto (un par de px dentro, para que ya cuente como activo). */
+function scrollYFor(act: ActDef): number {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  return act.start === 0 ? 0 : act.start * max + 2;
+}
+
+const buttonBase =
+  'relative grid h-11 w-11 place-items-center rounded-full text-mist transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-glow';
+
+export function Navbar() {
+  const { t, lang } = useT();
+  const activeAct = useWorld((s) => s.activeAct);
+  const muted = useWorld((s) => s.audio.muted);
+  const reducedMotion = useReducedMotion();
+  const bar = useRef<HTMLDivElement>(null);
+  const nav = useRef<HTMLElement>(null);
+  const pill = useRef<HTMLSpanElement>(null);
+  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const pillPlaced = useRef(false);
+
+  // Entrada tras el título del Hero.
+  useLayoutEffect(() => (nav.current ? revealBlock(nav.current, { delay: 1.6, y: 20 }) : undefined), []);
+
+  // La pastilla del acto activo se desliza entre íconos en vez de saltar.
+  useLayoutEffect(() => {
+    const target = buttons.current[activeAct - 1];
+    if (!target || !pill.current) return;
+    const x = target.offsetLeft;
+    if (!pillPlaced.current || reducedMotion) {
+      gsap.set(pill.current, { x });
+      pillPlaced.current = true;
+    } else {
+      gsap.to(pill.current, { x, duration: DUR.base, ease: EASE.inOut, overwrite: true });
+    }
+  }, [activeAct, reducedMotion]);
+
+  // La barra de progreso se actualiza fuera de React: no re-renderizar la navbar en cada scroll.
+  useEffect(() => {
+    const paint = (p: number) => {
+      if (bar.current) bar.current.style.transform = `scaleX(${p})`;
+    };
+    paint(useWorld.getState().progress);
+    return useWorld.subscribe((s) => paint(s.progress));
+  }, []);
+
+  function goTo(act: ActDef) {
+    useWorld.getState().setFocus(null);
+    gsap.to(window, {
+      scrollTo: { y: scrollYFor(act), autoKill: true },
+      duration: reducedMotion ? 0 : 1.4,
+      ease: 'power2.inOut',
+    });
+  }
+
+  function cycleLang() {
+    const i = SUPPORTED_LANGS.indexOf(lang as (typeof SUPPORTED_LANGS)[number]);
+    useWorld.getState().setLang(SUPPORTED_LANGS[(i + 1) % SUPPORTED_LANGS.length]);
+  }
+
+  return (
+    <nav
+      ref={nav}
+      aria-label={t('nav.label')}
+      className="fixed bottom-5 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 overflow-hidden rounded-full border border-white/10 bg-void/70 px-2 py-1 shadow-lg backdrop-blur-md"
+    >
+      <ol className="relative flex items-center gap-0.5">
+        <span
+          ref={pill}
+          aria-hidden
+          className="pointer-events-none absolute left-0 top-0 h-11 w-11 rounded-full border border-glow/25 bg-white/[0.07]"
+        />
+        {ACTS.map((act, index) => {
+          const name = t(`acts.${act.key}`);
+          const current = act.id === activeAct;
+          return (
+            <li key={act.id} className="group relative">
+              <button
+                ref={(el) => {
+                  buttons.current[index] = el;
+                }}
+                type="button"
+                onClick={() => goTo(act)}
+                aria-label={t('nav.goTo', { act: name })}
+                aria-current={current ? 'step' : undefined}
+                className={`${buttonBase} ${current ? 'text-glow' : ''}`}
+              >
+                {ACT_ICONS[act.key]}
+              </button>
+              <span
+                role="presentation"
+                className="pointer-events-none absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-void/90 px-2 py-1 text-xs text-ink opacity-0 transition-opacity group-hover:opacity-100 md:block"
+              >
+                {name}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+
+      <span aria-hidden className="mx-1 h-6 w-px bg-white/10" />
+
+      <button
+        type="button"
+        onClick={cycleLang}
+        aria-label={`${t('nav.language')}: ${lang.toUpperCase()}`}
+        className={`${buttonBase} text-xs font-medium tracking-wider`}
+      >
+        {lang.toUpperCase()}
+      </button>
+      <button
+        type="button"
+        onClick={() => useWorld.getState().toggleMute()}
+        aria-pressed={!muted}
+        aria-label={muted ? t('nav.sound.off') : t('nav.sound.on')}
+        className={buttonBase}
+      >
+        <SoundIcon muted={muted} />
+      </button>
+
+      <div
+        ref={bar}
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-px origin-left bg-glow/70"
+        style={{ transform: 'scaleX(0)' }}
+      />
+    </nav>
+  );
+}

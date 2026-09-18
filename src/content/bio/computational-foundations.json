@@ -1,0 +1,9 @@
+{
+  "title": { "en": "Computational foundations", "es": "Fundamento computacional" },
+  "body": {
+    "en": "Placeholder — implementation grounded in theory: complexity, correctness, trade-offs.",
+    "es": "Placeholder — implementación con fundamento teórico: complejidad, corrección, compromisos."
+  },
+  "gridPos": [2, 2, -1],
+  "order": 3
+}

@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* Espejo de src/world/theme.ts: si cambias un valor, cámbialo en ambos. */
+@theme {
+  --color-void: #05060a;
+  --color-ink: #e8e6e3;
+  --color-mist: #8a8f98;
+  --color-glow: #f3c77a;
+  --color-ember: #b34a14;
+  --color-cyan: #7fe3ff;
+  --color-violet: #c9a7ff;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-void);
+  color: var(--color-ink);
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Texto multilingüe del HTML semántico: solo se ve (y se lee) el idioma activo. */
+html[lang="en"] [data-l10n]:not([data-l10n="en"]),
+html[lang="es"] [data-l10n]:not([data-l10n="es"]),
+html[lang="ja"] [data-l10n]:not([data-l10n="ja"]) {
+  display: none;
+}
+
+/* Con WebGL, el HTML semántico queda solo para lectores de pantalla y buscadores; sin WebGL es la página. */
+html.webgl .semantic {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

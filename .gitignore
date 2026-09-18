@@ -24,3 +24,5 @@ pnpm-debug.log*
 .idea/
 
 .temp/
+# fuentes pesadas de assets (zip/stl/blend)
+raw/
