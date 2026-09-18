@@ -1,22 +1,14 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { ACTS, type ActDef } from '../acts.config';
 import { useWorld } from '../store';
 import { useT } from '../../i18n/useT';
 import { SUPPORTED_LANGS } from '../../i18n/langs';
 import { useReducedMotion } from '../lib/motion';
 import { revealBlock } from '../lib/anim';
+import { scrollToProgress } from '../lib/scrollTo';
 import { DUR, EASE } from '../theme';
 import { ACT_ICONS, SoundIcon } from './icons';
-
-gsap.registerPlugin(ScrollToPlugin);
-
-/** Posición de scroll donde empieza un acto (un par de px dentro, para que ya cuente como activo). */
-function scrollYFor(act: ActDef): number {
-  const max = document.documentElement.scrollHeight - window.innerHeight;
-  return act.start === 0 ? 0 : act.start * max + 2;
-}
 
 const buttonBase =
   'relative grid h-11 w-11 place-items-center rounded-full text-mist transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-glow';
@@ -60,12 +52,7 @@ export function Navbar() {
   }, []);
 
   function goTo(act: ActDef) {
-    useWorld.getState().setFocus(null);
-    gsap.to(window, {
-      scrollTo: { y: scrollYFor(act), autoKill: true },
-      duration: reducedMotion ? 0 : 1.4,
-      ease: 'power2.inOut',
-    });
+    scrollToProgress(act.start);
   }
 
   function cycleLang() {

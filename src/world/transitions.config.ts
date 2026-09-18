@@ -19,7 +19,8 @@ export interface TransitionDef {
 
 const KINDS: Record<string, { kind: TransitionKind; fade: number; color: string }> = {
   '1-2': { kind: 'lens', fade: 0.02, color: COLORS.void },
-  '2-3': { kind: 'horizon', fade: 0.025, color: COLORS.void },
+  // Corto: la salida del Acto 2 ya termina en negro con estrellas; el velo solo tapa el viaje.
+  '2-3': { kind: 'horizon', fade: 0.008, color: COLORS.void },
   '3-4': { kind: 'door', fade: 0.006, color: '#000000' },
   '4-5': { kind: 'dive', fade: 0.018, color: COLORS.glow },
 };

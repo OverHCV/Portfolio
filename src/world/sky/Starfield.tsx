@@ -5,6 +5,7 @@ import { useWorld } from '../store';
 import { QUALITY } from '../lib/quality';
 import { ACTS } from '../acts.config';
 import { TRANSITIONS } from '../transitions.config';
+import { starsAt } from '../acts/Act2Field/chapters';
 
 const vertexShader = /* glsl */ `
 uniform float uTime;
@@ -25,12 +26,13 @@ void main() {
 `;
 
 const fragmentShader = /* glsl */ `
+uniform float uFade;
 varying vec3 vColor;
 varying float vTwinkle;
 
 void main() {
   float d = length(gl_PointCoord - 0.5);
-  float alpha = smoothstep(0.5, 0.0, d);
+  float alpha = smoothstep(0.5, 0.0, d) * uFade;
   gl_FragColor = vec4(vColor * vTwinkle * alpha, alpha);
 }
 `;
@@ -89,8 +91,9 @@ function buildGeometry(density: number): BufferGeometry {
   return geometry;
 }
 
-// El cielo estrellado acompaña a los dos actos "espaciales" y se apaga bajo el velo hacia el mar.
-const SKY_END = ACTS[1].end + (TRANSITIONS[1].hold + TRANSITIONS[1].fade);
+// Cielo del Acto 1; dentro del agujero negro (Acto 2) no hay estrellas hasta la salida, y siguen
+// como cielo nocturno del muelle (Acto 3). Se apaga bajo el velo de la puerta del faro.
+const SKY_END = ACTS[2].end + TRANSITIONS[2].hold;
 
 export function Starfield() {
   const quality = useWorld((s) => s.quality);
@@ -101,10 +104,12 @@ export function Starfield() {
 
   useFrame(({ clock }) => {
     if (material.current) material.current.uniforms.uTime.value = clock.elapsedTime;
-    if (points.current) {
-      const { progress, activeAct, hd } = useWorld.getState();
+    if (points.current && material.current) {
+      const { progress, activeAct, localProgress, hd } = useWorld.getState();
+      const fade = activeAct === 2 ? starsAt(localProgress) : 1;
+      material.current.uniforms.uFade.value = fade;
       // En HD el shader del Acto 1 dibuja su propio cielo, ya lenteado.
-      points.current.visible = progress <= SKY_END && !(hd && activeAct === 1);
+      points.current.visible = fade > 0.001 && progress <= SKY_END && !(hd && activeAct === 1);
     }
   });
 
@@ -114,7 +119,7 @@ export function Starfield() {
         ref={material}
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
-        uniforms={{ uTime: { value: 0 }, uPixelRatio: { value: dpr } }}
+        uniforms={{ uTime: { value: 0 }, uPixelRatio: { value: dpr }, uFade: { value: 1 } }}
         transparent
         depthWrite={false}
         blending={AdditiveBlending}

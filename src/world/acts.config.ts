@@ -15,7 +15,7 @@ export interface ActDef {
  */
 const WEIGHTS: readonly { id: ActId; key: ActDef['key']; weight: number }[] = [
   { id: 1, key: 'galaxy', weight: 1 },
-  { id: 2, key: 'field', weight: 1.8 },
+  { id: 2, key: 'field', weight: 3 },
   { id: 3, key: 'pier', weight: 3 },
   { id: 4, key: 'lighthouse', weight: 2 },
   { id: 5, key: 'city', weight: 2.2 },

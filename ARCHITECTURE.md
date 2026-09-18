@@ -106,15 +106,16 @@ Portfolio/
     │   │   └── CameraRig.tsx     # muestrea la curva + offset por mouse
     │   ├── acts/
     │   │   ├── Act1Galaxy/       # agujero negro ligero + hd/ (ray marching de blackhole-ts, MIT)
-    │   │   ├── Act2Field/        # grid de conos (gradiente)
+    │   │   ├── Act2Field/        # paisaje f(x, z, t): malla + puntos + glifos, sonda −∇f
     │   │   ├── Act3Pier/         # mar, muelle, faroles, medusas, exterior del faro
     │   │   ├── Act4Lighthouse/   # interior del faro, piano, violín, partitura
     │   │   └── Act5City/         # ciudad-circuito, edificios, pulsos, buzón
     │   ├── overlay/
     │   │   ├── Navbar.tsx        # navbar flotante inferior: actos + progreso + idioma + HD + sonido
     │   │   ├── HeroOverlay.tsx   # título/rol del Acto 1 (DOM)
+│   │   ├── FieldOverlay.tsx  # capítulos de bio del Acto 2 (DOM)
     │   │   ├── TransitionVeil.tsx # velo que cubre el viaje entre actos
-    │   │   ├── Panel.tsx         # panel de detalle (bio, hito, proyecto)
+    │   │   ├── Panel.tsx         # panel de detalle (hito, proyecto)
     │   │   └── ContactSheet.tsx  # formulario del buzón
     │   ├── audio/
     │   │   └── AudioEngine.ts    # contexto, desbloqueo, música por acto, notas del piano
@@ -164,17 +165,17 @@ flowchart TD
 
 ### 4.2 Rangos por acto (`acts.config.ts`)
 
-Cada acto declara un **peso** (1, 1.8, 3, 2, 2.2); los rangos se derivan y siempre son contiguos. Para alargar o acortar un acto se cambia su peso, nunca `start`/`end` a mano. Con los pesos actuales:
+Cada acto declara un **peso** (1, 3, 3, 2, 2.2); los rangos se derivan y siempre son contiguos. Para alargar o acortar un acto se cambia su peso, nunca `start`/`end` a mano. Con los pesos actuales:
 
 | Acto                                              | Rango de `progress` | Peso narrativo                 |
 | ------------------------------------------------- | ------------------- | ------------------------------ |
-| 1 — Galaxia                                       | 0.00 – 0.10         | corto: solo título             |
-| 2 — Espacio de soluciones                         | 0.10 – 0.28         | medio                          |
-| 3 — Muelle y mar (construcción ~15%, recorrido ~85%) | 0.28 – 0.58      | largo: música + N medusas      |
-| 4 — El faro (piano → partitura)                   | 0.58 – 0.78         | medio                          |
-| 5 — Dentro del piano (ciudad → buzón)             | 0.78 – 1.00         | medio                          |
+| 1 — Galaxia                                       | 0.00 – 0.09         | corto: solo título             |
+| 2 — Espacio de soluciones                         | 0.09 – 0.36         | largo: un capítulo por fragmento de bio |
+| 3 — Muelle y mar (construcción ~15%, recorrido ~85%) | 0.36 – 0.63      | largo: música + N medusas      |
+| 4 — El faro (piano → partitura)                   | 0.63 – 0.80         | medio                          |
+| 5 — Dentro del piano (ciudad → buzón)             | 0.80 – 1.00         | medio                          |
 
-De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del acto. En el Acto 3, la construcción del muelle ocupa el primer ~15% (rápida) y el recorrido el resto; las medusas se distribuyen a lo largo del recorrido según `milestones.length`, alternando lados del muelle. En el Acto 4, la primera mitad es el plano del piano y la segunda el acercamiento al atril.
+De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del acto. En el Acto 2, `acts/Act2Field/chapters.ts` reparte el progreso local: entrada (~8%), un capítulo por fragmento de bio y calma final (~15%); lo leen la escena, `FieldOverlay` y el cielo. En el Acto 3, la construcción del muelle ocupa el primer ~15% (rápida) y el recorrido el resto; las medusas se distribuyen a lo largo del recorrido según `milestones.length`, alternando lados del muelle. En el Acto 4, la primera mitad es el plano del piano y la segunda el acercamiento al atril.
 
 ### 4.3 Cámara
 - `path.ts` define waypoints por acto; se unen en una sola `CatmullRomCurve3`. `CameraRig` hace `getPointAt(progress)` y mira hacia un segundo punto adelantado de la curva (o a un `lookAt` fijo por acto).
@@ -185,7 +186,7 @@ De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del act
 ### 4.4 Montaje por proximidad
 - `World.tsx` monta solo `activeAct - 1 … activeAct + 1`, cada acto como `lazy(() => import('./acts/ActN'))` dentro de `Suspense`.
 - Precarga: cuando `localProgress > 0.8` se dispara el `import()` y los `useGLTF.preload` del acto siguiente.
-- Montado no es visible: `ActGate` solo dibuja un acto dentro de su rango más el margen del velo de sus transiciones (evita, p. ej., ver el Acto 2 a través del agujero negro).
+- Montado no es visible: `ActGate` solo dibuja un acto dentro de su rango más la zona **opaca** (`hold`) de sus transiciones, nunca durante el fundido (evita, p. ej., ver el Acto 2 al fondo del agujero negro).
 - Al desmontar, R3F libera geometrías y materiales propios; los assets cacheados (`useGLTF`, `useTexture`) se liberan a mano cuando lleguen los modelos.
 
 ### 4.5 Transiciones
@@ -193,7 +194,7 @@ De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del act
 | Paso  | Técnica                                                                        |
 | ----- | ------------------------------------------------------------------------------ |
 | 1 → 2 | La cámara atraviesa el agujero negro; distorsión al máximo + fundido           |
-| 2 → 3 | El grid se desvanece, aparece la línea de horizonte sobre el mar               |
+| 2 → 3 | El paisaje se calma como un mar, la cámara pica hacia abajo, vuelven las estrellas; velo con la línea del horizonte |
 | 3 → 4 | Cruzar la puerta del faro: fundido a negro de ~200 ms, cambio de escena        |
 | 4 → 5 | Zoom vertical dentro del piano, fundido a color plano, revelado de la ciudad   |
 
@@ -221,11 +222,11 @@ interface Site {                    // Actos 1 y 5
   socials: { github?: string; linkedin?: string; dribbble?: string; twitter?: string };
 }
 
-interface BioFragment {             // Acto 2 — un punto destacado del grid
+interface BioFragment {             // Acto 2 — un capítulo y un mínimo del paisaje
   id: string;
   title: L10n;                      // "Pensamiento sistémico / analítico"
   body: L10n;                       // 2–4 frases
-  gridPos: [number, number, number];
+  gridPos: [number, number];        // (x, z) del pozo en el paisaje
   order: number;
 }
 
@@ -281,7 +282,7 @@ interface Post {                    // Acto 5 — mencionado en el buzón
 | Colección    | Acto | Representación                                                    |
 | ------------ | ---- | ----------------------------------------------------------------- |
 | `site`       | 1, 5 | Título/rol; email y sellos sociales del buzón                     |
-| `bio`        | 2    | Puntos destacados del grid                                        |
+| `bio`        | 2    | Capítulos de texto + mínimos del paisaje                          |
 | `milestones` | 3    | Medusas a lo largo del muelle (orden cronológico, color por tipo) |
 | `skills`     | 4    | Hojas de la partitura en formato álbum (una por familia)          |
 | `projects`   | 5    | Edificios + calles                                                |
@@ -329,7 +330,6 @@ interface WorldState {
   localProgress: number;            // 0..1 dentro del acto activo
   lang: Lang;
   focus: null
-    | { kind: 'bio'; id: string }
     | { kind: 'milestone'; id: string }
     | { kind: 'score' }             // álbum de la partitura abierto
     | { kind: 'project'; id: string }
@@ -399,7 +399,7 @@ interface WorldState {
 | ------------------------------ | ---- | --------------------------------------------- | ---------------------- |
 | Estrellas                      | 1    | Procedural (`Points`)                         | 5k–20k puntos según tier |
 | Agujero negro + disco          | 1    | Procedural (shader + `RingGeometry`)          | —                      |
-| Grid de conos                  | 2    | Procedural (`InstancedMesh`)                  | ≤ 2k instancias        |
+| Paisaje + glifos               | 2    | Procedural (malla y `Points` desplazados en shader; atlas de canvas instanciado) | ≤ 40k vértices, 3 draw calls |
 | Mar                            | 3    | Procedural (shader Gerstner / react-three-ocean) | 1 plano subdividido |
 | Tablas del muelle + faroles    | 3    | Procedural (`InstancedMesh` de cajas/cilindros) | —                    |
 | Medusas                        | 3    | Procedural (campana = esfera deformada, tentáculos = líneas + shader) | ≤ 5k tris c/u |
@@ -483,7 +483,7 @@ bunx @gltf-transform/cli inspect public/models/piano.glb
 | ---- | -------------------------- | ------------------------------ | ------------------------------- |
 | high | `min(devicePixelRatio, 2)` | bloom + distorsión + ojo de pez | completas                      |
 | mid  | 1.5                        | solo bloom                     | 70%                             |
-| low  | 1                          | ninguno                        | 40% (estrellas, conos, medusas) |
+| low  | 1                          | ninguno                        | 40% (estrellas, paisaje, medusas) |
 
 **Otras reglas:** instancing para todo lo repetido; `frameloop="demand"` cuando hay un panel abierto y nada se anima; los shaders reciben `uTime` y `uProgress` como uniforms en lugar de recrear materiales.
 
@@ -533,7 +533,7 @@ Todos se cubren con **Astro + el stack actual**; no hace falta otro framework. A
 | Hito                      | Alcance                                                                                                                                                                       | Criterio de listo                                                                        |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | **M0 — Esqueleto**        | Proyecto Astro en la raíz, Canvas vacío, `ScrollDriver`, store, `CameraRig` sobre una curva de prueba, **navbar**, i18n EN/ES, colecciones con datos de ejemplo, HTML semántico | El scroll y la navbar mueven la cámara de principio a fin; el idioma se detecta y cambia en vivo |
-| **M1 — Actos 1 y 2**      | Agujero negro + estrellas; grid de conos con hover/clic → `Panel`                                                                                                             | Valida la mecánica scroll + mouse (mayor riesgo técnico)                                 |
+| **M1 — Actos 1 y 2**      | Agujero negro + estrellas; paisaje de soluciones con capítulos de bio                                                                                                           | Valida la mecánica scroll + mouse (mayor riesgo técnico)                                 |
 | **M2 — Acto 3 + audio**   | Mar, construcción del muelle con ojo de pez, faroles, medusas desde `milestones`, exterior del faro; `AudioEngine` con desbloqueo y Chopin                                    | La música sube con el recorrido; añadir un hito añade una medusa                         |
 | **M3 — Acto 4**           | Interior del faro, piano (asset optimizado) con teclas tocables, violín, partitura-álbum desde `skills`, Liebestraum                                                            | Tocar teclas y pasar hojas es fluido; la música cambia al cruzar la puerta               |
 | **M4 — Acto 5 + Contact** | Ciudad desde `projects.building`, pulsos, panel de proyecto, buzón + Web3Forms + mención del blog                                                                              | Un mensaje de prueba llega al correo                                                     |

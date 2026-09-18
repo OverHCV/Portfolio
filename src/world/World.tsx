@@ -12,6 +12,7 @@ import { DevProbe } from './lib/DevProbe';
 import { ActGate } from './lib/ActGate';
 import { Starfield } from './sky/Starfield';
 import { HeroOverlay } from './overlay/HeroOverlay';
+import { FieldOverlay } from './overlay/FieldOverlay';
 import { Navbar } from './overlay/Navbar';
 import { Panel } from './overlay/Panel';
 import { TransitionVeil } from './overlay/TransitionVeil';
@@ -73,6 +74,7 @@ function WorldScene({ content }: { content: WorldContent }) {
 
       <TransitionVeil />
       <HeroOverlay site={content.site} />
+      <FieldOverlay bio={content.bio} />
       <Navbar />
       <Panel content={content} />
     </>

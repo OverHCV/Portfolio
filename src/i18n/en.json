@@ -4,6 +4,7 @@
   "acts.pier": "Pier & sea",
   "acts.lighthouse": "The lighthouse",
   "acts.city": "Inside the piano",
+  "field.hint": "Hover the landscape: −∇f points the way down",
   "hero.scroll": "Scroll to begin",
   "nav.label": "Journey",
   "nav.goTo": "Go to {act}",
@@ -28,7 +29,6 @@
   "project.repo": "Code",
   "project.demo": "Demo",
   "panel.close": "Close",
-  "panel.bio": "About me",
   "nav.hd.on": "High-definition black hole: on (more demanding)",
   "nav.hd.off": "High-definition black hole: off"
 }

@@ -4,6 +4,7 @@
   "acts.pier": "Muelle y mar",
   "acts.lighthouse": "El faro",
   "acts.city": "Dentro del piano",
+  "field.hint": "Pasa el cursor por el paisaje: −∇f señala la bajada",
   "hero.scroll": "Haz scroll para empezar",
   "nav.label": "Recorrido",
   "nav.goTo": "Ir a {act}",
@@ -28,7 +29,6 @@
   "project.repo": "Código",
   "project.demo": "Demo",
   "panel.close": "Cerrar",
-  "panel.bio": "Sobre mí",
   "nav.hd.on": "Agujero negro en alta definición: activado (más exigente)",
   "nav.hd.off": "Agujero negro en alta definición: desactivado"
 }

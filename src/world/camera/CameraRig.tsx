@@ -4,6 +4,7 @@ import { MathUtils, Vector2, Vector3 } from 'three';
 import { useWorld } from '../store';
 import { useReducedMotion } from '../lib/motion';
 import { sampleCamera } from './path';
+import { veilAt } from '../transitions.config';
 
 /** Cuánto gira la cámara con el mouse en los bordes de la pantalla (radianes). */
 const LOOK_YAW = 0.12;
@@ -20,9 +21,12 @@ export function CameraRig() {
 
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1);
-    sampleCamera(useWorld.getState().progress, goalPosition.current, goalTarget.current);
+    const { progress } = useWorld.getState();
+    sampleCamera(progress, goalPosition.current, goalTarget.current);
 
-    if (!initialized.current || reducedMotion) {
+    // Bajo el velo opaco la cámara salta a su pose: el suavizado no debe dejar ver el viaje entre actos.
+    // Con reduced motion se mantiene el suavizado (evita saltos al navegar); solo se quita el mirar con el mouse.
+    if (!initialized.current || veilAt(progress).opacity >= 1) {
       position.current.copy(goalPosition.current);
       target.current.copy(goalTarget.current);
       initialized.current = true;

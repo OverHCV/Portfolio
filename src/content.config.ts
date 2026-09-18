@@ -13,7 +13,8 @@ const bio = defineCollection({
   schema: z.object({
     title: l10n,
     body: l10n,
-    gridPos: z.tuple([z.number(), z.number(), z.number()]),
+    // Posición (x, z) del pozo sobre el paisaje del Acto 2.
+    gridPos: z.tuple([z.number(), z.number()]),
     order: z.number(),
   }),
 });

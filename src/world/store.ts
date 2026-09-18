@@ -5,7 +5,6 @@ import { initialLang, persistLang } from '../i18n/detect';
 
 export type Focus =
   | null
-  | { kind: 'bio'; id: string }
   | { kind: 'milestone'; id: string }
   | { kind: 'score' }
   | { kind: 'project'; id: string }

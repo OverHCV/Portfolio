@@ -19,6 +19,17 @@ interface Shot {
   target: Vec;
 }
 
+/** Cuánto se corre el encuadre hacia la izquierda de la cámara: deja libre la columna de texto. */
+const TEXT_LEAD = 3.5;
+
+/** Toma que mira al centro del acto pero desplazada a la izquierda, para que el sujeto quede a la derecha. */
+function framed(t: number, position: Vec): Shot {
+  const [x, , z] = position;
+  const len = Math.hypot(x, z) || 1;
+  // Izquierda de la cámara en el plano xz = (fz, −fx) con f = dirección hacia el centro.
+  return { t, position, target: [(-z / len) * TEXT_LEAD, 0, (x / len) * TEXT_LEAD] };
+}
+
 /**
  * Tomas de cámara por acto. Viven aquí y no en cada acto para que el camino completo
  * esté disponible sin cargar los chunks de los actos.
@@ -31,11 +42,14 @@ const SHOTS: Record<ActId, Shot[]> = {
     { t: 0.55, position: [0, 0.7, 9], target: [0, -0.8, 0] },
     { t: 1, position: [0, 0.05, 1.1], target: [0, 0, 0] },
   ],
-  // Tres cuartos con una órbita lenta alrededor del campo.
+  // Sale del agujero negro mirando desde arriba → órbita a tres cuartos durante los capítulos,
+  // con el paisaje a la derecha del texto → se acerca y pica hacia la superficie ya en calma.
   2: [
-    { t: 0, position: [11, 6, 10], target: [0, -0.5, 0] },
-    { t: 0.5, position: [5, 4, 10], target: [0, 0, 0] },
-    { t: 1, position: [-2.5, 3.5, 9], target: [0, 0, 0] },
+    { t: 0, position: [0, 15, 9], target: [0, -1, 0] },
+    framed(0.14, [8, 7.5, 15]),
+    framed(0.48, [1, 7, 16]),
+    framed(0.82, [-7, 7.5, 14]),
+    { t: 1, position: [-3, 2.4, 6], target: [-3.5, -1.4, -1.5] },
   ],
   // Provisional hasta M2.
   3: [

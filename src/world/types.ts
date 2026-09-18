@@ -14,7 +14,8 @@ export interface BioFragment {
   id: string;
   title: L10n;
   body: L10n;
-  gridPos: [number, number, number];
+  /** Posición (x, z) de su pozo en el paisaje del Acto 2. */
+  gridPos: [number, number];
   order: number;
 }
 

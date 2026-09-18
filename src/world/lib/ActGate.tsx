@@ -5,10 +5,10 @@ import { ACTS, type ActId } from '../acts.config';
 import { TRANSITIONS } from '../transitions.config';
 import { useWorld } from '../store';
 
-/** Margen de visibilidad a cada lado de un acto: lo que dura el velo de la transición vecina. */
+/** Margen de visibilidad a cada lado de un acto: solo la zona opaca del velo, donde viaja la cámara. */
 function marginAt(boundary: number): number {
   const tr = TRANSITIONS.find((t) => Math.abs(t.at - boundary) < 1e-6);
-  return tr ? tr.hold + tr.fade : 0;
+  return tr ? tr.hold : 0;
 }
 
 /**

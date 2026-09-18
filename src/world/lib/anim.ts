@@ -38,7 +38,7 @@ export function revealText(el: HTMLElement, { by = 'chars', delay = 0, stagger, 
 }
 
 /** Entrada simple: sube y aparece. */
-export function revealBlock(el: HTMLElement, { delay = 0, y = 24, duration = DUR.slow } = {}) {
+export function revealBlock(el: HTMLElement, { delay = 0, y = 24, duration = DUR.slow as number } = {}) {
   if (prefersReducedMotion()) return () => {};
   const tween = gsap.from(el, { y, opacity: 0, duration, delay, ease: EASE.enter });
   return () => tween.kill();

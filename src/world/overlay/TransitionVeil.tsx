@@ -6,8 +6,8 @@ import { COLORS } from '../theme';
 
 const BACKGROUNDS: Record<TransitionKind, string> = {
   lens: COLORS.void,
-  // La línea del horizonte aparece en el centro mientras el velo se abre sobre el mar.
-  horizon: `linear-gradient(to bottom, ${COLORS.void} 0%, ${COLORS.void} 49.7%, rgba(243, 199, 122, 0.85) 50%, ${COLORS.void} 50.3%, ${COLORS.void} 100%)`,
+  // Vacío liso: el "mirar hacia abajo" lo hace la cámara al final del Acto 2.
+  horizon: COLORS.void,
   door: '#000000',
   dive: `radial-gradient(circle at 50% 50%, #fff4da 0%, ${COLORS.glow} 45%, #9c6a2c 100%)`,
 };

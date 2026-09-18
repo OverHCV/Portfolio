@@ -2,7 +2,7 @@ import type { Quality } from '../store';
 
 export interface QualitySettings {
   dpr: [number, number];
-  /** Multiplicador de densidades (estrellas, conos, medusas). */
+  /** Multiplicador de densidades (estrellas, paisaje, medusas). */
   density: number;
   bloom: boolean;
   /** Lente, grano y viñeta. */

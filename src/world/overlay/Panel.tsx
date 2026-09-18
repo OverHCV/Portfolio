@@ -12,12 +12,11 @@ interface PanelItem {
   body: L10n;
 }
 
-/** Traduce el `focus` del store al contenido del panel. Los demás tipos llegan con sus actos. */
-function resolve(focus: NonNullable<Focus>, content: WorldContent): PanelItem | null {
-  if (focus.kind === 'bio') {
-    const b = content.bio.find((x) => x.id === focus.id);
-    return b ? { eyebrow: 'panel.bio', title: b.title, body: b.body } : null;
-  }
+/**
+ * Traduce el `focus` del store al contenido del panel. Cada tipo llega con su acto (hitos en M2,
+ * proyectos en M4); la bio del Acto 2 ya no usa panel: se lee en capítulos (FieldOverlay).
+ */
+function resolve(_focus: NonNullable<Focus>, _content: WorldContent): PanelItem | null {
   return null;
 }
 

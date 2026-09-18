@@ -31,7 +31,7 @@ El tono emocional es **liminal**: espacios de tránsito, vacíos, con una sola f
 | Sección clásica                           | Acto               | Cómo se ve                                      |
 | ----------------------------------------- | ------------------ | ----------------------------------------------- |
 | Hero                                      | 1 — Galaxia        | Título + rol sobre un agujero negro             |
-| About                                     | 2 — Espacio de soluciones | Grid 3D de puntos con flechas, clicable  |
+| About                                     | 2 — Espacio de soluciones | Paisaje de puntos y malla; texto por capítulos |
 | Experience / Educación / Certificaciones  | 3 — Muelle y mar   | Medusas bioluminiscentes, una por hito          |
 | Skills / Stack                            | 4 — El faro        | Hojas de la partitura (álbum)                   |
 | Projects                                  | 5 — Dentro del piano | Edificios de la ciudad-circuito               |
@@ -52,15 +52,15 @@ Cada sección clásica vive en **un solo** acto. El orden cuenta una historia: q
 - **Tipografía sugerida:** `Fraunces` (nombre) + `Space Grotesk` (UI). Pendiente probar con tu nombre real.
 
 ### Acto 2 — Espacio de soluciones (About)
-- **Qué se muestra:** un **grid 3D estático de puntos**; en cada punto una flecha (cono) que apunta en la dirección del gradiente de un campo matemático fijo. **El paisaje no se mueve.** Representa cómo piensas: cada punto de un problema tiene una dirección de mejora.
+- **Qué se muestra:** estamos *dentro* del agujero negro: todo negro, sin estrellas. Aparece un **paisaje blanco** f(x, y) hecho de puntos y malla que respira (ondas lentas), con notación matemática flotando (ℝ, ℂ, ℍ, ∇f, e^{iπ} + 1 = 0…). Cada fragmento de bio es un **mínimo** del paisaje, marcado por una esfera luminosa que sube y baja con él. Representa cómo piensas: cada punto de un problema tiene una dirección de mejora.
 - **Qué se hace:**
-  - El mouse resalta el punto más cercano (la flecha crece/brilla).
-  - **5–7 puntos destacados** (más brillantes). Clic → panel con un fragmento de tu presentación: pensamiento sistémico y analítico, principios, axiomas de diseño, implementación con fundamento computacional…
-  - El resto de puntos son decorativos (hover sí, clic no).
-- **Contenido que carga:** colección `bio`.
-- **Cámara:** perspectiva fija a tres cuartos, con leve yaw/pitch por mouse.
-- **Notas técnicas:** `InstancedMesh` para los conos (un draw call); gradiente analítico calculado una vez al montar. Raycasting para hover/clic. Sin física.
-- **Transición → 3:** el grid se desvanece y aparece la línea del horizonte sobre el mar.
+  - El scroll recorre un **capítulo por fragmento**: el texto (título + cuerpo) está siempre a la vista en una columna a la izquierda, y el pozo del capítulo activo se hunde y su esfera brilla. Sin clic ni panel.
+  - **Sonda del cursor:** bajo el puntero se dibujan los dos cortes ortogonales de la malla (x fija, y fija) y, en su cruce, el vector de descenso −∇f con el valor de f.
+  - Hover en una esfera → crece y muestra su título; clic → viaja a su capítulo. Los puntos de progreso bajo el texto hacen lo mismo.
+- **Contenido que carga:** colección `bio` (`gridPos` = posición (x, z) del pozo en el paisaje).
+- **Cámara:** sale del negro mirando desde arriba; órbita lenta a tres cuartos con el paisaje a la derecha del texto; al final baja la mirada hacia la superficie.
+- **Notas técnicas:** f se define una sola vez y se genera en GLSL (desplaza malla y puntos en GPU) y en TS (esferas y sonda, con raycast propio contra la altura). Malla con líneas por shader (`fract` + `fwidth`), puntos con `Points`, glifos en un atlas de canvas con un solo draw call.
+- **Transición → 3:** el paisaje se **calma** hasta ser un mar suave, la cámara pica hacia abajo, el paisaje se apaga mientras vuelven las estrellas (salimos del agujero negro) y el velo `horizon` da paso al muelle, que se construye rápido desde el faro hacia nosotros.
 
 ### Acto 3 — Muelle y mar (Trayectoria)
 Muelle de noche, mar oscuro, medusas bioluminiscentes bajo y sobre el agua, y el faro al fondo. Representa el camino recorrido — *no todo es instantáneo en esta vida*.
