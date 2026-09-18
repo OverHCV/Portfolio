@@ -94,27 +94,37 @@ Portfolio/
     ├── world/
     │   ├── World.tsx             # raíz de la isla: Canvas + overlay + providers
     │   ├── store.ts              # estado global (zustand)
-    │   ├── acts.config.ts        # rangos de progreso por acto
+    │   ├── theme.ts              # paleta + tokens de movimiento (espejo en global.css)
+    │   ├── acts.config.ts        # pesos por acto → rangos de progreso contiguos
+    │   ├── transitions.config.ts # una transición por frontera (lens, horizon, door, dive)
+    │   ├── fx/                   # EffectComposer + lente gravitacional (versión ligera)
+    │   ├── sky/                  # cielo estrellado de los Actos 1–2
     │   ├── scroll/
     │   │   └── ScrollDriver.tsx  # ScrollTrigger → store.progress
     │   ├── camera/
     │   │   ├── path.ts           # CatmullRomCurve3 con los waypoints de cada acto
     │   │   └── CameraRig.tsx     # muestrea la curva + offset por mouse
     │   ├── acts/
-    │   │   ├── Act1Galaxy/       # agujero negro, estrellas
+    │   │   ├── Act1Galaxy/       # agujero negro ligero + hd/ (ray marching de blackhole-ts, MIT)
     │   │   ├── Act2Field/        # grid de conos (gradiente)
     │   │   ├── Act3Pier/         # mar, muelle, faroles, medusas, exterior del faro
     │   │   ├── Act4Lighthouse/   # interior del faro, piano, violín, partitura
     │   │   └── Act5City/         # ciudad-circuito, edificios, pulsos, buzón
     │   ├── overlay/
-    │   │   ├── Navbar.tsx        # navbar flotante inferior: actos + progreso + idioma + sonido
+    │   │   ├── Navbar.tsx        # navbar flotante inferior: actos + progreso + idioma + HD + sonido
+    │   │   ├── HeroOverlay.tsx   # título/rol del Acto 1 (DOM)
+    │   │   ├── TransitionVeil.tsx # velo que cubre el viaje entre actos
     │   │   ├── Panel.tsx         # panel de detalle (bio, hito, proyecto)
     │   │   └── ContactSheet.tsx  # formulario del buzón
     │   ├── audio/
     │   │   └── AudioEngine.ts    # contexto, desbloqueo, música por acto, notas del piano
     │   └── lib/
-    │       ├── dispose.ts        # liberar geometrías/materiales/texturas
-    │       └── quality.ts        # tier de GPU → DPR, postprocesado, densidades
+    │       ├── anim.ts           # helpers GSAP (reveal por letras/palabras) con los tokens de theme.ts
+    │       ├── ActGate.tsx       # un acto montado solo se dibuja dentro de su ventana de progreso
+    │       ├── QualityProbe.tsx  # tier de GPU inicial + bajada en caliente por FPS
+    │       ├── WorldErrorBoundary.tsx # si el 3D falla, queda el HTML semántico
+    │       ├── DevProbe.tsx      # solo dev: window.__world (escena, cámara, store)
+    │       └── quality.ts        # tier → DPR, postprocesado, densidades
     └── styles/
         └── global.css            # Tailwind + tokens
 ```
@@ -152,7 +162,9 @@ flowchart TD
 - `index.astro` renderiza un contenedor alto (p. ej. `height: 1000vh`) detrás del canvas fijo.
 - `ScrollDriver` crea un `ScrollTrigger` con `scrub` sobre ese contenedor y escribe `progress ∈ [0, 1]` en el store. Todo lo demás lee de ahí; nada escucha `scroll` directamente.
 
-### 4.2 Rangos por acto (`acts.config.ts`, valores iniciales a ajustar)
+### 4.2 Rangos por acto (`acts.config.ts`)
+
+Cada acto declara un **peso** (1, 1.8, 3, 2, 2.2); los rangos se derivan y siempre son contiguos. Para alargar o acortar un acto se cambia su peso, nunca `start`/`end` a mano. Con los pesos actuales:
 
 | Acto                                              | Rango de `progress` | Peso narrativo                 |
 | ------------------------------------------------- | ------------------- | ------------------------------ |
@@ -173,7 +185,8 @@ De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del act
 ### 4.4 Montaje por proximidad
 - `World.tsx` monta solo `activeAct - 1 … activeAct + 1`, cada acto como `lazy(() => import('./acts/ActN'))` dentro de `Suspense`.
 - Precarga: cuando `localProgress > 0.8` se dispara el `import()` y los `useGLTF.preload` del acto siguiente.
-- Al desmontar, `dispose.ts` recorre el subárbol y libera geometrías, materiales y texturas.
+- Montado no es visible: `ActGate` solo dibuja un acto dentro de su rango más el margen del velo de sus transiciones (evita, p. ej., ver el Acto 2 a través del agujero negro).
+- Al desmontar, R3F libera geometrías y materiales propios; los assets cacheados (`useGLTF`, `useTexture`) se liberan a mano cuando lleguen los modelos.
 
 ### 4.5 Transiciones
 
@@ -184,7 +197,11 @@ De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del act
 | 3 → 4 | Cruzar la puerta del faro: fundido a negro de ~200 ms, cambio de escena        |
 | 4 → 5 | Zoom vertical dentro del piano, fundido a color plano, revelado de la ciudad   |
 
-Los fundidos son un plano a pantalla completa en el overlay (o un pass de postprocesado) controlado por `progress`, no por timers, para que sean reversibles al hacer scroll hacia atrás.
+Implementado en `transitions.config.ts` + `overlay/TransitionVeil.tsx`: cada frontera tiene una zona opaca (`hold`, cubre el viaje de cámara entre actos, `TRAVEL_HALF_WINDOW` en `path.ts`) y un fundido (`fade`). Todo depende de `progress`, no de timers, así que es reversible al volver con el scroll. Con reduced motion el velo es un corte.
+
+### 4.6 Agujero negro: ligero y HD
+- **Ligero (por defecto):** disco con shader, halo lenteado (la parte trasera del disco que se curva sobre la sombra) y lente de pantalla (`fx/GravitationalLens.ts`, en su propio `EffectPass` porque deforma el UV).
+- **HD (botón `HD` en la navbar, se guarda en `localStorage`):** ray marching de geodésicas de blackhole-ts (MIT) a pantalla completa, sincronizado con la cámara; escala `WORLD_PER_UNIT = 0.9`. Mientras está activo se apagan el lente y las estrellas propias, y el DPR se limita a 1.25. El cambio al salir del acto ocurre bajo el velo `lens`.
 
 ---
 
@@ -277,7 +294,8 @@ interface Post {                    // Acto 5 — mencionado en el buzón
 - **Navbar flotante inferior-centrada** (`overlay/Navbar.tsx`), un `<nav>` DOM sobre el canvas, siempre visible.
 - **Destinos:** 5 botones con ícono (galaxia, campo, ola, faro, circuito) y tooltip traducido. Clic → `gsap.to(window, { scrollTo: inicioDelActo })`, que mueve el scroll real, así que la cámara, el audio y las transiciones siguen funcionando igual que con la rueda.
 - **Estado:** el botón del `activeAct` queda resaltado; una barra fina muestra `progress` global.
-- **Grupo derecho:** selector de idioma (EN/ES) y toggle de sonido (también desbloquea el audio).
+- **Grupo derecho:** selector de idioma (EN/ES), `HD` (agujero negro físico) y toggle de sonido (también desbloquea el audio).
+- **Indicador:** una pastilla que se desliza entre íconos al cambiar de acto; la navbar entra con un reveal tras el título.
 - **Móvil:** solo íconos, sin tooltips; tamaño táctil ≥ 44 px.
 - **Teclado:** botones enfocables con `Tab`, `aria-current` en el acto activo, `aria-label` traducido.
 - Mientras hay un `Panel` abierto, la navbar se atenúa pero sigue activa (navegar cierra el panel).

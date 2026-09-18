@@ -28,12 +28,12 @@ void main() {
   float up = sin(angle);
 
   // Espesor aparente según el ángulo: arco ancho arriba, hilo fino abajo, casi nada a los lados.
-  float reach = mix(0.18, 1.0, smoothstep(-0.2, 0.9, up)) * (0.35 + 0.65 * abs(up));
+  float reach = mix(0.14, 0.75, smoothstep(-0.2, 0.9, up)) * (0.35 + 0.65 * abs(up));
   float profile = smoothstep(0.0, 0.05, t) * (1.0 - smoothstep(0.0, reach, t));
 
   float n = fbm(vec2(angle * 3.0 - uTime * 0.25, t * 6.0));
   vec3 color = mix(uWarm, uHot, pow(1.0 - t, 2.0));
-  float intensity = profile * (0.55 + 0.8 * n) * 1.6;
+  float intensity = profile * (0.5 + 0.7 * n) * 1.05;
   gl_FragColor = vec4(color * intensity, 1.0);
 }
 `;

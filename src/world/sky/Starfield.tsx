@@ -1,8 +1,10 @@
 import { useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, ShaderMaterial } from 'three';
-import { useWorld } from '../../store';
-import { QUALITY } from '../../lib/quality';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, type Points, ShaderMaterial } from 'three';
+import { useWorld } from '../store';
+import { QUALITY } from '../lib/quality';
+import { ACTS } from '../acts.config';
+import { TRANSITIONS } from '../transitions.config';
 
 const vertexShader = /* glsl */ `
 uniform float uTime;
@@ -87,18 +89,27 @@ function buildGeometry(density: number): BufferGeometry {
   return geometry;
 }
 
+// El cielo estrellado acompaña a los dos actos "espaciales" y se apaga bajo el velo hacia el mar.
+const SKY_END = ACTS[1].end + (TRANSITIONS[1].hold + TRANSITIONS[1].fade);
+
 export function Starfield() {
   const quality = useWorld((s) => s.quality);
+  const points = useRef<Points>(null);
   const dpr = useThree((s) => s.viewport.dpr);
   const geometry = useMemo(() => buildGeometry(QUALITY[quality].density), [quality]);
   const material = useRef<ShaderMaterial>(null);
 
   useFrame(({ clock }) => {
     if (material.current) material.current.uniforms.uTime.value = clock.elapsedTime;
+    if (points.current) {
+      const { progress, activeAct, hd } = useWorld.getState();
+      // En HD el shader del Acto 1 dibuja su propio cielo, ya lenteado.
+      points.current.visible = progress <= SKY_END && !(hd && activeAct === 1);
+    }
   });
 
   return (
-    <points geometry={geometry} frustumCulled={false}>
+    <points ref={points} geometry={geometry} frustumCulled={false}>
       <shaderMaterial
         ref={material}
         vertexShader={vertexShader}

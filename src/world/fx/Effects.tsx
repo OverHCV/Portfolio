@@ -18,13 +18,14 @@ const right = new Vector3();
 /** Lente del agujero negro: sigue su posición en pantalla y crece al acercarse (transición `lens`). */
 function useLensUniforms(lens: GravitationalLensEffect) {
   useFrame(({ camera, size }) => {
-    const { activeAct, localProgress } = useWorld.getState();
+    const { activeAct, localProgress, hd } = useWorld.getState();
     const anchor = ACT_ANCHORS[1];
     const distance = camera.position.distanceTo(anchor);
 
     projected.copy(anchor).project(camera);
     const inFront = projected.z < 1;
-    if (activeAct > 2 || !inFront || distance < HORIZON_RADIUS * 1.15) {
+    // En HD el propio shader curva la luz: el lente de pantalla sobra.
+    if (hd || activeAct > 2 || !inFront || distance < HORIZON_RADIUS * 1.15) {
       lens.set(center.set(0.5, 0.5), 0, 0, 1);
       return;
     }
@@ -51,7 +52,7 @@ export function Effects() {
   return (
     <EffectComposer multisampling={settings.fullFx ? 4 : 0}>
       <>{settings.fullFx && <primitive object={lensPass} dispose={null} />}</>
-      <>{settings.bloom && <Bloom mipmapBlur luminanceThreshold={0.9} luminanceSmoothing={0.2} intensity={0.85} radius={0.7} />}</>
+      <>{settings.bloom && <Bloom mipmapBlur luminanceThreshold={0.95} luminanceSmoothing={0.15} intensity={0.7} radius={0.55} />}</>
       <>{settings.fullFx && <Noise premultiply blendFunction={BlendFunction.SCREEN} opacity={0.35} />}</>
       <>{settings.fullFx && <Vignette offset={0.25} darkness={0.75} />}</>
       <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />

@@ -33,14 +33,14 @@ const SHOTS: Record<ActId, Shot[]> = {
   ],
   // Tres cuartos con una órbita lenta alrededor del campo.
   2: [
-    { t: 0, position: [15, 8, 13], target: [0, -0.5, 0] },
-    { t: 0.5, position: [7, 5.5, 14], target: [0, 0, 0] },
-    { t: 1, position: [-3, 4.5, 12], target: [0, 0, 0] },
+    { t: 0, position: [11, 6, 10], target: [0, -0.5, 0] },
+    { t: 0.5, position: [5, 4, 10], target: [0, 0, 0] },
+    { t: 1, position: [-2.5, 3.5, 9], target: [0, 0, 0] },
   ],
   // Provisional hasta M2.
   3: [
-    { t: 0, position: [0, 1.5, 16], target: [0, 0, 0] },
-    { t: 1, position: [0, 0.8, 7], target: [0, 0, 0] },
+    { t: 0, position: [0, 1.2, 10], target: [0, 0, 0] },
+    { t: 1, position: [0, 0.6, 5], target: [0, 0, 0] },
   ],
   // Plano del piano → vista cenital → picado dentro del piano (transición `dive`).
   4: [
@@ -51,8 +51,8 @@ const SHOTS: Record<ActId, Shot[]> = {
   ],
   // Casi isométrica desde arriba; la cámara ortográfica llega en M4.
   5: [
-    { t: 0, position: [0, 16, 16], target: [0, 0, 0] },
-    { t: 1, position: [4, 12, 10], target: [2, 0, 0] },
+    { t: 0, position: [0, 10, 10], target: [0, 0, 0] },
+    { t: 1, position: [4, 7, 7], target: [2, 0, 0] },
   ],
 };
 

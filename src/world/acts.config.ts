@@ -8,14 +8,28 @@ export interface ActDef {
   end: number;
 }
 
-/** Rangos de `progress` por acto (ARCHITECTURE.md §4.2). Deben ser contiguos y cubrir 0..1. */
-export const ACTS: readonly ActDef[] = [
-  { id: 1, key: 'galaxy', start: 0.0, end: 0.1 },
-  { id: 2, key: 'field', start: 0.29, end: 0.3 },
-  { id: 3, key: 'pier', start: 0.6, end: 0.7 },
-  { id: 4, key: 'lighthouse', start: 0.8, end: 0.81 },
-  { id: 5, key: 'city', start: 0.9, end: 1.0 },
+/**
+ * Peso de cada acto en el recorrido: cuánto scroll ocupa respecto a los demás.
+ * Los rangos de `progress` se calculan a partir de aquí y siempre quedan contiguos,
+ * así que se puede alargar o acortar un acto sin romper el resto.
+ */
+const WEIGHTS: readonly { id: ActId; key: ActDef['key']; weight: number }[] = [
+  { id: 1, key: 'galaxy', weight: 1 },
+  { id: 2, key: 'field', weight: 1.8 },
+  { id: 3, key: 'pier', weight: 3 },
+  { id: 4, key: 'lighthouse', weight: 2 },
+  { id: 5, key: 'city', weight: 2.2 },
 ];
+
+const TOTAL_WEIGHT = WEIGHTS.reduce((sum, a) => sum + a.weight, 0);
+
+/** Rangos de `progress` por acto (ARCHITECTURE.md §4.2), derivados de WEIGHTS. */
+export const ACTS: readonly ActDef[] = WEIGHTS.reduce<ActDef[]>((acts, { id, key, weight }) => {
+  const start = acts.length ? acts[acts.length - 1].end : 0;
+  const end = id === WEIGHTS[WEIGHTS.length - 1].id ? 1 : start + weight / TOTAL_WEIGHT;
+  acts.push({ id, key, start, end });
+  return acts;
+}, []);
 
 /** Largo total del recorrido de scroll, en alturas de viewport. */
 export const SCROLL_LENGTH_VH = 1000;

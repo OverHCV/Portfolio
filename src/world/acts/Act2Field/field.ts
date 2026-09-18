@@ -27,8 +27,8 @@ const BOWL = 0.06;
  */
 export function createField(nodes: Vec[]) {
   const wells: Well[] = [
-    ...nodes.map((c) => ({ center: new Vector3(...c), depth: 1.3, width: 2.2 })),
-    ...DECOYS.map((c) => ({ center: new Vector3(...c), depth: 0.55, width: 1.6 })),
+    ...nodes.map((c) => ({ center: new Vector3(...c), depth: 1.0, width: 1.25 })),
+    ...DECOYS.map((c) => ({ center: new Vector3(...c), depth: 0.45, width: 1.1 })),
   ];
   const d = new Vector3();
 

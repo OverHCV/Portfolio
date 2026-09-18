@@ -23,12 +23,33 @@ export interface WorldState {
   focus: Focus;
   audio: { unlocked: boolean; muted: boolean };
   quality: Quality;
+  /** Agujero negro físico (ray marching). Apagado por defecto; se guarda entre visitas. */
+  hd: boolean;
   setProgress(p: number): void;
   setFocus(f: Focus): void;
   setLang(l: ActiveLang): void;
   setQuality(q: Quality): void;
   toggleMute(): void;
+  toggleHd(): void;
   unlockAudio(): void;
+}
+
+const HD_STORAGE_KEY = 'hd';
+
+function readFlag(key: string): boolean {
+  try {
+    return localStorage.getItem(key) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeFlag(key: string, value: boolean) {
+  try {
+    localStorage.setItem(key, value ? '1' : '0');
+  } catch {
+    // Almacenamiento bloqueado: la preferencia vale solo para esta visita.
+  }
 }
 
 export const useWorld = create<WorldState>()((set, get) => ({
@@ -40,6 +61,7 @@ export const useWorld = create<WorldState>()((set, get) => ({
   focus: null,
   audio: { unlocked: false, muted: true },
   quality: 'high',
+  hd: readFlag(HD_STORAGE_KEY),
   setProgress(p) {
     const { act, local } = actAt(p);
     // activeAct solo cambia al cruzar un límite, así los suscriptores reactivos no re-renderizan por frame.
@@ -59,6 +81,11 @@ export const useWorld = create<WorldState>()((set, get) => ({
   toggleMute() {
     const { audio } = get();
     set({ audio: { unlocked: true, muted: !audio.muted } });
+  },
+  toggleHd() {
+    const hd = !get().hd;
+    writeFlag(HD_STORAGE_KEY, hd);
+    set({ hd });
   },
   unlockAudio() {
     set((s) => ({ audio: { ...s.audio, unlocked: true } }));

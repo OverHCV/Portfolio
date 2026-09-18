@@ -6,8 +6,8 @@ import { BOUNDS, type Field } from './field';
 
 const COUNTS = { x: 15, y: 5, z: 11 };
 const UP = new Vector3(0, 1, 0);
-const LOW = new Color(COLORS.mist).multiplyScalar(0.55);
-const HIGH = new Color(COLORS.cyan).multiplyScalar(0.9);
+const LOW = new Color(COLORS.mist).multiplyScalar(0.3);
+const HIGH = new Color(COLORS.cyan).multiplyScalar(0.55);
 // Por encima de 1 para que el bloom lo recoja.
 const HOVER = new Color(COLORS.glow).multiplyScalar(2.4);
 
@@ -102,7 +102,7 @@ export function FieldGrid({ field, avoid }: { field: Field; avoid: Vector3[] }) 
       }}
       onPointerOut={() => highlight(null)}
     >
-      <coneGeometry args={[0.055, 0.28, 6, 1]} />
+      <coneGeometry args={[0.04, 0.26, 6, 1]} />
       <meshBasicMaterial toneMapped={false} />
     </instancedMesh>
   );

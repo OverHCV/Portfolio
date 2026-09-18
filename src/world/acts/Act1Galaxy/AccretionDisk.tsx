@@ -58,7 +58,7 @@ void main() {
 
   float beaming = 1.0 + 0.6 * sin(angle);
   float edges = smoothstep(0.0, 0.06, t) * (1.0 - smoothstep(0.55, 1.0, t));
-  float intensity = (0.35 + 0.9 * n + 0.4 * streaks) * (0.4 + 2.6 * heat) * beaming * edges;
+  float intensity = (0.3 + 0.8 * n + 0.35 * streaks) * (0.22 + 1.5 * heat) * beaming * edges;
 
   gl_FragColor = vec4(color * intensity, 1.0);
 }

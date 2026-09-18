@@ -18,9 +18,13 @@ void mainUv(inout vec2 uv) {
   float alpha = strength * radius * radius / max(r, 1e-4);
   alpha *= 1.0 - smoothstep(radius * 3.0, radius * 7.0, r);
   float source = r - alpha;
-  // Si el rayo "cae" dentro del horizonte, es sombra: se muestrea el centro (negro).
+  // El rayo "cae" en el horizonte: es sombra. Se remapea el disco de sombra [0, rs] al interior
+  // de la esfera [0, radius], que en la escena es negro (salvo la banda frontal del disco).
   if (source < radius) {
-    uv = center;
+    float shadowRadius = radius * (1.0 + sqrt(1.0 + 4.0 * strength)) * 0.5;
+    vec2 inside = (d / max(r, 1e-4)) * (r * radius / shadowRadius);
+    inside.x /= aspect;
+    uv = center + inside;
     return;
   }
   vec2 offset = (d / r) * alpha;

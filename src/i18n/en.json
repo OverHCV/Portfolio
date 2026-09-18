@@ -28,5 +28,7 @@
   "project.repo": "Code",
   "project.demo": "Demo",
   "panel.close": "Close",
-  "panel.bio": "About me"
+  "panel.bio": "About me",
+  "nav.hd.on": "High-definition black hole: on (more demanding)",
+  "nav.hd.off": "High-definition black hole: off"
 }

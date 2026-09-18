@@ -25,6 +25,7 @@ export function Navbar() {
   const { t, lang } = useT();
   const activeAct = useWorld((s) => s.activeAct);
   const muted = useWorld((s) => s.audio.muted);
+  const hd = useWorld((s) => s.hd);
   const reducedMotion = useReducedMotion();
   const bar = useRef<HTMLDivElement>(null);
   const nav = useRef<HTMLElement>(null);
@@ -39,7 +40,8 @@ export function Navbar() {
   useLayoutEffect(() => {
     const target = buttons.current[activeAct - 1];
     if (!target || !pill.current) return;
-    const x = target.offsetLeft;
+    // El <li> es el que se posiciona respecto al <ol> (el botón lo hace respecto a su <li>).
+    const x = target.parentElement?.offsetLeft ?? 0;
     if (!pillPlaced.current || reducedMotion) {
       gsap.set(pill.current, { x });
       pillPlaced.current = true;
@@ -120,6 +122,16 @@ export function Navbar() {
         className={`${buttonBase} text-xs font-medium tracking-wider`}
       >
         {lang.toUpperCase()}
+      </button>
+      <button
+        type="button"
+        onClick={() => useWorld.getState().toggleHd()}
+        aria-pressed={hd}
+        aria-label={hd ? t('nav.hd.on') : t('nav.hd.off')}
+        title={hd ? t('nav.hd.on') : t('nav.hd.off')}
+        className={`${buttonBase} text-[10px] font-semibold tracking-wider`}
+      >
+        <span className={`rounded border px-1 py-px transition-colors ${hd ? 'border-glow text-glow' : 'border-current'}`}>HD</span>
       </button>
       <button
         type="button"

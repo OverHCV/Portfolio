@@ -6,7 +6,7 @@ import { streamline, type Field } from './field';
 
 // Semillas repartidas en una esfera (Fibonacci) alrededor de cada nodo.
 const SEEDS_PER_NODE = 9;
-const SEED_RADIUS = 3.4;
+const SEED_RADIUS = 2.4;
 
 function fibonacciSphere(n: number): Vector3[] {
   const golden = Math.PI * (3 - Math.sqrt(5));
@@ -31,7 +31,7 @@ export function Streamlines({ field, nodes }: { field: Field; nodes: Vector3[] }
   return (
     <group>
       {lines.map((points, i) => (
-        <Line key={i} points={points} color={COLORS.glow} lineWidth={1} transparent opacity={0.28} />
+        <Line key={i} points={points} color={COLORS.glow} lineWidth={1} transparent opacity={0.35} />
       ))}
     </group>
   );
