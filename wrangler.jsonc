@@ -1,0 +1,14 @@
+{
+  // Despliegue en Cloudflare (Workers con assets estáticos — sucesor de Pages).
+  // Uso: bun run build && npx wrangler@latest deploy
+  "name": "portfolio",
+  "compatibility_date": "2026-09-18",
+  "assets": {
+    "directory": "dist",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "overhcv.com", "custom_domain": true },
+    { "pattern": "www.overhcv.com", "custom_domain": true }
+  ]
+}

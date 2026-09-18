@@ -545,9 +545,11 @@ Todos se cubren con **Astro + el stack actual**; no hace falta otro framework. A
 ## 15. Deploy
 
 - `bun run build` → `astro build` en modo estático (`output: 'static'`) → `dist/`.
-- Hosting estático: Vercel (recomendado por previews por rama) o cualquier CDN.
-- Variables de entorno: solo `PUBLIC_WEB3FORMS_KEY`.
-- Cabeceras de caché largas para `/models`, `/audio`, `/fonts` (nombres con hash o versión en la ruta).
+- Hosting: **Cloudflare Workers con assets estáticos** (sucesor de Pages; el dominio vive en la misma cuenta). Config en `wrangler.jsonc`: `bun run build && npx wrangler@latest deploy`.
+- Dominios custom (`overhcv.com`, `www.overhcv.com`) como rutas `custom_domain` en `wrangler.jsonc`: Cloudflare crea el DNS y el certificado al desplegar.
+- Variables de entorno: solo `PUBLIC_WEB3FORMS_KEY` (se hornea en build; va en `.env` local o en el entorno de CI).
+- Cabeceras: `public/_headers` (Workers Assets las sirve): caché `immutable` de 1 año para `/models`, `/audio`, `/textures`, `/draco` — como no tienen hash, tras reemplazar un asset hay que purgar caché en el dashboard — más headers de seguridad globales.
+- CI/CD (pendiente): GitHub Actions con `wrangler-action` + API token, o recrear el proyecto con la integración Git del dashboard.
 
 ---
 
