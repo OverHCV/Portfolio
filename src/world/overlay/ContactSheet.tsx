@@ -1,7 +1,7 @@
 import { useEffect, useId, useState, type FormEvent } from 'react';
 import { useWorld } from '../store';
 import { useT } from '../../i18n/useT';
-import { canSubmit, mailtoHref, MESSAGE_MAX, submitContact, validateContact, type ContactErrors, type ContactMessage } from '../lib/contact';
+import { canSubmit, gmailHref, mailtoHref, MESSAGE_MAX, submitContact, validateContact, type ContactErrors, type ContactMessage } from '../lib/contact';
 import type { Post, Site } from '../types';
 import { useDialog } from './useDialog';
 
@@ -9,11 +9,12 @@ type Status = 'idle' | 'sending' | 'sent' | 'error';
 
 const EMPTY: ContactMessage = { name: '', email: '', subject: '', message: '', botcheck: '' };
 
-const NETWORKS: Record<string, string> = { github: 'GitHub', linkedin: 'LinkedIn', dribbble: 'Dribbble', twitter: 'Twitter' };
+const NETWORKS: Record<string, string> = { github: 'GitHub', linkedin: 'LinkedIn', dribbble: 'Dribbble', twitter: 'X' };
 
 /**
  * La hoja que sale del buzón (Acto 5): formulario de contacto en papel, la mención del blog si hay
- * posts y los sellos postales con las redes. Envía por Web3Forms; sin servicio o si falla, `mailto:`.
+ * posts y los sellos postales con las redes. Envía por Web3Forms; sin servicio o si falla, Gmail web,
+ * `mailto:` o copiar la dirección.
  */
 export function ContactSheet({ site, posts }: { site: Site; posts: Post[] }) {
   const { t, pick } = useT();
@@ -23,6 +24,7 @@ export function ContactSheet({ site, posts }: { site: Site; posts: Post[] }) {
   const [form, setForm] = useState<ContactMessage>(EMPTY);
   const [errors, setErrors] = useState<ContactErrors>({});
   const [status, setStatus] = useState<Status>('idle');
+  const [copied, setCopied] = useState(false);
   const id = useId();
 
   // Una carta enviada no se reabre enviada: la siguiente vez la hoja vuelve en blanco.
@@ -46,11 +48,21 @@ export function ContactSheet({ site, posts }: { site: Site; posts: Post[] }) {
     setErrors(found);
     if (Object.keys(found).length) return;
     if (!canSubmit) {
-      window.location.href = mailtoHref(site.email, form);
+      window.open(gmailHref(site.email, form), '_blank', 'noopener');
       return;
     }
     setStatus('sending');
     setStatus((await submitContact(form)) ? 'sent' : 'error');
+  }
+
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(site.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // Sin permiso de portapapeles: la dirección sigue visible en el encabezado.
+    }
   }
 
   const field =
@@ -68,7 +80,7 @@ export function ContactSheet({ site, posts }: { site: Site; posts: Post[] }) {
         aria-modal="true"
         aria-labelledby={`${id}-title`}
         onKeyDown={onKeyDown}
-        className="fixed inset-x-3 bottom-3 top-auto z-40 mx-auto max-h-[88vh] max-w-lg overflow-y-auto rounded-sm bg-paper p-6 text-paper-ink shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:p-10"
+        className="fixed inset-x-3 bottom-3 top-auto z-40 mx-auto max-h-[88vh] max-w-lg overflow-y-auto rounded-sm bg-paper p-6 text-paper-ink shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] md:inset-y-0 md:my-auto md:h-fit md:p-10"
         style={{ backgroundImage: 'repeating-linear-gradient(transparent 0 31px, rgba(27,26,23,0.06) 31px 32px)' }}
       >
         <div className="flex items-start justify-between gap-6">
@@ -161,10 +173,7 @@ export function ContactSheet({ site, posts }: { site: Site; posts: Post[] }) {
 
             {status === 'error' && (
               <p className="text-sm text-ember" role="alert">
-                {t('contact.error')}{' '}
-                <a className="underline underline-offset-4" href={mailtoHref(site.email, form)}>
-                  {t('contact.fallback')}
-                </a>
+                {t('contact.error')} {t('contact.fallback')}:
               </p>
             )}
 
@@ -176,9 +185,19 @@ export function ContactSheet({ site, posts }: { site: Site; posts: Post[] }) {
               >
                 {status === 'sending' ? t('contact.sending') : t('contact.send')}
               </button>
-              <a className="text-right text-xs text-paper-ink/60 underline-offset-4 hover:underline" href={mailtoHref(site.email, form)}>
-                {t('contact.fallback')}
-              </a>
+              <p className="text-right text-xs text-paper-ink/60">
+                <a className="underline-offset-4 hover:underline" href={gmailHref(site.email, form)} target="_blank" rel="noopener noreferrer">
+                  {t('contact.gmail')}
+                </a>
+                {' · '}
+                <a className="underline-offset-4 hover:underline" href={mailtoHref(site.email, form)}>
+                  {t('contact.mailApp')}
+                </a>
+                {' · '}
+                <button type="button" className="underline-offset-4 hover:underline" onClick={copyEmail} aria-live="polite">
+                  {copied ? t('contact.copied') : t('contact.copy')}
+                </button>
+              </p>
             </div>
           </form>
         )}

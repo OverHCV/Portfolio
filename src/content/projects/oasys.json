@@ -18,7 +18,10 @@
   },
   "images": [
     "/projects/oasys/01.webp",
-    "/projects/oasys/02.webp"
+    "/projects/oasys/02.webp",
+    "/projects/oasys/03.webp",
+    "/projects/oasys/04.webp",
+    "/projects/oasys/05.webp"
   ],
   "stack": [
     "Rust",

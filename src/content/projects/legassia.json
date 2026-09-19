@@ -1,0 +1,45 @@
+{
+  "order": 6,
+  "title": {
+    "en": "Legassia",
+    "es": "Legassia"
+  },
+  "role": {
+    "en": "Freelance · full-stack",
+    "es": "Freelance · full-stack"
+  },
+  "summary": {
+    "en": "Website for a law firm in Bogotá.",
+    "es": "Sitio web para una firma jurídica en Bogotá."
+  },
+  "description": {
+    "en": "Services, process, team and publications for a law firm, with consultation booking as the main call to action. A Vue 3 SPA with Pinia and Vue Router; publications and contact live on Supabase. GSAP and motion-v handle the motion, Three.js adds a touch of depth, and it has a light/dark theme, per-page SEO with Unhead and PostHog analytics.",
+    "es": "Servicios, proceso, equipo y publicaciones de una firma jurídica, con el agendamiento de consultas como llamado principal. Una SPA en Vue 3 con Pinia y Vue Router; las publicaciones y el contacto viven en Supabase. GSAP y motion-v llevan el movimiento, Three.js añade un toque de profundidad, y tiene tema claro/oscuro, SEO por página con Unhead y analítica con PostHog."
+  },
+  "images": [
+    "/projects/legassia/01.webp",
+    "/projects/legassia/02.webp",
+    "/projects/legassia/03.webp"
+  ],
+  "stack": [
+    "Vue",
+    "Pinia",
+    "Vue Router",
+    "Three.js",
+    "GSAP",
+    "Supabase",
+    "Sass",
+    "PostHog"
+  ],
+  "links": {
+    "demo": "https://legassia.co"
+  },
+  "building": {
+    "chip": "qfp",
+    "height": 0.9,
+    "connectsTo": [
+      "texel"
+    ]
+  },
+  "year": 2026
+}
