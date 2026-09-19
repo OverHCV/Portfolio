@@ -8,24 +8,28 @@
   "start": "2025-01",
   "end": "2026-06",
   "summary": {
-    "en": "End-to-end architecture, backend and cloud of the company's AI product — the precursor of OASys.",
-    "es": "Arquitectura, backend y nube de punta a punta del producto de IA de la empresa — el precursor de OASys."
+    "en": "End-to-end architecture, backend and cloud of the company's AI product — N8N B2B & B2C automation.",
+    "es": "Arquitectura, backend y nube de punta a punta del producto de IA de la empresa — Automatización B2B & B2C en N8N."
   },
   "details": {
-    "en": "Led the end-to-end architecture, backend and cloud deployment of the company's AI product, owning the whole stack. Built LLM pipelines (RAG, tool-use agents) in Python and TypeScript with vector stores and embedding workflows, drove Scrum planning and delivery with Screaming Architecture and layered design, and automated business processes with N8N. The limits of those agents and workflows are what led me to build OASys.",
-    "es": "Lideré la arquitectura, el backend y el despliegue en la nube del producto de IA de la empresa, a cargo de todo el stack. Construí pipelines LLM (RAG, agentes con herramientas) en Python y TypeScript con bases vectoriales y embeddings, conduje la planeación y entrega con Scrum aplicando Screaming Architecture y diseño por capas, y automaticé procesos de negocio con N8N. Los límites de esos agentes y workflows fueron los que me llevaron a crear OASys."
+    "en": "Lead the architecture, fullstack development and cloud deployment of the company's AI product. Built LLM pipelines (RAG, tool-using agents) in Python, Golang, TypeScript with vector databases and embeddings, drove planning and delivery with Scrum applying layered architecture and design principles, and automated business processes with N8N. The limits of those agents and workflows led me to create OASys.",
+    "es": "Lideré el proceso de arquitectura, desarrollo fullstack y despliegue en la nube del producto de IA de la empresa. Construí pipelines LLM (RAG, agentes con herramientas) en Python, Golang, TypeScript con bases vectoriales y embeddings, conduje la planeación y entrega con Scrum aplicando principios de Architectura y diseño por capas y automaticé procesos de negocio con N8N. Los límites de esos agentes y workflows fueron los que me llevaron a crear OASys."
   },
   "stack": [
     "Next.js",
     "FastAPI",
-    "Node.js",
-    "Docker",
-    "QDrant",
     "LangChain",
-    "Supabase",
+    "LangGraph",
+    "LangSmith",
+    "Redis",
+    "Docker",
+    "Node.js",
+    "QDrant",
     "ChromaDB",
+    "Metabase",
+    "Supabase",
     "Azure",
-    "GCP",
-    "N8N"
+    "N8N",
+    "GCP"
   ]
 }

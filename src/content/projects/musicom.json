@@ -1,5 +1,5 @@
 {
-  "order": 10,
+  "order": 9,
   "title": { "en": "Musicom", "es": "Musicom" },
   "role": { "en": "Author", "es": "Autor" },
   "summary": { "en": "A composable algebra of music theory that reads and explains real scores.", "es": "Un álgebra componible de teoría musical que lee y explica partituras reales." },
