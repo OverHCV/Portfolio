@@ -7,16 +7,20 @@
     "es": "Los instrumentos: cada uno, una forma distinta de pensar un problema."
   },
   "items": [
+    { "label": "Bash · Shell · PowerShell", "level": 2 },
     { "label": "Python", "level": 3 },
     { "label": "TypeScript", "level": 3 },
+    { "label": "Assembly (AVR / x86)", "level": 3 },
     { "label": "Java", "level": 3 },
     { "label": "C++", "level": 3 },
     { "label": "C#", "level": 3 },
     { "label": "Rust", "level": 3 },
     { "label": "Go", "level": 3 },
+    { "label": "R", "level": 3 },
     { "label": "C", "level": 3 },
-    { "label": "Assembly (AVR / x86)", "level": 3 },
+    { "label": "Arduino", "level": 3 },
+    { "label": "Kotlin", "level": 3 },
     { "label": "LaTeX", "level": 3 },
-    { "label": "Bash · Shell · PowerShell", "level": 2 }
+    { "label": "OS", "level": 3 }
   ]
 }

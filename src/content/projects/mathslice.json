@@ -1,15 +1,38 @@
 {
-  "order": 7,
-  "title": { "en": "MathSlice", "es": "MathSlice" },
-  "role": { "en": "Author · private code", "es": "Autor · código privado" },
-  "summary": { "en": "Interactive maths content: graphs, runnable code and step-by-step algebra.", "es": "Contenido matemático interactivo: gráficas, código ejecutable y álgebra paso a paso." },
+  "order": 2,
+  "title": {
+    "en": "MathSlice",
+    "es": "MathSlice"
+  },
+  "role": {
+    "en": "Author · private code",
+    "es": "Autor · código privado"
+  },
+  "summary": {
+    "en": "Interactive maths content: graphs, runnable code and step-by-step algebra.",
+    "es": "Contenido matemático interactivo: gráficas, código ejecutable y álgebra paso a paso."
+  },
   "description": {
     "en": "A platform for interactive mathematics: topics are authored in MDX and embed artifacts — graphs, Python that runs in the browser through Pyodide in a worker, diagrams and LaTeX — inside Astro pages with React islands. Its own symbolic engine, a separate piece, will turn exercises into derivations you can follow. Not deployed yet.",
     "es": "Una plataforma de matemática interactiva: los temas se escriben en MDX e incrustan artefactos — gráficas, Python que corre en el navegador con Pyodide en un worker, diagramas y LaTeX — en páginas Astro con islas de React. Su propio motor simbólico, una pieza aparte, convertirá los ejercicios en derivaciones que se pueden seguir. Aún sin desplegar."
   },
-  "images": ["/projects/mathslice/01.webp", "/projects/mathslice/02.webp", "/projects/mathslice/03.webp"],
-  "stack": ["Astro", "React", "MDX", "Pyodide", "TypeScript"],
+  "images": [
+    "/projects/mathslice/01.webp",
+    "/projects/mathslice/02.webp",
+    "/projects/mathslice/03.webp"
+  ],
+  "stack": [
+    "Astro",
+    "React",
+    "MDX",
+    "Pyodide",
+    "TypeScript"
+  ],
   "links": {},
-  "building": { "chip": "module", "height": 0.9, "connectsTo": [] },
+  "building": {
+    "chip": "module",
+    "height": 1.4,
+    "connectsTo": []
+  },
   "year": 2026
 }

@@ -1,8 +1,8 @@
 {
-  "order": 2,
+  "order": 7,
   "title": {
-    "en": "Alter — the precursor of OASys",
-    "es": "Alter — el precursor de OASys"
+    "en": "Alter AI",
+    "es": "Alter AI"
   },
   "role": {
     "en": "Founding engineer",
@@ -30,7 +30,7 @@
   "links": {},
   "building": {
     "chip": "bga",
-    "height": 1.4,
+    "height": 0.9,
     "connectsTo": [
       "oasys",
       "healink",

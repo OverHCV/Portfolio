@@ -8,14 +8,14 @@
   },
   "items": [
     { "label": "PostgreSQL", "level": 3 },
-    { "label": "Supabase", "level": 3 },
-    { "label": "ChromaDB", "level": 3 },
-    { "label": "MongoDB", "level": 2 },
     { "label": "Redis", "level": 2 },
     { "label": "MySQL", "level": 2 },
+    { "label": "QDrant", "level": 3 },
+    { "label": "ChromaDB", "level": 3 },
+    { "label": "MongoDB", "level": 2 },
     { "label": "MariaDB", "level": 2 },
     { "label": "SQLite", "level": 2 },
-    { "label": "Oracle SQL", "level": 2 },
-    { "label": "SQL Server", "level": 2 }
+    { "label": "SQL Server", "level": 2 },
+    { "label": "Oracle SQL", "level": 2 }
   ]
 }

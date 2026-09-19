@@ -1,9 +1,15 @@
 {
-  "title": { "en": "Computational foundations", "es": "Fundamento computacional" },
-  "body": {
-    "en": "Implementation grows out of theory: complexity, correctness and invariants before the first commit. From IIT 4.0 in Complexum to a symbolic engine checked with Lean — what can't be argued doesn't ship.",
-    "es": "La implementación nace de la teoría: complejidad, corrección e invariantes antes del primer commit. Del IIT 4.0 en Complexum a un motor simbólico verificado con Lean: lo que no se puede argumentar no se despliega."
+  "title": {
+    "en": "Computational foundations",
+    "es": "Fundamento computacional"
   },
-  "gridPos": [4.5, 1.5],
-  "order": 3
+  "body": {
+    "es": "La implementación nace de la teoría: complejidad, corrección e invariantes antes del primer commit. Del IIT 4.0 en Complexum a un motor simbólico verificado con Lean: lo que no se puede argumentar no se despliega.",
+    "en": "Implementation grows out of theory: complexity, correctness and invariants before the first commit. From IIT 4.0 in Complexum to a symbolic engine checked with Lean — what can't be argued doesn't ship."
+  },
+  "gridPos": [
+    4.5,
+    1.5
+  ],
+  "order": 1
 }

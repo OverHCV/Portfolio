@@ -1,23 +1,27 @@
 {
   "order": 2,
   "tempo": "Vivace",
-  "title": { "en": "Web & backend", "es": "Web y backend" },
+  "title": { "en": "Stacks", "es": "Tecnologías" },
   "epigraph": {
     "en": "From the API to the last pixel.",
     "es": "De la API al último píxel."
   },
   "items": [
-    { "label": "Next.js", "level": 3 },
-    { "label": "React", "level": 3 },
-    { "label": "FastAPI", "level": 3 },
-    { "label": "Node.js", "level": 3 },
-    { "label": "Spring Boot", "level": 3 },
     { "label": "Astro", "level": 3 },
+    { "label": "React & Native", "level": 3 },
     { "label": "Vue", "level": 2 },
     { "label": "Angular", "level": 2 },
-    { "label": "SolidJS", "level": 2 },
+    { "label": "Next.js", "level": 3 },
+    { "label": "FastAPI", "level": 3 },
+    { "label": "Node.js", "level": 3 },
     { "label": "Axum", "level": 2 },
+    { "label": "Redis", "level": 2 },
+    { "label": "Tailwind CSS", "level": 3 },
+    { "label": "GraphQL / REST APIs", "level": 3 },
+    { "label": "CI/CD", "level": 2 },
+    { "label": "Unit / integration testing", "level": 2 },
+    { "label": "SpringBoot", "level": 3 },
     { "label": "Streamlit", "level": 2 },
-    { "label": "Unity (C#)", "level": 2 }
+    { "label": "Docker", "level": 3 }
   ]
 }

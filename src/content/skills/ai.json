@@ -7,15 +7,16 @@
     "es": "Modelos que aprenden, pipelines que recuerdan."
   },
   "items": [
-    { "label": { "en": "LLM pipelines (RAG, agents)", "es": "Pipelines LLM (RAG, agentes)" }, "level": 3 },
+    { "label": { "en": "RAG / LLM Pipelines", "es": "Pipelines LLM / RAG" }, "level": 3 },
     { "label": "PyTorch", "level": 3 },
-    { "label": "scikit-learn", "level": 3 },
+    { "label": "Scikit-Learn", "level": 3 },
     { "label": "NumPy", "level": 3 },
-    { "label": "Pandas", "level": 3 },
-    { "label": "TensorFlow", "level": 2 },
-    { "label": "Keras", "level": 2 },
+    { "label": "Pandas / Polars", "level": 3 },
+    { "label": "TensorFlow / Keras", "level": 2 },
     { "label": "XGBoost", "level": 2 },
-    { "label": "Plotly", "level": 2 },
-    { "label": "PyPhi (IIT 4.0)", "level": 2 }
+    { "label": "Matplotlib / Seaborn / Plotly", "level": 2 },
+    { "label": "OpenCV", "level": 2 },
+    { "label": "Mesa", "level": 2 },
+    { "label": "LangGraph", "level": 3 }
   ]
 }
