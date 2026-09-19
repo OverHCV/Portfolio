@@ -28,7 +28,9 @@ const KINDS: Record<string, KindDef> = {
   '1-2': { kind: 'lens', veil: true, fade: 0.02, color: COLORS.void },
   // Sin velo: la malla del paisaje en calma se funde con el mar en el mismo sitio (chapters.ts).
   '2-3': { kind: 'sea', veil: false, fade: 0, color: COLORS.void, overlap: SEA_HANDOFF },
-  '3-4': { kind: 'door', veil: true, fade: 0.006, color: '#000000' },
+  // Cruzar la puerta es entrar en su luz: blanco cálido que crece mientras la cámara se acerca y se
+  // disuelve ya dentro del faro (los ojos que se acostumbran a la penumbra del cuarto).
+  '3-4': { kind: 'door', veil: true, fade: 0.035, color: '#fff4dc' },
   '4-5': { kind: 'dive', veil: true, fade: 0.018, color: COLORS.glow },
 };
 
@@ -39,6 +41,12 @@ export const TRANSITIONS: TransitionDef[] = ACTS.slice(0, -1).map((act, i) => {
   const hold = travelHalfWindow(act.id);
   return { from: act.id, to: next.id, at: act.end, hold, overlap: overlap ?? hold, ...def };
 });
+
+/** Progreso global en que empieza a aparecer el velo de la frontera que sale del acto `from`. */
+export function veilStartAt(from: ActId): number {
+  const tr = TRANSITIONS.find((t) => t.from === from)!;
+  return tr.at - tr.hold - tr.fade;
+}
 
 /** Opacidad del velo (0..1) y la transición activa para un progreso dado. */
 export function veilAt(progress: number): { transition: TransitionDef | null; opacity: number } {

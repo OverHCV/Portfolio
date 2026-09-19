@@ -199,10 +199,10 @@ De `progress` se derivan `activeAct` y `localProgress ∈ [0, 1]` dentro del act
 | ----- | ------------------------------------------------------------------------------ |
 | 1 → 2 | La cámara atraviesa el agujero negro; distorsión al máximo + fundido           |
 | 2 → 3 | **Sin velo.** El paisaje se calma como un mar y vuelven las estrellas; el Acto 3 está anclado junto al Acto 2 con el mar a la altura del paisaje en calma, así que el paisaje aplanado se desvanece mientras aparece el mar en el mismo sitio, sin volver a dibujar la malla (`seaHandoff`) y la cámara pasa del picado a flotar sobre el mar sin viaje |
-| 3 → 4 | Cruzar la puerta del faro: fundido a negro de ~200 ms, cambio de escena        |
+| 3 → 4 | La puerta del faro se abre al acercarse; su luz crece hasta un blanco cálido que tapa el cruce y se disuelve ya dentro del cuarto |
 | 4 → 5 | Zoom vertical dentro del piano, fundido a color plano, revelado de la ciudad   |
 
-Implementado en `transitions.config.ts` + `overlay/TransitionVeil.tsx`: cada frontera con velo tiene una zona opaca (`hold`, cubre el viaje de cámara entre actos, `travelHalfWindow` en `path.ts`) y un fundido (`fade`); la 2 → 3 no tiene velo (`veil: false`). Todo depende de `progress`, no de timers, así que es reversible al volver con el scroll. Con reduced motion el velo es un corte.
+Implementado en `transitions.config.ts` + `overlay/TransitionVeil.tsx`: cada frontera con velo tiene una zona opaca (`hold`, cubre el viaje de cámara entre actos, `travelHalfWindow` en `path.ts`) y un fundido (`fade`); la 2 → 3 no tiene velo (`veil: false`). El objetivo del velo depende de `progress`, así que es reversible al volver con el scroll; la opacidad mostrada lo persigue con un suavizado en el tiempo (entra en ~0.2 s, sale en ~0.45 s) para que un giro de rueda no lo haga saltar. Sin corte con reduced motion: un fundido de opacidad no es movimiento, y un salto a un velo claro (la puerta del faro, blanco cálido) sería un destello.
 
 ### 4.6 Agujero negro: ligero y HD
 - **Ligero (por defecto):** disco con shader, halo lenteado (la parte trasera del disco que se curva sobre la sombra) y lente de pantalla (`fx/GravitationalLens.ts`, en su propio `EffectPass` porque deforma el UV).
@@ -516,7 +516,7 @@ bunx @gltf-transform/cli inspect public/models/piano.glb
 
 - **HTML semántico siempre presente:** `index.astro` renderiza todas las secciones (`<header>`, `<section id="about">`, `<section id="journey">`, `<section id="stack">`, `<section id="projects">`, `<section id="contact">`) con el contenido real. Con WebGL se ocultan visualmente (`sr-only`) pero siguen para lectores de pantalla y SEO.
 - **Sin WebGL** (detectado antes de montar la isla): no se monta el canvas y el HTML semántico se muestra con un estilo simple y legible; la navbar sigue funcionando como índice (anclas).
-- **`prefers-reduced-motion`:** sin parallax de mouse ni ojo de pez, transiciones como cortes directos, pulsos y medusas estáticos o muy lentos.
+- **`prefers-reduced-motion`:** sin parallax de mouse ni ojo de pez, transiciones con fundido de opacidad (nunca un salto a blanco), pulsos y medusas estáticos o muy lentos.
 - **Teclado:** la navbar es el índice principal; `Tab` recorre los elementos interactivos del acto activo (proxies DOM invisibles sobre los objetos 3D clicables); `Esc` cierra paneles.
 - **Contraste:** texto del overlay ≥ 4.5:1 sobre el fondo.
 

@@ -180,27 +180,33 @@ export function GradientProbe({ landscape, chapter, anchor }: { landscape: Lands
       <Html position={[0, 0.35, 0]} zIndexRange={[60, 50]} style={{ pointerEvents: 'none' }}>
         <div
           ref={label}
-          className="ml-4 whitespace-nowrap text-[24px] text-glow opacity-0 transition-opacity duration-200 [filter:drop-shadow(0_0_2px_#05060a)_drop-shadow(0_2px_6px_rgba(5,6,10,0.95))] [text-shadow:0_0_2px_#05060a,0_1px_4px_#05060a,0_2px_14px_rgba(5,6,10,0.95)]"
+          className="ml-4 whitespace-nowrap text-[24px] leading-tight text-glow opacity-0 transition-opacity duration-200 [filter:drop-shadow(0_0_2px_#05060a)_drop-shadow(0_2px_6px_rgba(5,6,10,0.95))] [text-shadow:0_0_2px_#05060a,0_1px_4px_#05060a,0_2px_14px_rgba(5,6,10,0.95)]"
         >
           {/* MathML nativo: matemática real sin dependencias, actualizable por frame. */}
-          <math>
-            <mi>f</mi>
-            <mo>(</mo>
-            <mi>x</mi>
-            <mo>)</mo>
-            <mo>=</mo>
-            <mn ref={fVal} />
-            <mspace width="1.6em" />
-            <mo>−</mo>
-            <mo>∇</mo>
-            <mi>f</mi>
-            <mo>=</mo>
-            <mo>(</mo>
-            <mn ref={gxVal} />
-            <mo>,</mo>
-            <mn ref={gzVal} />
-            <mo>)</mo>
-          </math>
+          {/* Dos líneas: el valor arriba y, debajo, el gradiente (la más larga). */}
+          <div>
+            <math>
+              <mi>f</mi>
+              <mo>(</mo>
+              <mi>x</mi>
+              <mo>)</mo>
+              <mo>=</mo>
+              <mn ref={fVal} />
+            </math>
+          </div>
+          <div>
+            <math>
+              <mo>−</mo>
+              <mo>∇</mo>
+              <mi>f</mi>
+              <mo>=</mo>
+              <mo>(</mo>
+              <mn ref={gxVal} />
+              <mo>,</mo>
+              <mn ref={gzVal} />
+              <mo>)</mo>
+            </math>
+          </div>
         </div>
       </Html>
     </group>

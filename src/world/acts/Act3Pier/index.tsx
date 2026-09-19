@@ -7,7 +7,9 @@ import { useReducedMotion } from '../../lib/motion';
 import type { ActProps } from '../types';
 import { seaHandoff } from '../Act2Field/chapters';
 import { LAMPS, jellyAt } from './layout';
-import { BUILD_END, WALK_END, buildAt, builtAt, doorOpenAt, lampGlow, lighthouseAt, orderAt, pierLocal } from './timeline';
+import { BUILD_END, WALK_END, buildAt, builtAt, lampGlow, lighthouseAt, orderAt, pierLocal } from './timeline';
+import { smoothstep } from '../../lib/motion';
+import { veilStartAt } from '../../transitions.config';
 import { createPierFrame } from './frame';
 import { Ocean } from './Ocean';
 import { Moon } from './Moon';
@@ -19,6 +21,13 @@ import { Lighthouse } from './Lighthouse';
 const ACT = ACTS[2];
 /** Distancia (en z) a la que una medusa pasa a la tarjeta sin hover. */
 const NEAR_RANGE = 7;
+/**
+ * La puerta del faro se abre mientras la cámara se acerca y termina justo cuando empieza el velo
+ * `door` (blanco cálido): primero se la ve abrirse, luego su luz lo inunda todo. En progreso global,
+ * para no depender de los pesos de los actos.
+ */
+const DOOR_OPEN_END = veilStartAt(3);
+const DOOR_OPEN_START = DOOR_OPEN_END - 0.025;
 
 /**
  * Muelle y mar: el paisaje del Acto 2 se vuelve mar bajo los pies, el faro sale del agua, el muelle
@@ -41,7 +50,7 @@ export default function Act3Pier({ content }: ActProps) {
     frame.sea = seaHandoff(progress);
     frame.build.value = buildAt(local);
     frame.lighthouse = lighthouseAt(local);
-    frame.door = doorOpenAt(local);
+    frame.door = smoothstep(DOOR_OPEN_START, DOOR_OPEN_END, progress);
     frame.cameraZ = camera.position.z - anchor.z;
     LAMPS.forEach((lamp, i) => {
       frame.lampGlow[i] = builtAt(orderAt(lamp.z), frame.build.value) * lampGlow(lamp.z, frame.cameraZ);

@@ -1,0 +1,15 @@
+{
+  "title": {
+    "en": "Learning journey never ends",
+    "es": "La jornada del aprendizaje nunca termina"
+  },
+  "body": {
+    "es": "Me motivan todos los desafíos que aún no sé resolver. Disfruto y aprendo del proceso, aprender en anchura y comprender a profundidad (tanto como el tiempo lo permita). Busco proyectos donde seguir creciendo: Por ejemplo, liderar iniciativas de LLMs/IA aplicada donde mi background analítico y sistémico aporte soluciones innovadoras.",
+    "en": "I'm motivated by the challenges I don't know how to solve yet. I enjoy the process of learning—exploring broadly first, then going deep enough to truly understand what matters. I'm looking for projects where I can keep growing, particularly by leading LLM and applied AI initiatives where my analytical and systems background can contribute to building novel solutions."
+  },
+  "gridPos": [
+    -4,
+    1
+  ],
+  "order": 3
+}

@@ -51,7 +51,7 @@
     {
       "label": "Matplotlib / Seaborn / Plotly",
       "icon": "plotly",
-      "level": 2
+      "level": 3
     },
     {
       "label": "OpenCV",
@@ -61,7 +61,7 @@
     {
       "label": "Mesa",
       "icon": "agents",
-      "level": 2
+      "level": 1
     },
     {
       "label": "LangGraph",

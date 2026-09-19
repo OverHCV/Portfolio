@@ -9,7 +9,7 @@ import { PIER, PIER_FAR } from './layout';
  *   0 ─ ARRIVE_END          llegada: solo mar bajo los pies (el paisaje del Acto 2 ya se volvió agua)
  *   ARRIVE_END ─ BUILD_END  construcción: el faro sale del mar y el muelle se arma hacia la cámara
  *   BUILD_END ─ WALK_END    recorrido: medusas a los lados, faroles que se encienden al pasar
- *   WALK_END ─ 1            la puerta del faro se abre (velo `door` hacia el Acto 4)
+ *   WALK_END ─ 1            la puerta del faro (se abre justo antes del velo `door`, index.tsx)
  */
 export const ARRIVE_END = 0.07;
 export const BUILD_END = 0.22;
@@ -29,14 +29,6 @@ export function pierLocal(progress: number): number {
 /** El faro sale del mar antes que el muelle: es el destino. */
 export function lighthouseAt(local: number): number {
   return smoothstep(ARRIVE_END, ARRIVE_END + 0.05, local);
-}
-
-/**
- * Apertura de la puerta del faro, al llegar frente a ella. Termina antes del velo `door`, que cubre
- * el último ~8% del acto (su zona opaca y el fundido, transitions.config.ts): hay que verla abrirse.
- */
-export function doorOpenAt(local: number): number {
-  return smoothstep(WALK_END - 0.12, WALK_END - 0.04, local);
 }
 
 /** Avance de la construcción del muelle (0..1), del faro hacia la cámara. */

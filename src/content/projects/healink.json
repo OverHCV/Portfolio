@@ -1,7 +1,7 @@
 {
   "order": 12,
   "title": { "en": "Healink", "es": "Healink" },
-  "role": { "en": "Capstone · full-stack lead", "es": "Proyecto de grado · líder full-stack" },
+  "role": { "en": "Capstone · full-stack lead", "es": "Proyecto Integrador · líder full-stack" },
   "summary": { "en": "Cardiovascular health platform with a multi-agent system.", "es": "Plataforma de salud cardiovascular con un sistema multiagente." },
   "description": {
     "en": "Three decoupled services: a Spring Boot 3 backend (DDD, JWT + RBAC), a FastAPI machine-learning engine and a Next.js 14 frontend. A multi-agent system handles triage, risk prediction, recommendations and a chatbot.",

@@ -23,7 +23,7 @@
     {
       "label": "MySQL",
       "icon": "mysql",
-      "level": 2
+      "level": 3
     },
     {
       "label": "QDrant",
@@ -43,12 +43,12 @@
     {
       "label": "MariaDB",
       "icon": "mariadb",
-      "level": 2
+      "level": 3
     },
     {
       "label": "SQLite",
       "icon": "sqlite",
-      "level": 2
+      "level": 3
     },
     {
       "label": "SQL Server",
@@ -58,7 +58,7 @@
     {
       "label": "Oracle SQL",
       "icon": "oracle",
-      "level": 2
+      "level": 3
     }
   ]
 }

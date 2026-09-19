@@ -38,12 +38,12 @@
     {
       "label": "C++",
       "icon": "cplusplus",
-      "level": 3
+      "level": 2
     },
     {
       "label": "C#",
       "icon": "csharp",
-      "level": 3
+      "level": 2
     },
     {
       "label": "Rust",
@@ -58,22 +58,22 @@
     {
       "label": "R",
       "icon": "r",
-      "level": 3
+      "level": 1
     },
     {
       "label": "C",
       "icon": "c",
-      "level": 3
+      "level": 2
     },
     {
       "label": "Arduino",
       "icon": "arduino",
-      "level": 3
+      "level": 2
     },
     {
       "label": "Kotlin",
       "icon": "kotlin",
-      "level": 3
+      "level": 2
     },
     {
       "label": "LaTeX",
@@ -83,7 +83,7 @@
     {
       "label": "OS",
       "icon": "linux",
-      "level": 3
+      "level": 2
     }
   ]
 }

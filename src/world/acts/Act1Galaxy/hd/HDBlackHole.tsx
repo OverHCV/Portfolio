@@ -20,7 +20,7 @@ const TEXTURES = {
 const WORLD_PER_UNIT = 0.80;
 
 /** Giro de las estrellas (radianes) con el mouse en el borde; la Vía Láctea queda fija. */
-const STAR_PARALLAX = 1.03;
+const STAR_PARALLAX = 0.08;
 
 const up = new Vector3();
 const dir = new Vector3();

@@ -10,9 +10,9 @@ import { smoothstep } from '../../lib/motion';
  *   OUTRO_START ─ OUTRO_END  calma: el paisaje se aplana como un mar y vuelven las estrellas
  *   OUTRO_END ─ 1            la malla plana se funde con el mar del Acto 3 (sin velo: `seaHandoff`)
  */
-export const INTRO_END = 0.08;
 export const OUTRO_START = 0.87;
 export const OUTRO_END = 1.1;
+export const INTRO_END = 0.08;
 
 /**
  * Largo (en progreso global) del fundido paisaje → mar, que termina justo en la frontera.

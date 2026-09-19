@@ -1,7 +1,7 @@
 import { CanvasTexture, SRGBColorSpace } from 'three';
 import { pickL10n } from '../../../../i18n/translate';
 import type { Lang } from '../../../../i18n/langs';
-import type { StackItem, StackSheet } from '../../../types';
+import type { StackSheet } from '../../../types';
 import { roman } from '../../../lib/roman';
 import { stackIcon } from './stackIcons';
 
@@ -9,8 +9,8 @@ import { stackIcon } from './stackIcons';
  * Páginas del álbum dibujadas en canvas: papel, pentagramas y tipografía del sitio (Fraunces +
  * Space Grotesk). Una página es una de tres clases:
  *   - portada interior (verso de la primera hoja): título, nombre e índice de movimientos
- *   - verso de un movimiento: número romano, tempo y la "melodía" de la familia
- *   - recto de un movimiento: la familia con cada tecnología (su ícono, o una nota) y su dinámica
+ *   - verso de un movimiento: número romano, tempo, título y epígrafe de la familia
+ *   - recto de un movimiento: solo el listado, cada tecnología con su ícono (o una nota) y su dinámica
  */
 
 /** Tamaño lógico de la página (px); proporción de PAGE en layout.ts. */
@@ -30,12 +30,14 @@ const DYNAMICS = { 1: 'p', 2: 'mf', 3: 'f' } as const;
 
 export type PageSpec =
   | { kind: 'cover'; title: string; name: string; subtitle: string; toc: { numeral: string; title: string; tempo: string }[]; hint: string }
-  | { kind: 'verso'; numeral: string; tempo: string; title: string; caption: string; items: StackItem[]; folio: number }
+  | { kind: 'verso'; numeral: string; tempo: string; title: string; epigraph: string; caption: string; folio: number }
   | {
       kind: 'recto';
-      heading: string;
-      title: string;
-      epigraph: string;
+      /**
+       * Encabezado propio del recto: solo en el primer movimiento, cuya página izquierda es la
+       * portada. En los demás el título y el epígrafe van en el verso de enfrente.
+       */
+      head?: { heading: string; title: string; epigraph: string };
       items: { label: string; note?: string; icon?: string; level: 1 | 2 | 3 }[];
       legend: string;
       folio: number;
@@ -67,9 +69,7 @@ export function buildPages(stack: StackSheet[], name: string, lang: Lang, s: Pag
   };
   const rectos: PageSpec[] = stack.map((sheet, i) => ({
     kind: 'recto',
-    heading: `${s.movement} ${roman(i + 1)} · ${sheet.tempo}`,
-    title: title(sheet),
-    epigraph: pickL10n(sheet.epigraph, lang),
+    head: i === 0 ? { heading: `${s.movement} ${roman(i + 1)} · ${sheet.tempo}`, title: title(sheet), epigraph: pickL10n(sheet.epigraph, lang) } : undefined,
     items: sheet.items.map((item) => ({
       label: typeof item.label === 'string' ? item.label : pickL10n(item.label, lang),
       note: item.note ? pickL10n(item.note, lang) : undefined,
@@ -88,8 +88,8 @@ export function buildPages(stack: StackSheet[], name: string, lang: Lang, s: Pag
           numeral: roman(i + 1),
           tempo: sheet.tempo,
           title: title(sheet),
+          epigraph: pickL10n(sheet.epigraph, lang),
           caption: s.count(sheet.items.length),
-          items: sheet.items,
           folio: i * 2,
         },
   );
@@ -278,45 +278,27 @@ function dots(ctx: CanvasRenderingContext2D, from: number, to: number, y: number
 }
 
 function drawVerso(ctx: CanvasRenderingContext2D, p: Extract<PageSpec, { kind: 'verso' }>) {
-  const { width: w } = PAGE_PX;
+  const { width: w, height: h } = PAGE_PX;
   ctx.textAlign = 'center';
   ctx.fillStyle = ACCENT;
   ctx.font = font(150, { weight: 300 });
-  ctx.fillText(p.numeral, w / 2, 280);
+  ctx.fillText(p.numeral, w / 2, 260);
   ctx.fillStyle = INK;
   ctx.font = font(40, { italic: true });
-  ctx.fillText(p.tempo, w / 2, 350);
-  ctx.fillStyle = FADED;
-  fitFont(ctx, p.title, w - 160, 26, 18, { family: SANS, weight: 500 });
-  ctx.fillText(p.title.toUpperCase(), w / 2, 400);
-  ctx.textAlign = 'left';
+  ctx.fillText(p.tempo, w / 2, 330);
+  ctx.fillStyle = RULE;
+  ctx.fillRect(w / 2 - 40, 372, 80, 1);
 
-  // La "melodía" de la familia: una nota por tecnología, más aguda cuanto más dominio.
-  const gap = 12;
-  const left = 70;
-  const width = w - 2 * left;
-  const perStaff = 6;
-  const staves = Math.max(1, Math.ceil(p.items.length / perStaff));
-  for (let s = 0; s < staves; s++) {
-    const top = 500 + s * 130;
-    staff(ctx, left, top, width, gap);
-    // Barras de compás a los extremos.
-    ctx.fillStyle = INK;
-    ctx.fillRect(left, top, 1.5, gap * 4);
-    ctx.fillRect(left + width - 1.5, top, 1.5, gap * 4);
-    if (s === staves - 1) ctx.fillRect(left + width - 7, top, 5, gap * 4);
-    const slice = p.items.slice(s * perStaff, (s + 1) * perStaff);
-    slice.forEach((item, i) => {
-      const idx = s * perStaff + i;
-      const stepInScale = (item.level * 2 + ((idx * 3) % 4)) % 9;
-      note(ctx, left + 60 + (i * (width - 100)) / Math.max(perStaff - 1, 1), top + gap * 4, gap, stepInScale, item.level === 1);
-    });
-  }
-
+  // El título de la familia, que antes se repetía en grande en el recto.
+  ctx.fillStyle = INK;
+  ctx.font = font(58);
+  let y = wrap(ctx, p.title, w / 2, 470, w - 160, 66);
   ctx.fillStyle = FADED;
-  ctx.font = font(24, { italic: true });
-  ctx.textAlign = 'center';
-  ctx.fillText(p.caption, w / 2, 500 + staves * 130 + 40);
+  ctx.font = font(26, { italic: true });
+  y = wrap(ctx, p.epigraph, w / 2, y + 14, w - 180, 36);
+
+  ctx.font = font(22, { italic: true });
+  ctx.fillText(p.caption, w / 2, Math.max(y + 60, h - 190));
   ctx.textAlign = 'left';
   folio(ctx, p.folio);
 }
@@ -324,17 +306,20 @@ function drawVerso(ctx: CanvasRenderingContext2D, p: Extract<PageSpec, { kind: '
 function drawRecto(ctx: CanvasRenderingContext2D, p: Extract<PageSpec, { kind: 'recto' }>) {
   const { width: w, height: h } = PAGE_PX;
   const x = 64;
-  ctx.fillStyle = ACCENT;
-  ctx.font = font(18, { family: SANS, weight: 500 });
-  ctx.fillText(p.heading.toUpperCase(), x, 110);
-  ctx.fillStyle = INK;
-  fitFont(ctx, p.title, w - 2 * x, 56, 34, { weight: 400 });
-  ctx.fillText(p.title, x, 176);
-  ctx.fillStyle = FADED;
-  ctx.font = font(23, { italic: true });
-  const after = wrap(ctx, p.epigraph, x, 220, w - 2 * x, 30);
-  ctx.fillStyle = RULE;
-  ctx.fillRect(x, after - 6, w - 2 * x, 1);
+  let after = 90;
+  if (p.head) {
+    ctx.fillStyle = ACCENT;
+    ctx.font = font(18, { family: SANS, weight: 500 });
+    ctx.fillText(p.head.heading.toUpperCase(), x, 110);
+    ctx.fillStyle = INK;
+    fitFont(ctx, p.head.title, w - 2 * x, 56, 34, { weight: 400 });
+    ctx.fillText(p.head.title, x, 176);
+    ctx.fillStyle = FADED;
+    ctx.font = font(23, { italic: true });
+    after = wrap(ctx, p.head.epigraph, x, 220, w - 2 * x, 30);
+    ctx.fillStyle = RULE;
+    ctx.fillRect(x, after - 6, w - 2 * x, 1);
+  }
 
   const top = after + 30;
   const bottom = h - 150;

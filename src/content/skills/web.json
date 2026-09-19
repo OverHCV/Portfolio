@@ -48,12 +48,7 @@
     {
       "label": "Axum",
       "icon": "tokio",
-      "level": 2
-    },
-    {
-      "label": "Redis",
-      "icon": "redis",
-      "level": 2
+      "level": 3
     },
     {
       "label": "Tailwind CSS",
@@ -63,17 +58,17 @@
     {
       "label": "GraphQL / REST APIs",
       "icon": "graphql",
-      "level": 3
+      "level": 2
     },
     {
       "label": "SpringBoot",
       "icon": "springboot",
-      "level": 3
+      "level": 2
     },
     {
       "label": "Streamlit",
       "icon": "streamlit",
-      "level": 2
+      "level": 3
     }
   ]
 }

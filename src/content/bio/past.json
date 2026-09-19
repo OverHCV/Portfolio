@@ -1,0 +1,15 @@
+{
+  "title": {
+    "en": "Systems First",
+    "es": "Sistemas primero"
+  },
+  "body": {
+    "es": "Soy Over Haider Castrillón Valencia, ingeniero de sistemas con 2 años de experiencia. Me especializo en diseño y arquitectura de sistemas cognitivos donde siempre aplico el pensamiento sistémico y analítico (aplicabilidad de capas de abstración y gestión de contexto). Antes de proyectar visualizo los retos y desafíos completamente desde el alto nivel del problema para asegurarme que luego cada pieza del bajo nivel encaje sin sorpresas",
+    "en": "I'm Over Haider Castrillón Valencia, a Systems Engineer with two years of professional experience. I specialize in the design and architecture of cognitive systems, where I apply systems and analytical thinking through layered abstraction and context management. Before I design, I try to see the challenge as a whole, starting from the highest level of the problem so that, when I reach the low-level details, every piece fits together without surprises."
+  },
+  "gridPos": [
+    4.5,
+    1.5
+  ],
+  "order": 1
+}

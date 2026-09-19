@@ -101,7 +101,7 @@ const SKY_END = ACTS[2].end + TRANSITIONS[2].hold;
  * Cuánto se desplaza el cielo (unidades de mundo) con el mouse en el borde de la pantalla.
  * Es una traslación, no un giro: la cáscara cercana se corre más que la lejana y da profundidad.
  */
-const PARALLAX = 4;
+const PARALLAX = 7;
 const right = new Vector3();
 const up = new Vector3();
 

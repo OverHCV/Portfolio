@@ -28,12 +28,12 @@
     {
       "label": "Google Cloud",
       "icon": "googlecloud",
-      "level": 2
+      "level": 3
     },
     {
       "label": "N8N",
       "icon": "n8n",
-      "level": 2
+      "level": 3
     }
   ]
 }

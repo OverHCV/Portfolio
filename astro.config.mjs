@@ -36,6 +36,9 @@ export default defineConfig({
         'three/examples/jsm/lines/LineMaterial.js',
         'three/examples/jsm/objects/Water.js',
         'three/examples/jsm/environments/RoomEnvironment.js',
+        // Íconos del álbum del Acto 4 (album/stackIcons.ts): también solo los importa un chunk perezoso.
+        'simple-icons',
+        'lucide-static',
       ],
       esbuildOptions: { define: { PACKAGE_VERSION: MATHJAX_VERSION } },
     },

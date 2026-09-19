@@ -1,0 +1,15 @@
+{
+  "title": {
+    "es": "Razón y acción",
+    "en": "Reason, then act"
+  },
+  "body": {
+    "es": "Pienso computacionalmente y trabajo orientado por objetivos. Cada instrucción debe estar sustentada: Al trabajar con múltiples motores mis principios en ingeniería son claros; Seguridad, Calidad, Escalabilidad. Actualmente trabajo aplicando estos y más axiomas en proyectos de sistematización, machine learning / deep learning / recursive & adaptive learning y visión por computador.",
+    "en": "I think mathematically and work towards clear objectives. Every instruction should have a reason behind it. I've worked with multipe engines and my engineering principles are straightforward: security, quality, and scalability. Today, I apply these and other axioms across automation, machine learning, deep learning, recursive & adaptive learning and computer vision projects."
+  },
+  "gridPos": [
+    0.5,
+    -2.5
+  ],
+  "order": 2
+}

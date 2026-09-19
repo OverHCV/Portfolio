@@ -31,7 +31,7 @@
     {
       "label": "Scrum",
       "icon": "scrum",
-      "level": 3
+      "level": 2
     },
     {
       "label": "Integration / Unit testing",
@@ -41,12 +41,12 @@
     {
       "label": "TDD",
       "icon": "tdd",
-      "level": 2
+      "level": 3
     },
     {
       "label": "SDD",
       "icon": "sdd",
-      "level": 2
+      "level": 3
     },
     {
       "label": "DDD",

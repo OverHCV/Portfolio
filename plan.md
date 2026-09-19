@@ -76,7 +76,7 @@ Muelle de noche, mar oscuro, medusas bioluminiscentes bajo y sobre el agua, y el
 - **Contenido que carga:** colección `milestones`.
 - **Cámara:** perspectiva a altura de ojos mirando al faro; el mouse deja mirar a los lados (al mar, a las medusas).
 - **Notas técnicas:** tablas y faroles con `InstancedMesh`; medusas = geometría procedural + shader emisivo con pulso; agua = `Water` de three.js (el de `react-three-ocean`): reflejo planar real + normales animadas. Luces reales solo en los 2–3 faroles más cercanos; el resto emisivo + bloom.
-- **Transición → 4:** al llegar, la puerta del faro se abre hacia el muelle y sale la luz del interior; al cruzarla, fundido a negro breve y ya estás dentro.
+- **Transición → 4:** al llegar, la puerta del faro se abre hacia el muelle y sale la luz del interior; al acercarte su luz lo llena todo (fundido a blanco cálido) y, al disiparse, ya estás dentro.
 
 ### Acto 4 — El faro (Stack)
 - **Qué se muestra:** el interior del faro: cuarto circular casi vacío, un solo foco de luz, un piano de cola y un violín recostado.
