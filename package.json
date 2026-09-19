@@ -19,10 +19,12 @@
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.5",
     "gsap": "^3.14.2",
+    "lucide-static": "^1.47.0",
     "mathjax-full": "^3.2.1",
     "postprocessing": "^6.39.5",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "simple-icons": "^16.31.0",
     "tailwindcss": "^4.1.18",
     "three": "^0.182.0",
     "zustand": "^5.0.15"

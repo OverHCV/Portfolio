@@ -1,15 +1,15 @@
 {
   "title": {
-    "en": "Computational foundations",
-    "es": "Fundamento computacional"
+    "en": "If I can't argue it, I don't ship it",
+    "es": "Si no lo puedo argumentar, no lo despliego"
   },
   "body": {
-    "es": "La implementación nace de la teoría: complejidad, corrección e invariantes antes del primer commit. Del IIT 4.0 en Complexum a un motor simbólico verificado con Lean: lo que no se puede argumentar no se despliega.",
-    "en": "Implementation grows out of theory: complexity, correctness and invariants before the first commit. From IIT 4.0 in Complexum to a symbolic engine checked with Lean — what can't be argued doesn't ship."
+    "es": "Antes de escribir código quiero saber por qué va a funcionar: Su complejidad, qué no puede romperse, dónde va a fallar. Así nacieron Complexum, sobre un problema NP-difícil de IIT 4.0, y el motor de MathSlice, verificado con Lean. Tengo pocas reglas y todas las puedo justificar: una sola fuente de verdad, ninguna entrada es de fiar, código que no sorprenda.",
+    "en": "Before writing code I want to know why it will work: its complexity, what must never break, where it will fail. That's how Complexum, built on an NP-hard problem from IIT 4.0, and the MathSlice engine, checked with Lean, came to be. I keep few rules and can justify every one: a single source of truth, no input is trusted, code that doesn't surprise."
   },
   "gridPos": [
-    4.5,
-    1.5
+    0.5,
+    -2.5
   ],
-  "order": 1
+  "order": 2
 }

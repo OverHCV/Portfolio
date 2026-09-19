@@ -3,13 +3,14 @@ import { pickL10n } from '../../../../i18n/translate';
 import type { Lang } from '../../../../i18n/langs';
 import type { StackItem, StackSheet } from '../../../types';
 import { roman } from '../../../lib/roman';
+import { stackIcon } from './stackIcons';
 
 /**
  * Páginas del álbum dibujadas en canvas: papel, pentagramas y tipografía del sitio (Fraunces +
  * Space Grotesk). Una página es una de tres clases:
  *   - portada interior (verso de la primera hoja): título, nombre e índice de movimientos
  *   - verso de un movimiento: número romano, tempo y la "melodía" de la familia
- *   - recto de un movimiento: la familia con cada tecnología como una nota con su dinámica
+ *   - recto de un movimiento: la familia con cada tecnología (su ícono, o una nota) y su dinámica
  */
 
 /** Tamaño lógico de la página (px); proporción de PAGE en layout.ts. */
@@ -35,7 +36,7 @@ export type PageSpec =
       heading: string;
       title: string;
       epigraph: string;
-      items: { label: string; note?: string; level: 1 | 2 | 3 }[];
+      items: { label: string; note?: string; icon?: string; level: 1 | 2 | 3 }[];
       legend: string;
       folio: number;
     };
@@ -72,6 +73,7 @@ export function buildPages(stack: StackSheet[], name: string, lang: Lang, s: Pag
     items: sheet.items.map((item) => ({
       label: typeof item.label === 'string' ? item.label : pickL10n(item.label, lang),
       note: item.note ? pickL10n(item.note, lang) : undefined,
+      icon: item.icon,
       level: item.level,
     })),
     legend: s.legend,
@@ -192,6 +194,31 @@ function note(ctx: CanvasRenderingContext2D, x: number, bottom: number, gap: num
     ctx.lineTo(x - gap * 0.6, y + gap * 3.3);
   }
   ctx.stroke();
+}
+
+/** Ícono de una tecnología encajado (contain) en la celda de alto `size` centrada en (cx, cy). */
+function icon(ctx: CanvasRenderingContext2D, key: string | undefined, cx: number, cy: number, size: number): boolean {
+  const ic = stackIcon(key);
+  if (!ic) return false;
+  const [vx, vy, vw, vh] = ic.viewBox;
+  // Celda más ancha que alta: los logotipos de solo texto (Oracle) no quedan diminutos.
+  const s = Math.min((size * 2) / vw, size / vh);
+  ctx.save();
+  ctx.translate(cx - (vw * s) / 2, cy - (vh * s) / 2);
+  ctx.scale(s, s);
+  ctx.translate(-vx, -vy);
+  if (ic.stroke) {
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = ic.stroke.width * 0.9;
+    ctx.lineCap = ic.stroke.cap;
+    ctx.lineJoin = ic.stroke.join;
+    ctx.stroke(ic.path);
+  } else {
+    ctx.fillStyle = INK;
+    ctx.fill(ic.path);
+  }
+  ctx.restore();
+  return true;
 }
 
 function folio(ctx: CanvasRenderingContext2D, n: number) {
@@ -316,8 +343,11 @@ function drawRecto(ctx: CanvasRenderingContext2D, p: Extract<PageSpec, { kind: '
   const labelX = x + 104;
   p.items.forEach((item, i) => {
     const mid = top + rowH * (i + 0.5);
-    staff(ctx, x, mid - gap * 2, 80, gap);
-    note(ctx, x + 44, mid + gap * 2, gap, item.level * 2 + 1, item.level === 1);
+    // El ícono real de la tecnología; sin ícono, su compás con una nota.
+    if (!icon(ctx, item.icon, x + 40, mid, Math.min(34, rowH * 0.62))) {
+      staff(ctx, x, mid - gap * 2, 80, gap);
+      note(ctx, x + 44, mid + gap * 2, gap, item.level * 2 + 1, item.level === 1);
+    }
 
     const dyn = DYNAMICS[item.level];
     ctx.font = font(30, { italic: true, weight: 600 });

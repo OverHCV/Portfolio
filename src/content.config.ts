@@ -49,6 +49,8 @@ const skills = defineCollection({
         /** Dominio, dibujado como dinámica: 1 = p, 2 = mf, 3 = f. */
         level: z.union([z.literal(1), z.literal(2), z.literal(3)]),
         note: l10n.optional(),
+        /** Clave del ícono en Act4Lighthouse/album/stackIcons.ts; sin ícono se dibuja una nota. */
+        icon: z.string().optional(),
       }),
     ),
   }),

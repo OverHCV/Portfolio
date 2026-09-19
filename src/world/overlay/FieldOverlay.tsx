@@ -52,7 +52,7 @@ export function FieldOverlay({ bio }: { bio: BioFragment[] }) {
       {/* Scrim: oscurece solo la zona del texto para que el paisaje no lo tape. */}
       <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-void via-void/80 to-transparent md:inset-y-0 md:left-0 md:right-auto md:h-auto md:w-[58%] md:bg-gradient-to-r" />
 
-      <div className="absolute inset-x-6 bottom-28 max-w-md md:inset-x-auto md:bottom-auto md:left-[8vw] md:top-1/2 md:-translate-y-1/2 [text-shadow:0_2px_18px_rgba(5,6,10,0.95)]">
+      <div className="absolute inset-x-6 bottom-28 max-w-md md:inset-x-auto md:bottom-auto md:left-[8vw] md:top-1/2 md:-translate-y-1/2 [text-shadow:0_0_2px_#05060a,0_1px_4px_rgba(5,6,10,0.95),0_2px_18px_rgba(5,6,10,0.95)]">
         <p className="text-xs uppercase tracking-[0.35em] text-mist">{t('acts.field')}</p>
         <p className="mt-6 font-mono text-sm tracking-widest text-glow">
           {String(index + 1).padStart(2, '0')} <span className="text-mist/60">/ {String(n).padStart(2, '0')}</span>
@@ -60,7 +60,7 @@ export function FieldOverlay({ bio }: { bio: BioFragment[] }) {
         <h2 key={`t-${index}-${lang}`} ref={title} className="mt-3 font-display text-4xl font-light leading-[1.1] text-ink md:text-5xl">
           {pick(fragment.title)}
         </h2>
-        <p key={`b-${index}-${lang}`} ref={body} className="mt-5 text-base leading-relaxed text-ink/75 md:text-lg">
+        <p key={`b-${index}-${lang}`} ref={body} className="mt-5 text-base leading-relaxed text-ink/85 md:text-lg">
           {pick(fragment.body)}
         </p>
 

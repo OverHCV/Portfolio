@@ -1,7 +1,8 @@
 /**
  * Shaders de blackhole-ts (Roberto Marchetti, MIT — ver ./LICENSE),
  * https://github.com/rmarchet/blackhole-ts @ ddc1cd9. Copiados sin cambios salvo lo marcado `[portfolio]`
- * (utils.glsl: coordenada de pantalla; jet.glsl: variable sin inicializar).
+ * (utils.glsl: coordenada de pantalla; jet.glsl: variable sin inicializar; definitions.glsl y
+ * background.glsl: paralaje de las estrellas con el mouse).
  * Ray marching de geodésicas (Schwarzschild/Kerr) en unidades donde el horizonte mide 1.
  */
 import definitions from './glsl/definitions.glsl?raw';

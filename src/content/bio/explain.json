@@ -1,0 +1,15 @@
+{
+  "title": {
+    "en": "Understand it until I can explain it",
+    "es": "Entender hasta poder explicarlo"
+  },
+  "body": {
+    "es": "Desde media década descubrí mi pasión por enseñar, primero en Matemáticas y luego en Computación, sólo entiendes algo cuando puedes explicarlo paso a paso. Con lo nuevo me pasa igual: No basta con usarlo, hay que bajar de nivel hasta ver cómo funciona.",
+    "en": "Since 2023 I've been a teaching assistant, first in Mathematics and then in Algorithms, and that's where I learned I don't understand something until I can explain it step by step. New technology is the same: using it isn't enough, I take it apart until I see how it works. That's why most of what I build shows its work, from MathSlice, which walks through every algebra step, to Musicom, which reads scores like the ones I play on piano and violin."
+  },
+  "gridPos": [
+    4.5,
+    1.5
+  ],
+  "order": 1
+}

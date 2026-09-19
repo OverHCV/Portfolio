@@ -5,8 +5,13 @@ vec4 applyStarsAndBackground(
   vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
   vec2 tex_coord = to_spherical(ray_dir * ROT_Z(45.0 * DEG_TO_RAD));
 
+  // [portfolio] Las estrellas se corren con el mouse y la Vía Láctea no: paralaje entre capas.
+  vec3 cam_right = normalize(cross(cam_dir, cam_up));
+  vec3 star_dir = normalize(ray_dir + cam_right * star_parallax.x + cam_up * star_parallax.y);
+  vec2 star_coord = to_spherical(star_dir * ROT_Z(45.0 * DEG_TO_RAD));
+
   // Handle stars with luminance-based blending
-  vec4 star_color = texture2D(star_texture, tex_coord);
+  vec4 star_color = texture2D(star_texture, star_coord);
   if (show_stars && star_color.g > 0.0) {
     float star_temperature = (MIN_TEMPERATURE + TEMPERATURE_RANGE * star_color.r);
     // arbitrarily sets background stars' velocity for random shifts

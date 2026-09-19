@@ -15,6 +15,7 @@
         "en": "Spanish",
         "es": "Español"
       },
+      "icon": "languages",
       "note": {
         "en": "native",
         "es": "nativo"
@@ -26,6 +27,7 @@
         "en": "English",
         "es": "Inglés"
       },
+      "icon": "languages",
       "note": {
         "en": "professional working proficiency",
         "es": "competencia profesional"
@@ -34,9 +36,10 @@
     },
     {
       "label": {
-        "jp": "Japanese",
+        "en": "Japanese",
         "es": "Japonés"
       },
+      "icon": "languages",
       "note": {
         "en": "beginner",
         "es": "principiante"

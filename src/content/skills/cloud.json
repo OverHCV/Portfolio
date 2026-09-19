@@ -1,16 +1,39 @@
 {
   "order": 5,
   "tempo": "Con moto",
-  "title": { "en": "Cloud & DevOps", "es": "Cloud y DevOps" },
+  "title": {
+    "en": "Cloud & DevOps",
+    "es": "Cloud y DevOps"
+  },
   "epigraph": {
     "en": "Shipping it, and keeping it alive.",
     "es": "Llevarlo a producción y mantenerlo vivo."
   },
   "items": [
-    { "label": "Docker", "level": 3 },
-    { "label": "Git · GitHub", "level": 3 },
-    { "label": "Azure", "level": 2 },
-    { "label": "Google Cloud", "level": 2 },
-    { "label": "N8N", "level": 2 }
+    {
+      "label": "Docker",
+      "icon": "docker",
+      "level": 3
+    },
+    {
+      "label": "Git · GitHub",
+      "icon": "git",
+      "level": 3
+    },
+    {
+      "label": "Azure",
+      "icon": "azure",
+      "level": 2
+    },
+    {
+      "label": "Google Cloud",
+      "icon": "googlecloud",
+      "level": 2
+    },
+    {
+      "label": "N8N",
+      "icon": "n8n",
+      "level": 2
+    }
   ]
 }

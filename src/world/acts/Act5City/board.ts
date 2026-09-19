@@ -131,6 +131,8 @@ function leftNormal(a: XZ, b: XZ): XZ {
 
 /** Polilínea desplazada `d` a la izquierda, con uniones a inglete (sirve para buses y cintas). */
 export function offsetPolyline(pts: XZ[], d: number): XZ[] {
+  // Sin al menos un segmento no hay normal: se devuelve tal cual.
+  if (pts.length < 2) return pts.map((p) => [p[0], p[1]] as XZ);
   const last = pts.length - 1;
   return pts.map((p, i) => {
     const n1 = i > 0 ? leftNormal(pts[i - 1], p) : leftNormal(p, pts[i + 1]);
@@ -384,7 +386,10 @@ function splitByLayer(cells: XZ[], under: boolean[]): { pts: XZ[]; layer: 0 | 1 
   for (let k = 1; k <= cells.length; k++) {
     if (k === cells.length || low[k] !== low[start]) {
       // El tramo incluye la celda de frontera para que las piezas queden unidas.
-      runs.push({ pts: simplify(cells.slice(start, Math.min(k + 1, cells.length))), layer: low[start] ? 1 : 0 });
+      const pts = simplify(cells.slice(start, Math.min(k + 1, cells.length)));
+      // Un cambio de capa en la última celda deja un tramo de un solo punto, ya incluido como
+      // frontera del anterior: no es una pista (y no tiene dirección para desplazarla).
+      if (pts.length > 1 || !runs.length) runs.push({ pts, layer: low[start] ? 1 : 0 });
       start = k;
     }
   }

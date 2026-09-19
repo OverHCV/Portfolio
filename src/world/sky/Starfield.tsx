@@ -1,11 +1,13 @@
 import { useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, type Points, ShaderMaterial } from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, type Points, ShaderMaterial, Vector3 } from 'three';
 import { useWorld } from '../store';
 import { QUALITY } from '../lib/quality';
 import { ACTS } from '../acts.config';
 import { TRANSITIONS } from '../transitions.config';
 import { starsAt } from '../acts/Act2Field/chapters';
+import { useReducedMotion } from '../lib/motion';
+import { starParallax, updateStarParallax } from './parallax';
 
 const vertexShader = /* glsl */ `
 uniform float uTime;
@@ -95,14 +97,23 @@ function buildGeometry(density: number): BufferGeometry {
 // como cielo nocturno del muelle (Acto 3). Se apaga bajo el velo de la puerta del faro.
 const SKY_END = ACTS[2].end + TRANSITIONS[2].hold;
 
+/**
+ * Cuánto se desplaza el cielo (unidades de mundo) con el mouse en el borde de la pantalla.
+ * Es una traslación, no un giro: la cáscara cercana se corre más que la lejana y da profundidad.
+ */
+const PARALLAX = 4;
+const right = new Vector3();
+const up = new Vector3();
+
 export function Starfield() {
   const quality = useWorld((s) => s.quality);
   const points = useRef<Points>(null);
   const dpr = useThree((s) => s.viewport.dpr);
   const geometry = useMemo(() => buildGeometry(QUALITY[quality].density), [quality]);
   const material = useRef<ShaderMaterial>(null);
+  const reducedMotion = useReducedMotion();
 
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock, camera, pointer }, delta) => {
     if (material.current) material.current.uniforms.uTime.value = clock.elapsedTime;
     if (points.current && material.current) {
       const { progress, activeAct, localProgress, hd } = useWorld.getState();
@@ -111,6 +122,13 @@ export function Starfield() {
       // agujero negro, donde no hay estrellas, así que no se ve.
       if (activeAct === 1) points.current.position.set(0, 0, 0);
       else points.current.position.copy(camera.position);
+      // Paralaje con el mouse (Actos 1 y 3): el cielo se corre al lado contrario del puntero.
+      updateStarParallax(pointer, activeAct, reducedMotion, Math.min(delta, 0.1));
+      right.setFromMatrixColumn(camera.matrixWorld, 0);
+      up.setFromMatrixColumn(camera.matrixWorld, 1);
+      points.current.position
+        .addScaledVector(right, -starParallax.x * PARALLAX)
+        .addScaledVector(up, -starParallax.y * PARALLAX);
       const fade = activeAct === 2 ? starsAt(localProgress) : 1;
       material.current.uniforms.uFade.value = fade;
       // En HD el shader del Acto 1 dibuja su propio cielo, ya lenteado.

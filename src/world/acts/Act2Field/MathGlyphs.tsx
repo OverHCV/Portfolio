@@ -17,7 +17,7 @@ import { EXTENT, type Landscape } from './landscape';
 /**
  * Notación que flota sobre el paisaje. Es decoración (igual en todos los idiomas), no contenido.
  * Cada entrada es TeX real: MathJax la compila a SVG (glifos como trazados, sin fuentes web)
- * y se hornea en un atlas con una placa oscura por detrás para que las letras
+ * y se hornea en un atlas con una sombra oscura por detrás para que las letras
  * no se mezclen con la malla del paisaje.
  */
 const ENTRIES = [
@@ -29,7 +29,7 @@ const ENTRIES = [
   String.raw`\mathbb{Q}`,
   String.raw`\nabla f`,
   String.raw`\frac{\partial f}{\partial x}`,
-  String.raw`\int_{\inf}^{\inf}e^{-x}^2=\sqrt{\pi}`,
+  String.raw`\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}`,
   String.raw`\sum_{i=1}^{n}`,
   String.raw`\infty`,
   String.raw`\lambda`,
@@ -52,10 +52,18 @@ const FONT_PX = 64;
 const EX_PX = FONT_PX / 2;
 const ATLAS_WIDTH = 2048;
 /**
- * Placa oscura horneada detrás de cada fórmula: sin ella, las letras se mezclan con la malla.
- * `pad` margen interior alrededor de la fórmula; `bleed` alcance del difuminado exterior.
+ * Sombra horneada con la forma de cada fórmula (como un text-shadow): sin ella, las letras se
+ * mezclan con la malla. Dos capas de la silueta negra difuminada: un contorno ceñido que despega
+ * el trazo y un halo ancho que apaga los puntos de alrededor. `passes` apila la capa (más densa);
+ * `bleed` es el margen de la celda para que el halo no se corte.
  */
-const PLATE = { pad: 18, bleed: 16, radius: 12, fill: 0.62, glow: 0.85 };
+const SHADOW = {
+  layers: [
+    { blur: 3, passes: 3 },
+    { blur: 12, passes: 6 },
+  ],
+  bleed: 26,
+};
 
 interface AtlasEntry {
   /** Rect UV (u, v, ancho, alto) con v hacia arriba. */
@@ -118,6 +126,19 @@ async function rasterize(doc: Compiler, tex: string) {
   }
 }
 
+/** Copia negra (mismo alfa) de una fórmula, para hornear su sombra. */
+function silhouetteOf(img: HTMLImageElement, w: number, h: number): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d')!;
+  ctx.drawImage(img, 0, 0, w, h);
+  ctx.globalCompositeOperation = 'source-in';
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+  return c;
+}
+
 /** Compila todas las fórmulas y las empaqueta por filas en un canvas; una textura para todo. */
 async function buildAtlas(): Promise<Atlas> {
   compiler ??= createCompiler();
@@ -125,8 +146,8 @@ async function buildAtlas(): Promise<Atlas> {
   const glyphs = await Promise.all(ENTRIES.map((tex) => rasterize(doc, tex)));
 
   // Empaquetado por filas con alturas reales (fracciones y límites son altos).
-  // Cada celda incluye la placa (pad) y su difuminado (bleed) para que no se corten.
-  const margin = PLATE.pad + PLATE.bleed;
+  // Cada celda deja margen (bleed) para que la sombra no se corte.
+  const margin = SHADOW.bleed;
   const placed: { x: number; y: number; w: number; h: number }[] = [];
   let x = 0;
   let y = 0;
@@ -149,17 +170,16 @@ async function buildAtlas(): Promise<Atlas> {
   canvas.width = ATLAS_WIDTH;
   canvas.height = height;
   const ctx = canvas.getContext('2d')!;
-  // Placa: rectángulo redondeado oscuro con borde exterior suave (la sombra negra por detrás).
-  ctx.shadowColor = `rgba(0, 0, 0, ${PLATE.glow})`;
-  ctx.shadowBlur = PLATE.bleed;
-  ctx.fillStyle = `rgba(0, 0, 0, ${PLATE.fill})`;
-  for (const p of placed) {
-    ctx.beginPath();
-    ctx.roundRect(p.x + PLATE.bleed, p.y + PLATE.bleed, p.w - PLATE.bleed * 2, p.h - PLATE.bleed * 8, PLATE.radius);
-    ctx.fill();
-  }
-  // Fórmula blanca encima de su placa.
-  ctx.shadowColor = 'transparent';
+  // Silueta negra de cada fórmula, difuminada varias veces por detrás: la sombra sigue al glifo.
+  glyphs.forEach((g, i) => {
+    const silhouette = silhouetteOf(g.img, g.w, g.h);
+    for (const { blur, passes } of SHADOW.layers) {
+      ctx.filter = `blur(${blur}px)`;
+      for (let k = 0; k < passes; k++) ctx.drawImage(silhouette, placed[i].x + margin, placed[i].y + margin);
+    }
+  });
+  ctx.filter = 'none';
+  // Fórmula blanca encima de su sombra.
   glyphs.forEach((g, i) => ctx.drawImage(g.img, placed[i].x + margin, placed[i].y + margin, g.w, g.h));
 
   const entries = placed.map(({ x: px, y: py, w, h }) => ({
@@ -210,7 +230,7 @@ varying vec2 vUv;
 varying float vAlpha;
 
 void main() {
-  // Fórmula blanca (teñida con uColor) sobre su placa negra horneada en el atlas.
+  // Fórmula blanca (teñida con uColor) sobre su sombra negra horneada en el atlas.
   vec4 t = texture2D(uAtlas, vUv);
   float a = t.a * vAlpha * uOpacity * uReveal * (1.0 - uCalm) * 0.9;
   if (a < 0.004) discard;

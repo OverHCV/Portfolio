@@ -33,7 +33,7 @@
   "stack.hint": "Haz clic en la esquina de la hoja, o arrástrala, para pasarla.",
   "stack.movement": "Movimiento",
   "stack.count": "{n} instrumentos",
-  "stack.legend": "p  conocido   ·   mf  de trabajo   ·   f  dominio",
+  "stack.legend": "p  conocido   ·   mf  trabajado   ·   f  dominado",
   "stack.prev": "Hoja anterior",
   "stack.next": "Hoja siguiente",
   "stack.page": "{n} de {total}",

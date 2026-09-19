@@ -40,6 +40,8 @@ export interface StackItem {
   /** Dominio, dibujado como dinámica musical: 1 = p, 2 = mf, 3 = f. */
   level: 1 | 2 | 3;
   note?: L10n;
+  /** Clave en album/stackIcons.ts; sin ícono, la partitura dibuja una nota. */
+  icon?: string;
 }
 
 /** Acto 4 — una hoja del álbum: una familia del stack. */

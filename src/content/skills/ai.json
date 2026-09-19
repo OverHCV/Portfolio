@@ -1,22 +1,72 @@
 {
   "order": 3,
   "tempo": "Andante",
-  "title": { "en": "AI & data", "es": "IA y datos" },
+  "title": {
+    "en": "AI & data",
+    "es": "IA y datos"
+  },
   "epigraph": {
     "en": "Models that learn, pipelines that remember.",
     "es": "Modelos que aprenden, pipelines que recuerdan."
   },
   "items": [
-    { "label": { "en": "RAG / LLM Pipelines", "es": "Pipelines LLM / RAG" }, "level": 3 },
-    { "label": "PyTorch", "level": 3 },
-    { "label": "Scikit-Learn", "level": 3 },
-    { "label": "NumPy", "level": 3 },
-    { "label": "Pandas / Polars", "level": 3 },
-    { "label": "TensorFlow / Keras", "level": 2 },
-    { "label": "XGBoost", "level": 2 },
-    { "label": "Matplotlib / Seaborn / Plotly", "level": 2 },
-    { "label": "OpenCV", "level": 2 },
-    { "label": "Mesa", "level": 2 },
-    { "label": "LangGraph", "level": 3 }
+    {
+      "label": {
+        "en": "RAG / LLM Pipelines",
+        "es": "Pipelines LLM / RAG"
+      },
+      "icon": "llm",
+      "level": 3
+    },
+    {
+      "label": "PyTorch",
+      "icon": "pytorch",
+      "level": 3
+    },
+    {
+      "label": "Scikit-Learn",
+      "icon": "scikitlearn",
+      "level": 3
+    },
+    {
+      "label": "NumPy",
+      "icon": "numpy",
+      "level": 3
+    },
+    {
+      "label": "Pandas / Polars",
+      "icon": "pandas",
+      "level": 3
+    },
+    {
+      "label": "TensorFlow / Keras",
+      "icon": "tensorflow",
+      "level": 2
+    },
+    {
+      "label": "XGBoost",
+      "icon": "boosting",
+      "level": 2
+    },
+    {
+      "label": "Matplotlib / Seaborn / Plotly",
+      "icon": "plotly",
+      "level": 2
+    },
+    {
+      "label": "OpenCV",
+      "icon": "opencv",
+      "level": 2
+    },
+    {
+      "label": "Mesa",
+      "icon": "agents",
+      "level": 2
+    },
+    {
+      "label": "LangGraph",
+      "icon": "langgraph",
+      "level": 3
+    }
   ]
 }

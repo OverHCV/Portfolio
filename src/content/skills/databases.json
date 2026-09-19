@@ -1,21 +1,64 @@
 {
   "order": 4,
   "tempo": "Sostenuto",
-  "title": { "en": "Databases", "es": "Bases de datos" },
+  "title": {
+    "en": "Databases",
+    "es": "Bases de datos"
+  },
   "epigraph": {
     "en": "Where state lives, and endures.",
     "es": "Donde el estado vive y perdura."
   },
   "items": [
-    { "label": "PostgreSQL", "level": 3 },
-    { "label": "Redis", "level": 2 },
-    { "label": "MySQL", "level": 2 },
-    { "label": "QDrant", "level": 3 },
-    { "label": "ChromaDB", "level": 3 },
-    { "label": "MongoDB", "level": 2 },
-    { "label": "MariaDB", "level": 2 },
-    { "label": "SQLite", "level": 2 },
-    { "label": "SQL Server", "level": 2 },
-    { "label": "Oracle SQL", "level": 2 }
+    {
+      "label": "PostgreSQL",
+      "icon": "postgresql",
+      "level": 3
+    },
+    {
+      "label": "Redis",
+      "icon": "redis",
+      "level": 2
+    },
+    {
+      "label": "MySQL",
+      "icon": "mysql",
+      "level": 2
+    },
+    {
+      "label": "QDrant",
+      "icon": "qdrant",
+      "level": 3
+    },
+    {
+      "label": "ChromaDB",
+      "icon": "chromadb",
+      "level": 3
+    },
+    {
+      "label": "MongoDB",
+      "icon": "mongodb",
+      "level": 2
+    },
+    {
+      "label": "MariaDB",
+      "icon": "mariadb",
+      "level": 2
+    },
+    {
+      "label": "SQLite",
+      "icon": "sqlite",
+      "level": 2
+    },
+    {
+      "label": "SQL Server",
+      "icon": "sqlserver",
+      "level": 2
+    },
+    {
+      "label": "Oracle SQL",
+      "icon": "oracle",
+      "level": 2
+    }
   ]
 }

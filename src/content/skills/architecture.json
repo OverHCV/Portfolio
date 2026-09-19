@@ -1,18 +1,70 @@
 {
   "order": 6,
   "tempo": "Moderato",
-  "title": { "en": "Architecture & methods", "es": "Arquitectura y métodos" },
+  "title": {
+    "en": "Architecture & methods",
+    "es": "Arquitectura y métodos"
+  },
   "epigraph": {
     "en": "Structure before speed.",
     "es": "Estructura antes que velocidad."
   },
   "items": [
-    { "label": "Screaming Architecture", "level": 3 },
-    { "label": { "en": "Layered architecture", "es": "Arquitectura por capas" }, "level": 3 },
-    { "label": "REST APIs", "level": 3 },
-    { "label": "Scrum", "level": 3 },
-    { "label": "DDD", "level": 2 },
-    { "label": "TDD", "level": 2 },
-    { "label": { "en": "Networking: TCP/IP, subnetting, NAT, VLANs", "es": "Redes: TCP/IP, subnetting, NAT, VLANs" }, "level": 2 }
+    {
+      "label": "Screaming Architecture",
+      "icon": "folders",
+      "level": 3
+    },
+    {
+      "label": {
+        "en": "Layered architecture",
+        "es": "Arquitectura en capas"
+      },
+      "icon": "layers",
+      "level": 3
+    },
+    {
+      "label": "REST APIs",
+      "icon": "rest",
+      "level": 3
+    },
+    {
+      "label": "Scrum",
+      "icon": "scrum",
+      "level": 3
+    },
+    {
+      "label": "Integration / Unit testing",
+      "icon": "testing",
+      "level": 2
+    },
+    {
+      "label": "TDD",
+      "icon": "tdd",
+      "level": 2
+    },
+    {
+      "label": "SDD",
+      "icon": "sdd",
+      "level": 2
+    },
+    {
+      "label": "DDD",
+      "icon": "ddd",
+      "level": 2
+    },
+    {
+      "label": {
+        "en": "Networking: TCP/IP, subnetting, NAT, VLANs",
+        "es": "Redes: TCP/IP, VLANs, NAT"
+      },
+      "icon": "network",
+      "level": 2
+    },
+    {
+      "label": "CI/CD",
+      "icon": "cicd",
+      "level": 2
+    }
   ]
 }

@@ -1,11 +1,11 @@
 {
   "title": {
-    "en": "Systemic & analytical thinking",
-    "es": "Pensamiento sistémico y analítico"
+    "en": "Nothing has to know everything",
+    "es": "Nada tiene que saberlo todo"
   },
   "body": {
-    "es": "Antes de optimizar una pieza miro el sistema entero. Ningún componente necesita conocerlo todo para dar el siguiente paso, solo el contexto justo; las piezas bien compuestas forman un sistema mayor, y lo que empieza incierto debe converger a algo determinista y controlable.",
-    "en": "Before optimizing a part I look at the whole system. No component needs to know everything to take the next step, only the right context; well-composed parts become a bigger system, and what starts out uncertain should converge to something deterministic and controllable."
+    "es": "Cuando algo se complica no busco una pieza más lista, busco partirlo mejor. Una pieza no necesita saberlo todo para dar el siguiente paso, solo el contexto justo; y piezas simples, bien conectadas, hacen lo que ninguna haría sola, como un multiplexor dentro de un procesador. Es la idea detrás de OASys: que un agente impredecible termine construyendo un sistema predecible.",
+    "en": "When something gets complicated I don't look for a smarter part, I look for a better split. A part doesn't need to know everything to take the next step, just the right context; and simple parts, wired well, do what none of them could alone — like a multiplexer inside a CPU. That's the idea behind OASys: an unpredictable agent that ends up building a predictable system."
   },
   "gridPos": [
     -4,

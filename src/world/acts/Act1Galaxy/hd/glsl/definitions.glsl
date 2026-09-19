@@ -23,6 +23,8 @@ uniform vec2 resolution;
 uniform vec3 cam_pos;
 uniform vec3 cam_dir;
 uniform vec3 cam_up;
+// [portfolio] Paralaje de las estrellas con el mouse (radianes, en ejes derecha/arriba de la cámara).
+uniform vec2 star_parallax;
 uniform float fov;
 uniform vec3 cam_vel;
 uniform bool accretion_disk;

@@ -1,26 +1,89 @@
 {
   "order": 1,
   "tempo": "Allegro",
-  "title": { "en": "Languages", "es": "Lenguajes" },
+  "title": {
+    "en": "Languages",
+    "es": "Lenguajes"
+  },
   "epigraph": {
     "en": "The instruments: each one a different way of thinking about a problem.",
     "es": "Los instrumentos: cada uno, una forma distinta de pensar un problema."
   },
   "items": [
-    { "label": "Bash · Shell · PowerShell", "level": 2 },
-    { "label": "Python", "level": 3 },
-    { "label": "TypeScript", "level": 3 },
-    { "label": "Assembly (AVR / x86)", "level": 3 },
-    { "label": "Java", "level": 3 },
-    { "label": "C++", "level": 3 },
-    { "label": "C#", "level": 3 },
-    { "label": "Rust", "level": 3 },
-    { "label": "Go", "level": 3 },
-    { "label": "R", "level": 3 },
-    { "label": "C", "level": 3 },
-    { "label": "Arduino", "level": 3 },
-    { "label": "Kotlin", "level": 3 },
-    { "label": "LaTeX", "level": 3 },
-    { "label": "OS", "level": 3 }
+    {
+      "label": "Bash · Shell · PowerShell",
+      "icon": "bash",
+      "level": 2
+    },
+    {
+      "label": "Python",
+      "icon": "python",
+      "level": 3
+    },
+    {
+      "label": "TypeScript",
+      "icon": "typescript",
+      "level": 3
+    },
+    {
+      "label": "Assembly (AVR / x86)",
+      "icon": "assembly",
+      "level": 3
+    },
+    {
+      "label": "Java",
+      "icon": "java",
+      "level": 3
+    },
+    {
+      "label": "C++",
+      "icon": "cplusplus",
+      "level": 3
+    },
+    {
+      "label": "C#",
+      "icon": "csharp",
+      "level": 3
+    },
+    {
+      "label": "Rust",
+      "icon": "rust",
+      "level": 3
+    },
+    {
+      "label": "Go",
+      "icon": "go",
+      "level": 3
+    },
+    {
+      "label": "R",
+      "icon": "r",
+      "level": 3
+    },
+    {
+      "label": "C",
+      "icon": "c",
+      "level": 3
+    },
+    {
+      "label": "Arduino",
+      "icon": "arduino",
+      "level": 3
+    },
+    {
+      "label": "Kotlin",
+      "icon": "kotlin",
+      "level": 3
+    },
+    {
+      "label": "LaTeX",
+      "icon": "latex",
+      "level": 3
+    },
+    {
+      "label": "OS",
+      "icon": "linux",
+      "level": 3
+    }
   ]
 }

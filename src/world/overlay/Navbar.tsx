@@ -52,7 +52,7 @@ export function Navbar() {
   }, []);
 
   function goTo(act: ActDef) {
-    scrollToProgress(act.start);
+    scrollToProgress(act.land);
   }
 
   function cycleLang() {

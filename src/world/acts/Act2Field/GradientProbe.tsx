@@ -18,6 +18,8 @@ const UP = new Vector3(0, 1, 0);
 /** En desktop, la columna de texto ocupa la izquierda (overlay/FieldOverlay.tsx): ahí no hay sonda. */
 const TEXT_COLUMN_EDGE = -0.2;
 const GLOW = new Color(COLORS.glow);
+/** Puntero (NDC) a partir del cual el letrero se dibuja a la izquierda del punto. */
+const FLIP_X = 0.3;
 
 /** Línea gruesa (px de pantalla) de `points` vértices, que se reescribe en sitio cada frame. */
 function makeLine(points: number, width: number, colorAt: (s: number) => Color): Line2 {
@@ -154,6 +156,8 @@ export function GradientProbe({ landscape, chapter, anchor }: { landscape: Lands
       arrowHead.current.quaternion.copy(tmp.quat.setFromUnitVectors(UP, dir));
     }
 
+    // Cerca del borde derecho el letrero pasa al otro lado del punto para no salirse de la pantalla.
+    if (label.current) label.current.style.transform = pointer.x > FLIP_X ? 'translateX(calc(-100% - 2rem))' : '';
     if (fVal.current) fVal.current.textContent = fmt(f0);
     if (gxVal.current) gxVal.current.textContent = fmt(-grad.x);
     if (gzVal.current) gzVal.current.textContent = fmt(-grad.y);
@@ -176,7 +180,7 @@ export function GradientProbe({ landscape, chapter, anchor }: { landscape: Lands
       <Html position={[0, 0.35, 0]} zIndexRange={[60, 50]} style={{ pointerEvents: 'none' }}>
         <div
           ref={label}
-          className="ml-3 text-[12px] text-glow opacity-0 transition-opacity duration-200 [text-shadow:0_1px_3px_#05060a,0_2px_12px_rgba(5,6,10,0.95)]"
+          className="ml-4 whitespace-nowrap text-[24px] text-glow opacity-0 transition-opacity duration-200 [filter:drop-shadow(0_0_2px_#05060a)_drop-shadow(0_2px_6px_rgba(5,6,10,0.95))] [text-shadow:0_0_2px_#05060a,0_1px_4px_#05060a,0_2px_14px_rgba(5,6,10,0.95)]"
         >
           {/* MathML nativo: matemática real sin dependencias, actualizable por frame. */}
           <math>
