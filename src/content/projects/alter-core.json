@@ -1,14 +1,41 @@
 {
-  "order": 1,
-  "title": { "en": "Alter — core AI product", "es": "Alter — producto de IA principal" },
-  "role": { "en": "Founding engineer", "es": "Ingeniero fundador" },
-  "summary": { "en": "End-to-end architecture, backend and cloud of an AI product.", "es": "Arquitectura, backend y nube de punta a punta de un producto de IA." },
-  "description": {
-    "en": "Owned the whole stack of the company's core product: LLM pipelines with RAG and tool-using agents, vector stores and embedding workflows, a layered backend following Screaming Architecture, cloud deployment on Azure and GCP, and N8N automations for business processes.",
-    "es": "A cargo de todo el stack del producto principal de la empresa: pipelines LLM con RAG y agentes con herramientas, bases vectoriales y flujos de embeddings, un backend por capas con Screaming Architecture, despliegue en Azure y GCP, y automatizaciones de procesos de negocio con N8N."
+  "order": 2,
+  "title": {
+    "en": "Alter — the precursor of OASys",
+    "es": "Alter — el precursor de OASys"
   },
-  "stack": ["Next.js", "FastAPI", "Node.js", "Docker", "Supabase", "ChromaDB", "Azure", "GCP", "N8N"],
+  "role": {
+    "en": "Founding engineer",
+    "es": "Ingeniero fundador"
+  },
+  "summary": {
+    "en": "Where I learned what an agent is missing to become a system.",
+    "es": "Donde aprendí qué le falta a un agente para volverse sistema."
+  },
+  "description": {
+    "en": "As founding engineer I owned the full stack of the company's AI product: LLM pipelines with RAG and tool-using agents, vector stores and embedding workflows, a layered backend following Screaming Architecture, deployment on Azure and GCP, and N8N automations for business processes. Building agents on one side and workflows on the other showed me their limits up close — agents without control, processes no agent could iterate on — and that small part was what taught me how to build OASys.",
+    "es": "Como ingeniero fundador llevé todo el stack del producto de IA de la empresa: pipelines LLM con RAG y agentes con herramientas, bases vectoriales y flujos de embeddings, un backend por capas con Screaming Architecture, despliegue en Azure y GCP y automatizaciones de procesos de negocio con N8N. Construir agentes por un lado y workflows por el otro me mostró de cerca sus límites — agentes sin control, procesos que ningún agente podía iterar — y esa pequeña parte fue la que me enseñó cómo crear OASys."
+  },
+  "stack": [
+    "Next.js",
+    "FastAPI",
+    "Node.js",
+    "Docker",
+    "Supabase",
+    "ChromaDB",
+    "Azure",
+    "GCP",
+    "N8N"
+  ],
   "links": {},
-  "building": { "chip": "bga", "height": 1.4, "connectsTo": ["healink", "portfolio-3d"] },
+  "building": {
+    "chip": "bga",
+    "height": 1.4,
+    "connectsTo": [
+      "oasys",
+      "healink",
+      "portfolio-3d"
+    ]
+  },
   "year": 2025
 }

@@ -15,5 +15,19 @@
     "en": "Guided students through Backtracking, Branch & Bound and Dynamic Programming. Designed and maintained Complexum/Proyecto-2025A, a modular Python framework for IIT strategies adopted by 60+ student teams and auto-documented on DeepWiki, plus the worked-example notebooks used as primary reference across cohorts.",
     "es": "Acompañé a los estudiantes en Backtracking, Ramificación y Poda y Programación Dinámica. Diseñé y mantuve Complexum/Proyecto-2025A, un framework modular en Python para estrategias de IIT adoptado por más de 60 equipos y documentado automáticamente en DeepWiki, además de los cuadernos de ejemplos resueltos que sirven de referencia principal entre cohortes."
   },
-  "stack": ["Python", "UV", "PyPhi"]
+  "stack": [
+    "Python",
+    "UV",
+    "numpy",
+    "scipy",
+    "pyphi",
+    "pyinstrument",
+    "pyttsx3",
+    "textual",
+    "rich",
+    "polars",
+    "plotly",
+    "watchdog",
+    "matplotlib"
+  ]
 }

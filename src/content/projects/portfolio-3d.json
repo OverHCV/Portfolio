@@ -1,5 +1,5 @@
 {
-  "order": 8,
+  "order": 14,
   "title": { "en": "3D Portfolio", "es": "Portafolio 3D" },
   "role": { "en": "Design & development", "es": "Diseño y desarrollo" },
   "summary": { "en": "This site: a scroll-driven story in a single WebGL canvas.", "es": "Este sitio: una historia guiada por el scroll en un solo canvas WebGL." },
@@ -7,6 +7,7 @@
     "en": "Five acts in one persistent Three.js scene: a ray-marched black hole, a mathematical landscape, a pier with bioluminescent jellyfish, a lighthouse with a playable piano and this circuit board. Content lives in typed collections, text is bilingual from day one and the semantic HTML stays underneath for SEO and screen readers.",
     "es": "Cinco actos en una sola escena persistente de Three.js: un agujero negro con ray marching, un paisaje matemático, un muelle con medusas bioluminiscentes, un faro con un piano tocable y esta placa de circuito. El contenido vive en colecciones tipadas, el texto es bilingüe desde el primer día y el HTML semántico queda debajo para SEO y lectores de pantalla."
   },
+  "images": ["/projects/portfolio-3d/01.webp", "/projects/portfolio-3d/02.webp", "/projects/portfolio-3d/03.webp", "/projects/portfolio-3d/04.webp", "/projects/portfolio-3d/05.webp"],
   "stack": ["TypeScript", "Astro", "React", "Three.js", "GLSL", "GSAP"],
   "links": {},
   "building": { "chip": "module", "connectsTo": ["alter-core"] },

@@ -1,0 +1,43 @@
+{
+  "order": 1,
+  "title": {
+    "en": "OASys / ArchSlice",
+    "es": "OASys / ArchSlice"
+  },
+  "role": {
+    "en": "Creator & architect · private code",
+    "es": "Creador y arquitecto · código privado"
+  },
+  "summary": {
+    "en": "Agents that build deterministic systems instead of being the system.",
+    "es": "Agentes que construyen sistemas deterministas en vez de ser el sistema."
+  },
+  "description": {
+    "en": "My main product. Today LLMs live split between loops, where the agent carries all the responsibility and loses its way on a long task, and workflows, which are deterministic but that the agent can neither understand nor change. OASys takes the architecture of a computer: the LLM is an ALU specialised in its job — beyond ADD a, b, a CREATE <prompts>, <files>, <tools> — that doesn't need to see everything, only the curated step in front of it. Each agent solves a single task and leaves what it learned in an organisational memory; processes become Devices that compose like a digital circuit. The system starts stochastic and converges to a deterministic one, and since the Device is the state, the agent can read it and rewrite it: that's where self-improvement comes from, and the cost of the model stops growing with every turn. Programs are written in the .os DSL or in a visual grid (Device → Books → Pages → Lines → Cells) and run on a Rust engine with a program counter, call frames and a shared variable store, streaming every step over SSE. The code is private; the web app and the desktop builds are not.",
+    "es": "Mi producto principal. Hoy los LLM viven entre loops, donde el agente carga con toda la responsabilidad y se pierde en una tarea larga, y workflows, deterministas pero que el agente no puede entender ni modificar. OASys toma la arquitectura de un computador: el LLM es una ALU especializada en su labor — más allá de un ADD a, b, un CREATE <prompts>, <files>, <tools> — que no necesita conocerlo todo, solo el paso curado que tiene enfrente. Cada agente resuelve una única tarea y deja lo aprendido en una memoria organizacional; los procesos se vuelven Devices que se componen como un circuito digital. El sistema empieza estocástico y converge a uno determinista, y como el Device es el estado, el agente puede leerlo y reescribirlo: de ahí la automejora, y el coste del modelo deja de crecer con cada turno. Los programas se escriben en el DSL .os o en una grilla visual (Device → Books → Pages → Lines → Cells) y corren sobre un motor en Rust con contador de programa, marcos de llamada y un almacén de variables compartido, emitiendo cada paso por SSE. El código es privado; la aplicación web y los binarios de escritorio no."
+  },
+  "images": [
+    "/projects/oasys/01.webp",
+    "/projects/oasys/02.webp"
+  ],
+  "stack": [
+    "Rust",
+    "Axum",
+    "React",
+    "TypeScript",
+    "Supabase",
+    "Docker",
+    "Docusaurus"
+  ],
+  "links": {
+    "demo": "https://oasys-app.vercel.app"
+  },
+  "building": {
+    "chip": "bga",
+    "height": 1.5,
+    "connectsTo": [
+      "mathslice-engine"
+    ]
+  },
+  "year": 2026
+}

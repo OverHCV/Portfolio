@@ -1,5 +1,5 @@
 {
-  "order": 3,
+  "order": 6,
   "title": { "en": "Intel-II — Intelligent Systems II", "es": "Intel-II — Sistemas Inteligentes II" },
   "role": { "en": "Author", "es": "Autor" },
   "summary": { "en": "From classical learning to a hybrid deep ensemble in production.", "es": "Del aprendizaje clásico a un ensamble profundo híbrido en producción." },
@@ -8,7 +8,7 @@
     "es": "Repositorio de IA/ML desplegado en producción, del aprendizaje clásico al profundo. El proyecto final es un ensamble híbrido (LSTM + GNN + XGBoost + Transformer) que predice incidentes de ciberseguridad sobre el dataset GUIDE de Microsoft con 94.2 % de exactitud."
   },
   "stack": ["Python", "PyTorch", "XGBoost", "scikit-learn", "Streamlit"],
-  "links": { "repo": "https://github.com/OverCV/Intel-II", "demo": "https://intel-ii-exam-ii.streamlit.app/" },
+  "links": { "repo": "https://github.com/OverHCV/Intel-II", "demo": "https://intel-ii-exam-ii.streamlit.app/" },
   "building": { "chip": "bga", "height": 1.1, "connectsTo": ["homehealtech"] },
   "year": 2025
 }

@@ -1,7 +1,10 @@
 {
   "kind": "job",
   "org": "Universidad de Caldas",
-  "title": { "en": "Teaching Assistant — Mathematics", "es": "Monitor — Matemáticas" },
+  "title": {
+    "en": "Teaching Assistant — Mathematics",
+    "es": "Monitor — Matemáticas"
+  },
   "start": "2023-01",
   "end": "2024-06",
   "summary": {

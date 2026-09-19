@@ -1,16 +1,31 @@
 {
   "kind": "job",
   "org": "Alter",
-  "title": { "en": "Founding Engineer", "es": "Ingeniero fundador" },
+  "title": {
+    "en": "Founding Engineer",
+    "es": "Ingeniero fundador"
+  },
   "start": "2025-01",
   "end": "2026-06",
   "summary": {
-    "en": "End-to-end architecture, backend and cloud of the core AI product.",
-    "es": "Arquitectura, backend y nube de punta a punta del producto de IA principal."
+    "en": "End-to-end architecture, backend and cloud of the company's AI product — the precursor of OASys.",
+    "es": "Arquitectura, backend y nube de punta a punta del producto de IA de la empresa — el precursor de OASys."
   },
   "details": {
-    "en": "Led the end-to-end architecture, backend and cloud deployment of the core AI product, owning the whole stack. Built LLM pipelines (RAG, tool-use agents) in Python and TypeScript with vector stores and embedding workflows, drove Scrum planning and delivery with Screaming Architecture and layered design, and automated business processes with N8N.",
-    "es": "Lideré la arquitectura, el backend y el despliegue en la nube del producto de IA principal, a cargo de todo el stack. Construí pipelines LLM (RAG, agentes con herramientas) en Python y TypeScript con bases vectoriales y embeddings, conduje la planeación y entrega con Scrum aplicando Screaming Architecture y diseño por capas, y automaticé procesos de negocio con N8N."
+    "en": "Led the end-to-end architecture, backend and cloud deployment of the company's AI product, owning the whole stack. Built LLM pipelines (RAG, tool-use agents) in Python and TypeScript with vector stores and embedding workflows, drove Scrum planning and delivery with Screaming Architecture and layered design, and automated business processes with N8N. The limits of those agents and workflows are what led me to build OASys.",
+    "es": "Lideré la arquitectura, el backend y el despliegue en la nube del producto de IA de la empresa, a cargo de todo el stack. Construí pipelines LLM (RAG, agentes con herramientas) en Python y TypeScript con bases vectoriales y embeddings, conduje la planeación y entrega con Scrum aplicando Screaming Architecture y diseño por capas, y automaticé procesos de negocio con N8N. Los límites de esos agentes y workflows fueron los que me llevaron a crear OASys."
   },
-  "stack": ["Next.js", "FastAPI", "Node.js", "Docker", "Supabase", "ChromaDB", "Azure", "GCP", "N8N"]
+  "stack": [
+    "Next.js",
+    "FastAPI",
+    "Node.js",
+    "Docker",
+    "QDrant",
+    "LangChain",
+    "Supabase",
+    "ChromaDB",
+    "Azure",
+    "GCP",
+    "N8N"
+  ]
 }

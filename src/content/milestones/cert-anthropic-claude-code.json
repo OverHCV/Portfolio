@@ -10,5 +10,9 @@
     "en": "Agentic software development with Claude Code.",
     "es": "Desarrollo de software agéntico con Claude Code."
   },
-  "credentialUrl": "https://drive.google.com/file/d/1LyM5v5Y_OZ5x2E-DWXNzbGXqTmzguMQL/view?usp=sharing"
+  "credentialUrl": "https://drive.google.com/file/d/1LyM5v5Y_OZ5x2E-DWXNzbGXqTmzguMQL/view?usp=sharing",
+  "stack": [
+    "Claude Code",
+    "VS Code"
+  ]
 }

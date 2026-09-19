@@ -1,0 +1,15 @@
+{
+  "order": 5,
+  "title": { "en": "Texel — collaborative LaTeX", "es": "Texel — LaTeX colaborativo" },
+  "role": { "en": "Author", "es": "Autor" },
+  "summary": { "en": "Real-time LaTeX editing with PDF preview, Overleaf-style.", "es": "Edición de LaTeX en tiempo real con vista del PDF, al estilo Overleaf." },
+  "description": {
+    "en": "Several people edit the same .tex at once, compile it and see the PDF. Collaboration is a CRDT (Yjs) over a custom provider on Supabase Realtime, so text converges even when two people type on the same line; a Fastify service with TeX Live runs latexmk on Cloud Run and answers SyncTeX queries. Row-level security, private storage for assets and PDFs, and sync with the course repository it was born in.",
+    "es": "Varias personas editan el mismo .tex a la vez, lo compilan y ven el PDF. La colaboración es un CRDT (Yjs) sobre un proveedor propio en Supabase Realtime, así el texto converge aunque dos personas escriban en la misma línea; un servicio Fastify con TeX Live ejecuta latexmk en Cloud Run y responde consultas de SyncTeX. Seguridad por filas, almacenamiento privado para recursos y PDF, y sincronización con el repositorio del curso donde nació."
+  },
+  "images": ["/projects/texel/01.webp", "/projects/texel/02.webp"],
+  "stack": ["Nuxt", "Vue", "Yjs", "CodeMirror 6", "Supabase", "Cloud Run", "Docker"],
+  "links": { "repo": "https://github.com/Over-HCV/Texelate", "demo": "https://texelate.vercel.app" },
+  "building": { "chip": "module", "height": 1.0, "connectsTo": ["portfolio-3d"] },
+  "year": 2026
+}

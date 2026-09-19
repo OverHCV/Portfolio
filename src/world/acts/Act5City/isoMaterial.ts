@@ -54,6 +54,7 @@ void main() {
 const fragmentShader = /* glsl */ `
 ${CITY_FRAGMENT}
 uniform float uLed;
+uniform vec3 uAccent;
 varying vec3 vColor;
 varying float vShade;
 varying float vGlow;
@@ -68,6 +69,8 @@ void main() {
   vec2 w = fwidth(vUv);
   float edge = 1.0 - min(smoothstep(w.x * 0.6, w.x * 1.6, e.x), smoothstep(w.y * 0.6, w.y * 1.6, e.y));
   color += (vColor * 0.5 + 0.025) * edge;
+  // En hover y foco el filo se enciende con el acento (por encima de 1: lo toma el bloom).
+  color += uAccent * edge * smoothstep(0.5, 0.8, vGlow) * 2.5;
 #endif
   color *= 1.0 + vGlow * 0.35;
   // Los LEDs emiten: por encima de 1 para que los tome el bloom.

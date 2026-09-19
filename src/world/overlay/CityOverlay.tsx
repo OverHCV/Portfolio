@@ -4,14 +4,16 @@ import { useWorld } from '../store';
 import { ACTS } from '../acts.config';
 import { cityLocal, mailboxAt } from '../acts/Act5City/timeline';
 import type { Project } from '../types';
+import { ProjectShots } from './ProjectShots';
+import { ProjectBubble } from './ProjectBubble';
 
 /** Umbral de `mailboxAt` a partir del que la tarjeta del proyecto deja paso a la del buzón. */
 const MAILBOX_CARD = 0.5;
 
 /**
- * Overlay del Acto 5: tarjeta breve del chip en hover o del más cercano (`nearProject`), la
- * invitación del buzón al final del recorrido y, para teclado y lectores de pantalla, la lista de
- * proyectos como botones (se ve al recibir foco).
+ * Overlay del Acto 5: burbuja que sale del chip en hover o del más cercano (`nearProject`), con sus
+ * capturas rotando mientras se ve; la invitación del buzón al final del recorrido y, para teclado y
+ * lectores de pantalla, la lista de proyectos como botones (se ve al recibir foco).
  */
 export function CityOverlay({ projects }: { projects: Project[] }) {
   const { t, pick } = useT();
@@ -37,18 +39,19 @@ export function CityOverlay({ projects }: { projects: Project[] }) {
 
   return (
     <>
-      <div
-        className={`fixed inset-x-6 bottom-28 z-10 max-w-sm transition-[opacity,transform] duration-500 motion-reduce:transition-none md:inset-x-auto md:left-[8vw] md:bottom-24 ${
-          cardVisible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'
-        }`}
-      >
+      <ProjectBubble visible={cardVisible}>
         {project && (
-          <div key={project.id} className={card}>
+          <div key={project.id}>
+            {project.images && (
+              <div data-bubble-shots>
+                <ProjectShots images={project.images} alt={pick(project.title)} playing={cardVisible} ratio="aspect-[2/1] md:aspect-video" className="-mx-1 -mt-1 mb-4" />
+              </div>
+            )}
             <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-glow">
               <span aria-hidden className="block h-1.5 w-1.5 rounded-full bg-glow shadow-[0_0_10px_var(--color-glow)]" />
               U{index + 1} <span className="text-mist">· {project.year}</span>
             </p>
-            <h2 className="mt-3 font-display text-2xl leading-tight text-ink">{pick(project.title)}</h2>
+            <h2 className="mt-3 font-display text-xl leading-tight text-ink md:text-2xl">{pick(project.title)}</h2>
             {project.role && <p className="mt-1 font-mono text-xs tracking-wide text-mist">{pick(project.role)}</p>}
             <p className="mt-3 text-sm leading-relaxed text-mist">{pick(project.summary)}</p>
             <button type="button" tabIndex={cardVisible ? 0 : -1} onClick={() => open(project.id)} className={cta}>
@@ -56,7 +59,7 @@ export function CityOverlay({ projects }: { projects: Project[] }) {
             </button>
           </div>
         )}
-      </div>
+      </ProjectBubble>
 
       <div
         className={`fixed inset-x-6 bottom-28 z-10 max-w-sm transition-[opacity,transform] duration-500 motion-reduce:transition-none md:inset-x-auto md:left-[8vw] md:bottom-24 ${

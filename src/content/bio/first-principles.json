@@ -1,8 +1,8 @@
 {
   "title": { "en": "Principles & design axioms", "es": "Principios y axiomas de diseño" },
   "body": {
-    "en": "Placeholder — the axioms you design from and why.",
-    "es": "Placeholder — los axiomas desde los que diseñas y por qué."
+    "en": "I design from a few explicit rules: a single source of truth, no input is trusted, unsurprising code, progress over perfection. A rule I can't justify doesn't get in.",
+    "es": "Diseño desde pocas reglas explícitas: una sola fuente de verdad, ninguna entrada es de fiar, código sin sorpresas, progreso antes que perfección. Una regla que no puedo justificar no entra."
   },
   "gridPos": [0.5, -2.5],
   "order": 2

@@ -63,7 +63,7 @@ export interface Project {
   role?: L10n;
   summary: L10n;
   description: L10n;
-  image?: string;
+  images?: string[];
   stack: string[];
   links: { repo?: string; demo?: string; extra?: { label: string | L10n; url: string }[] };
   building: { chip: ChipKind; height?: number; connectsTo: string[] };

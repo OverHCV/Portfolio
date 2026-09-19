@@ -1,5 +1,5 @@
 {
-  "order": 7,
+  "order": 13,
   "title": { "en": "Micros-Learn", "es": "Micros-Learn" },
   "role": { "en": "Author", "es": "Autor" },
   "summary": { "en": "AVR assembly and Arduino, from registers to sensors.", "es": "Ensamblador AVR y Arduino, de los registros a los sensores." },
@@ -8,7 +8,7 @@
     "es": "Una serie sobre microcontroladores: manipulación directa de registros en ensamblador AVR, temporizadores e interrupciones, hasta la conexión de sensores en Arduino con C y C++."
   },
   "stack": ["AVR Assembly", "C", "C++", "Arduino"],
-  "links": { "repo": "https://github.com/OverCV/Micros-Learn" },
+  "links": { "repo": "https://github.com/OverHCV/Micros-Learn" },
   "building": { "chip": "dip", "height": 0.6, "connectsTo": [] },
   "year": 2024
 }

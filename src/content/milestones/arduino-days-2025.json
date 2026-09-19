@@ -1,7 +1,10 @@
 {
   "kind": "award",
   "org": "Arduino Days Colombia",
-  "title": { "en": "Winner — Arduino Days Colombia Hackathon 2025", "es": "Ganador — Hackathon Arduino Days Colombia 2025" },
+  "title": {
+    "en": "Winner — Arduino Days Colombia Hackathon 2025",
+    "es": "Ganador — Hackathon Arduino Days Colombia 2025"
+  },
   "start": "2025-03",
   "summary": {
     "en": "An IoT solution for the UN Sustainable Development Goals.",
@@ -11,6 +14,14 @@
     "en": "Awarded by Universidad de Manizales, Centro de Ciencias Francisco José de Caldas, Seeed Studio and the Young AI Leaders Community for an innovative IoT solution addressing the UN Sustainable Development Goals.",
     "es": "Otorgado por la Universidad de Manizales, el Centro de Ciencias Francisco José de Caldas, Seeed Studio y la comunidad Young AI Leaders por una solución IoT innovadora orientada a los Objetivos de Desarrollo Sostenible de la ONU."
   },
-  "stack": ["Arduino", "IoT"],
+  "stack": [
+    "Arduino",
+    "IoT",
+    "Python",
+    "C++",
+    "ESP32",
+    "Sensors",
+    "Actuators"
+  ],
   "credentialUrl": "https://drive.google.com/file/d/1ew0thcQirrNrKjARACCiXNtlMey9og0h/view?usp=drive_link"
 }

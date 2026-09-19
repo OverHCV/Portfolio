@@ -29,6 +29,8 @@ export interface CityFrame {
     uFogColor: { value: Color };
     /** Intensidad de los LEDs (late despacio). */
     uLed: { value: number };
+    /** Filo de los chips en hover y foco (mismo acento que la burbuja del overlay). */
+    uAccent: { value: Color };
   };
 }
 
@@ -47,6 +49,7 @@ export function createCityFrame(): CityFrame {
       uFog: { value: new Vector2(1e4, 2e4) },
       uFogColor: { value: new Color(COLORS.void) },
       uLed: { value: 1.5 },
+      uAccent: { value: new Color(COLORS.glow) },
     },
   };
 }

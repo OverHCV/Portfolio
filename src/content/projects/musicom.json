@@ -1,0 +1,14 @@
+{
+  "order": 10,
+  "title": { "en": "Musicom", "es": "Musicom" },
+  "role": { "en": "Author", "es": "Autor" },
+  "summary": { "en": "A composable algebra of music theory that reads and explains real scores.", "es": "Un álgebra componible de teoría musical que lee y explica partituras reales." },
+  "description": {
+    "en": "A minimal, immutable algebra for music theory and performance, built on an abstraction ladder: key → harmony → chord and scale → voicing → note, pitch and interval → performance event. The engine knows no piece; works live apart, from a hand-written sketch to an explicit score, MusicXML and audio. It analyses harmony down to roman numerals, secondary dominants and augmented sixths, and diffs two scores note by note.",
+    "es": "Un álgebra mínima e inmutable para la teoría y la interpretación musical, construida sobre una escalera de abstracción: tonalidad → armonía → acorde y escala → disposición → nota, altura e intervalo → evento de interpretación. El motor no conoce ninguna obra; las obras viven aparte, desde un boceto escrito a mano hasta una partitura explícita, MusicXML y audio. Analiza la armonía hasta numerales romanos, dominantes secundarias y sextas aumentadas, y compara dos partituras nota a nota."
+  },
+  "stack": ["Python", "MusicXML"],
+  "links": { "repo": "https://github.com/Over-HCV/Musicom" },
+  "building": { "chip": "dip", "height": 0.8, "connectsTo": ["portfolio-3d"] },
+  "year": 2026
+}

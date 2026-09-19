@@ -64,7 +64,8 @@ const projects = defineCollection({
     role: l10n.optional(),
     summary: l10n,
     description: l10n,
-    image: z.string().optional(),
+    /** Capturas en public/ (p. ej. `/projects/<id>/01.webp`); rotan en la tarjeta y el panel. */
+    images: z.array(z.string().startsWith('/')).optional(),
     stack: z.array(z.string()),
     links: z.object({
       repo: z.string().url().optional(),

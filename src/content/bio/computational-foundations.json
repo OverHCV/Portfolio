@@ -1,8 +1,8 @@
 {
   "title": { "en": "Computational foundations", "es": "Fundamento computacional" },
   "body": {
-    "en": "Placeholder — implementation grounded in theory: complexity, correctness, trade-offs.",
-    "es": "Placeholder — implementación con fundamento teórico: complejidad, corrección, compromisos."
+    "en": "Implementation grows out of theory: complexity, correctness and invariants before the first commit. From IIT 4.0 in Complexum to a symbolic engine checked with Lean — what can't be argued doesn't ship.",
+    "es": "La implementación nace de la teoría: complejidad, corrección e invariantes antes del primer commit. Del IIT 4.0 en Complexum a un motor simbólico verificado con Lean: lo que no se puede argumentar no se despliega."
   },
   "gridPos": [4.5, 1.5],
   "order": 3

@@ -1,5 +1,5 @@
 {
-  "order": 2,
+  "order": 4,
   "title": { "en": "Complexum / Proyecto-2025A", "es": "Complexum / Proyecto-2025A" },
   "role": { "en": "Author & maintainer", "es": "Autor y mantenedor" },
   "summary": { "en": "Open-source framework for the NP-hard MIP problem under IIT 4.0.", "es": "Framework abierto para el problema NP-difícil MIP bajo IIT 4.0." },

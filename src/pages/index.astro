@@ -105,6 +105,7 @@ const [galaxy, field, pier, lighthouse, city] = ACTS;
           <article class="mt-6">
             <h3 class="text-lg font-medium"><L text={p.title} /> <span class="text-mist">({p.year})</span></h3>
             {p.role && <p class="text-sm text-mist"><L text={p.role} /></p>}
+            {p.images?.[0] && <img class="mt-2 aspect-video w-full rounded-lg object-cover" src={p.images[0]} alt={p.title.en} loading="lazy" decoding="async" />}
             <p class="text-mist"><L text={p.description} /></p>
             <p class="text-sm text-mist">{p.stack.join(' · ')}</p>
             <p class="space-x-4 text-sm">

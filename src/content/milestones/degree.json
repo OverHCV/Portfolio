@@ -1,7 +1,10 @@
 {
   "kind": "education",
   "org": "Universidad de Caldas",
-  "title": { "en": "B.Sc. — Systems and Computing Engineering", "es": "Pregrado — Ingeniería de Sistemas y Computación" },
+  "title": {
+    "en": "B.Sc. — Systems and Computing Engineering",
+    "es": "Pregrado — Ingeniería de Sistemas y Computación"
+  },
   "start": "2021-01",
   "end": "2026-06",
   "summary": {

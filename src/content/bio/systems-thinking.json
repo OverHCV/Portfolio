@@ -1,9 +1,15 @@
 {
-  "title": { "en": "Systemic & analytical thinking", "es": "Pensamiento sistémico y analítico" },
-  "body": {
-    "en": "Placeholder — how you look at a problem as a whole before optimizing its parts.",
-    "es": "Placeholder — cómo miras un problema como un todo antes de optimizar sus partes."
+  "title": {
+    "en": "Systemic & analytical thinking",
+    "es": "Pensamiento sistémico y analítico"
   },
-  "gridPos": [-4, 1],
+  "body": {
+    "en": "Before optimizing a part I look at the whole system. No component needs to know everything to take the next step, only the right context; well-composed parts become a bigger system, and what starts out uncertain should converge to something deterministic and controllable.",
+    "es": "Antes de optimizar una pieza miro el sistema entero. Ningún componente necesita conocerlo todo para dar el siguiente paso, solo el contexto justo; las piezas bien compuestas forman un sistema mayor, y lo que empieza incierto debe converger a algo determinista y controlable."
+  },
+  "gridPos": [
+    -4,
+    1
+  ],
   "order": 1
 }

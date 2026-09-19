@@ -1,0 +1,15 @@
+{
+  "order": 3,
+  "title": { "en": "MathSlice engine", "es": "Motor de MathSlice" },
+  "role": { "en": "Author · private code, open-source planned", "es": "Autor · código privado, apertura prevista" },
+  "summary": { "en": "Symbolic computation in Rust/WASM that shows its steps.", "es": "Cómputo simbólico en Rust/WASM que muestra sus pasos." },
+  "description": {
+    "en": "A symbolic computation kernel of our own — the maths layer of a Wolfram|Alpha, written in Rust and compiled to WASM to run in the browser. The goal is not the answer but the derivation: every rewrite emits a trace, no rule fires unless its assumptions are satisfied (enforced by types), and the input is LaTeX only. SymPy and Maxima serve solely as differential-testing oracles in CI, next to a golden corpus and property tests, and Lean 4 backs the verification levels. It knows nothing about the platform that uses it.",
+    "es": "Un kernel de cómputo simbólico propio — la capa matemática de un Wolfram|Alpha, escrito en Rust y compilado a WASM para correr en el navegador. El objetivo no es la respuesta sino la derivación: toda reescritura emite traza, ninguna regla se dispara sin sus suposiciones satisfechas (impuesto por tipos) y la entrada es solo LaTeX. SymPy y Maxima sirven únicamente como oráculos de testing diferencial en CI, junto a un corpus dorado y property tests, y Lean 4 respalda los niveles de verificación. No sabe nada de la plataforma que lo usa."
+  },
+  "images": ["/projects/mathslice-engine/01.webp"],
+  "stack": ["Rust", "WebAssembly", "Lean 4", "LaTeX", "SymPy"],
+  "links": {},
+  "building": { "chip": "qfp", "height": 1.1, "connectsTo": ["complexum", "mathslice"] },
+  "year": 2026
+}

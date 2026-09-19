@@ -1,5 +1,5 @@
 {
-  "order": 5,
+  "order": 11,
   "title": { "en": "HomeHealTech", "es": "HomeHealTech" },
   "role": { "en": "Path-planning & developer lead", "es": "Líder de planeación y desarrollo" },
   "summary": { "en": "Telemedicine with real-time AI disease detection.", "es": "Telemedicina con detección de enfermedades por IA en tiempo real." },

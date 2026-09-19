@@ -116,7 +116,7 @@ Portfolio/
 │   │   ├── FieldOverlay.tsx  # capítulos de bio del Acto 2 (DOM)
     │   │   ├── TransitionVeil.tsx # velo que cubre el viaje entre actos
     │   │   ├── Panel.tsx         # panel de detalle (hito, proyecto)
-    │   │   ├── CityOverlay.tsx   # tarjeta del chip cercano, invitación del buzón, índice por teclado
+    │   │   ├── CityOverlay.tsx   # burbuja del chip (ProjectBubble + ProjectShots), invitación del buzón, índice por teclado
     │   │   ├── ContactSheet.tsx  # formulario del buzón (hoja de papel)
     │   │   └── useDialog.ts      # animación, bloqueo de scroll, foco y Esc de Panel y ContactSheet
     │   ├── audio/
@@ -373,7 +373,7 @@ interface WorldState {
   - **Clic** en la mitad exterior de una página → la pasa (derecha: siguiente, izquierda: anterior). Al pasar el puntero por esa zona la esquina se levanta.
   - **Arrastre** (`album/Album.tsx`): el pointerdown sobre un plano invisible toma la hoja; los movimientos se siguen en `window` con un raycast propio contra el plano del libro, y el punto tomado hace de borde libre (`θ = acos(x/W)`). Al soltar, pasa si supera π/2 o si el gesto fue rápido. Con el dedo se bloquea el scroll mientras se arrastra.
   - **Hoja** (`album/pageMaterial.ts`): plano subdividido que se dobla en el vertex shader (rotación sobre el lomo + rizo hacia el borde libre + la altura tomada va por delante), frente = recto y reverso = verso de la página siguiente. Páginas en canvas (`album/pageTexture.ts`): portada con índice, verso con número romano y "melodía" de la familia, recto con cada tecnología como nota y su dinámica.
-- **Chips (Acto 5):** cajas de hover invisibles sobre cada chip (`Buildings.tsx`); hover → el chip se levanta y sus calles brillan (`uLift`/`uGlow` por proyecto, uniforms compartidos); clic → `focus = { kind: 'project', id }`. Sin hover, la tarjeta breve (`nearProject`) sigue al chip más cercano al centro de la pantalla. `CityOverlay` expone además la lista de proyectos como botones para teclado.
+- **Chips (Acto 5):** cajas de hover invisibles sobre cada chip (`Buildings.tsx`); hover → el chip se levanta y sus calles brillan (`uLift`/`uGlow` por proyecto, uniforms compartidos); clic → `focus = { kind: 'project', id }`. Sin hover, la tarjeta breve (`nearProject`) sigue al chip más cercano al centro de la pantalla. La tarjeta es una burbuja que sale del chip: la escena proyecta su caja a pantalla cada frame (`Act5City/anchor.ts`) y `ProjectBubble` la coloca arriba, al lado o abajo (donde quepa), con cola y línea guía; con el puntero encima se queda quieta y retiene su chip. En hover y foco los filos del chip se encienden con el acento (`uAccent`). `CityOverlay` expone además la lista de proyectos como botones para teclado.
 - **Buzón (Acto 5):** `focus = { kind: 'contact' }` → la tapa se abre, asoma la carta y `ContactSheet` aparece como hoja de papel en el overlay (misma lógica de diálogo que el Panel: `overlay/useDialog.ts`).
 
 ---

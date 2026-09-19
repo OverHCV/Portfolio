@@ -1,0 +1,19 @@
+{
+  "order": 8,
+  "title": { "en": "SDA Lab — statistical data analysis", "es": "SDA Lab — análisis estadístico de datos" },
+  "role": { "en": "Author", "es": "Autor" },
+  "summary": { "en": "An interactive lab to see, live, what each statistical method does and why.", "es": "Un laboratorio interactivo para ver, en vivo, qué hace cada método estadístico y por qué." },
+  "description": {
+    "en": "A statistical method isn't applied to 'data' but to a matrix with declared roles, under assumptions, with hyperparameters and a way to be evaluated — so the lab splits an analysis into four phases: data, modelling, fitting and evaluation. Load a course dataset, a synthetic one or your own CSV, declare each column, clean, transform, split and balance it, then explore thirteen univariate, bivariate and multivariate plots, each with how to read it. A catalogue of 54 filterable methods, and the same Shiny code ships twice: compiled to WebAssembly with webR on GitHub Pages, and full R on Posit Connect.",
+    "es": "Un método estadístico no se aplica a «datos», sino a una matriz con roles declarados, bajo supuestos, con hiperparámetros y con una forma de evaluarse; por eso el laboratorio separa el análisis en cuatro fases: datos, modelado, ajuste y evaluación. Se carga un dataset del curso, uno sintético o un CSV propio, se declara cada columna, se limpia, transforma, parte y balancea, y se exploran trece gráficos univariados, bivariados y multivariados, cada uno con cómo se lee. Un catálogo de 54 métodos filtrables, y el mismo código Shiny con dos salidas: compilado a WebAssembly con webR en GitHub Pages y R completo en Posit Connect."
+  },
+  "images": ["/projects/sda/01.webp", "/projects/sda/02.webp"],
+  "stack": ["R", "Shiny", "webR", "WebAssembly", "renv", "Posit Connect"],
+  "links": {
+    "repo": "https://github.com/Over-HCV/SDA",
+    "demo": "https://overhcv-ur-sda.share.connect.posit.cloud/",
+    "extra": [{ "label": { "en": "In the browser (webR)", "es": "En el navegador (webR)" }, "url": "https://over-hcv.github.io/SDA/" }]
+  },
+  "building": { "chip": "qfp", "height": 1.0, "connectsTo": ["intel-ii"] },
+  "year": 2026
+}

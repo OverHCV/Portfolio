@@ -7,6 +7,7 @@ import { milestoneDates } from '../../i18n/dates';
 import type { Lang } from '../../i18n/langs';
 import type { L10n, WorldContent } from '../types';
 import { useDialog } from './useDialog';
+import { ProjectShots } from './ProjectShots';
 
 interface PanelItem {
   /** Clave de traducción. */
@@ -19,6 +20,8 @@ interface PanelItem {
   body: L10n;
   chips?: string[];
   links?: { href: string; label: string }[];
+  /** Capturas del proyecto. */
+  images?: string[];
 }
 
 type Detail = Exclude<NonNullable<Focus>, { kind: 'contact' } | { kind: 'score' }>;
@@ -61,6 +64,7 @@ function resolve(
     body: p.description,
     chips: p.stack,
     links,
+    images: p.images,
   };
 }
 
@@ -81,6 +85,7 @@ export function Panel({ content }: { content: WorldContent }) {
   const close = () => useWorld.getState().setFocus(null);
   const { mounted, panel, backdrop, initialFocus, onKeyDown } = useDialog(isDetail(focus), close);
   const title = useRef<HTMLHeadingElement>(null);
+  const [hoverShots, setHoverShots] = useState(false);
 
   const item = shown ? resolve(shown, content, lang, t, pick) : null;
   const itemKey = shown ? `${JSON.stringify(shown)}-${lang}` : '';
@@ -124,6 +129,19 @@ export function Panel({ content }: { content: WorldContent }) {
           {pick(item.title)}
         </h2>
         {item.meta && <p className="mt-3 font-mono text-xs tracking-wide text-mist">{item.meta}</p>}
+        {item.images && (
+          <div onPointerEnter={() => setHoverShots(true)} onPointerLeave={() => setHoverShots(false)}>
+            <ProjectShots
+              key={itemKey}
+              images={item.images}
+              alt={pick(item.title)}
+              playing={hoverShots}
+              dots
+              dotLabel={(n) => `${t('project.shot')} ${n}`}
+              className="mt-6"
+            />
+          </div>
+        )}
         <p className="mt-6 leading-relaxed text-mist">{pick(item.body)}</p>
         {item.chips && item.chips.length > 0 && (
           <ul className="mt-6 flex flex-wrap gap-2">
