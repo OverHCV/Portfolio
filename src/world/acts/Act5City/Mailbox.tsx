@@ -5,7 +5,7 @@ import { useWorld } from '../../store';
 import { MAILBOX } from './layout';
 import { ROLE } from './palette';
 import { createIsoMaterial } from './isoMaterial';
-import { cityInteractive, type CityHover } from './Buildings';
+import { DRAG_SLOP, cityInteractive, type CityHover } from './Buildings';
 import type { CityFrame } from './frame';
 
 /** Medidas del buzón (unidades de la placa). */
@@ -98,15 +98,13 @@ export function Mailbox({ frame, hover }: { frame: CityFrame; hover: CityHover }
           e.stopPropagation();
           if (!cityInteractive()) return;
           hover.mailbox = true;
-          document.body.style.cursor = 'pointer';
         }}
         onPointerOut={() => {
           hover.mailbox = false;
-          document.body.style.cursor = '';
         }}
         onClick={(e) => {
           e.stopPropagation();
-          if (!cityInteractive()) return;
+          if (!cityInteractive() || e.delta > DRAG_SLOP) return;
           useWorld.getState().setFocus({ kind: 'contact' });
         }}
       >

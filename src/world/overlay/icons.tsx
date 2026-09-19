@@ -58,3 +58,13 @@ export function SoundIcon({ muted }: { muted: boolean }) {
     </svg>
   );
 }
+
+/** Puntero con destellos: «clic aquí» (en táctil, el mismo gesto de tocar). */
+export function ClickIcon() {
+  return (
+    <svg {...common} width={16} height={16}>
+      <path d="M9 9l5 12 1.8-5.2L21 14z" />
+      <path d="M7.2 2.2 8 5.1M5.1 8 2.2 7.2M14 4.1 12 6M6 12l-1.9 2" />
+    </svg>
+  );
+}

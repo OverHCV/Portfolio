@@ -9,6 +9,9 @@ export interface CityHover {
   mailbox: boolean;
 }
 
+/** Píxeles que el puntero puede moverse entre bajar y soltar para que cuente como clic y no arrastre. */
+export const DRAG_SLOP = 6;
+
 /** El acto está a la vista y ya encendido: solo entonces responde al puntero. */
 export function cityInteractive(): boolean {
   return useWorld.getState().activeAct === 5;
@@ -16,8 +19,8 @@ export function cityInteractive(): boolean {
 
 /**
  * Zonas de hover/clic de los chips de proyecto: cajas invisibles algo más grandes que el chip
- * (el raycast de R3F no mira `visible`). Hover → el chip se levanta y sus calles brillan
- * (index.tsx); clic → panel del proyecto.
+ * (el raycast de R3F no mira `visible`). Hover → el chip se levanta y sus filos y calles brillan
+ * (index.tsx, que también gobierna el cursor); clic → panel del proyecto.
  */
 export function Buildings({ chips, projects, hover }: { chips: ChipSite[]; projects: Project[]; hover: CityHover }) {
   return (
@@ -30,7 +33,6 @@ export function Buildings({ chips, projects, hover }: { chips: ChipSite[]; proje
             e.stopPropagation();
             if (!cityInteractive()) return;
             hover.project = chip.project;
-            document.body.style.cursor = 'pointer';
           };
           return (
             <mesh
@@ -41,11 +43,11 @@ export function Buildings({ chips, projects, hover }: { chips: ChipSite[]; proje
               onPointerMove={(e) => hover.project !== chip.project && onOver(e)}
               onPointerOut={() => {
                 if (hover.project === chip.project) hover.project = -1;
-                document.body.style.cursor = '';
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                if (!cityInteractive()) return;
+                // Soltar después de arrastrar la placa no es un clic.
+                if (!cityInteractive() || e.delta > DRAG_SLOP) return;
                 useWorld.getState().setFocus({ kind: 'project', id: projects[chip.project].id });
               }}
             >

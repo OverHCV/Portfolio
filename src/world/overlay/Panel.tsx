@@ -85,7 +85,6 @@ export function Panel({ content }: { content: WorldContent }) {
   const close = () => useWorld.getState().setFocus(null);
   const { mounted, panel, backdrop, initialFocus, onKeyDown } = useDialog(isDetail(focus), close);
   const title = useRef<HTMLHeadingElement>(null);
-  const [hoverShots, setHoverShots] = useState(false);
 
   const item = shown ? resolve(shown, content, lang, t, pick) : null;
   const itemKey = shown ? `${JSON.stringify(shown)}-${lang}` : '';
@@ -130,17 +129,15 @@ export function Panel({ content }: { content: WorldContent }) {
         </h2>
         {item.meta && <p className="mt-3 font-mono text-xs tracking-wide text-mist">{item.meta}</p>}
         {item.images && (
-          <div onPointerEnter={() => setHoverShots(true)} onPointerLeave={() => setHoverShots(false)}>
-            <ProjectShots
-              key={itemKey}
-              images={item.images}
-              alt={pick(item.title)}
-              playing={hoverShots}
-              dots
-              dotLabel={(n) => `${t('project.shot')} ${n}`}
-              className="mt-6"
-            />
-          </div>
+          <ProjectShots
+            key={itemKey}
+            images={item.images}
+            alt={pick(item.title)}
+            playing
+            dots
+            dotLabel={(n) => `${t('project.shot')} ${n}`}
+            className="mt-6"
+          />
         )}
         <p className="mt-6 leading-relaxed text-mist">{pick(item.body)}</p>
         {item.chips && item.chips.length > 0 && (

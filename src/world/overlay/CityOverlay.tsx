@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useT } from '../../i18n/useT';
 import { useWorld } from '../store';
-import { ACTS } from '../acts.config';
-import { cityLocal, mailboxAt } from '../acts/Act5City/timeline';
+import { BOOT_END, FOCUS_AT, cityLocal, mailboxAt } from '../acts/Act5City/timeline';
 import type { Project } from '../types';
 import { ProjectShots } from './ProjectShots';
 import { ProjectBubble } from './ProjectBubble';
+import { ClickIcon } from './icons';
 
 /** Umbral de `mailboxAt` a partir del que la tarjeta del proyecto deja paso a la del buzón. */
 const MAILBOX_CARD = 0.5;
@@ -20,7 +20,12 @@ export function CityOverlay({ projects }: { projects: Project[] }) {
   const active = useWorld((s) => s.activeAct === 5);
   const nearId = useWorld((s) => s.nearProject);
   const atMailbox = useWorld((s) => s.activeAct === 5 && mailboxAt(cityLocal(s.progress)) > MAILBOX_CARD);
-  const hint = useWorld((s) => s.activeAct === 5 && s.progress < ACTS[4].start + (ACTS[4].end - ACTS[4].start) * 0.3);
+  // La ayuda de cómo moverse se ve al llegar al primer proyecto y se va al empezar a explorar.
+  const hint = useWorld((s) => {
+    const local = cityLocal(s.progress);
+    return s.activeAct === 5 && local > BOOT_END && local < FOCUS_AT + 0.1;
+  });
+  const touch = useMemo(() => !window.matchMedia('(hover: hover) and (pointer: fine)').matches, []);
   // Se conserva el último proyecto mientras la tarjeta se desvanece.
   const [shownId, setShownId] = useState<string | null>(null);
   useEffect(() => {
@@ -54,9 +59,10 @@ export function CityOverlay({ projects }: { projects: Project[] }) {
             <h2 className="mt-3 font-display text-xl leading-tight text-ink md:text-2xl">{pick(project.title)}</h2>
             {project.role && <p className="mt-1 font-mono text-xs tracking-wide text-mist">{pick(project.role)}</p>}
             <p className="mt-3 text-sm leading-relaxed text-mist">{pick(project.summary)}</p>
-            <button type="button" tabIndex={cardVisible ? 0 : -1} onClick={() => open(project.id)} className={cta}>
-              {t('city.open')} →
-            </button>
+            <p data-click-hint className="mt-4 flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-glow transition-colors">
+              <ClickIcon />
+              {t(touch ? 'city.tap' : 'city.click')}
+            </p>
           </div>
         )}
       </ProjectBubble>
@@ -82,7 +88,7 @@ export function CityOverlay({ projects }: { projects: Project[] }) {
           hint ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        {t('city.hint')}
+        {t(touch ? 'city.hint.touch' : 'city.hint')}
       </p>
 
       {/* Índice para teclado: invisible hasta que recibe el foco. */}

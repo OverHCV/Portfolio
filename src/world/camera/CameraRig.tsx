@@ -6,10 +6,17 @@ import { useReducedMotion } from '../lib/motion';
 import { BASE_FOV, albumFitAt, cityFitAt, fovAt, nearAt, sampleCamera } from './path';
 import { albumAt, lighthouseLocal } from '../acts/Act4Lighthouse/timeline';
 import { veilAt } from '../transitions.config';
+import { ACTS } from '../acts.config';
+import { cityLocal, panWeightAt } from '../acts/Act5City/timeline';
+import { cityPan } from '../acts/Act5City/pan';
 
 /** Cuánto gira la cámara con el mouse en los bordes de la pantalla (radianes). */
 const LOOK_YAW = 0.12;
 const LOOK_PITCH = 0.08;
+
+const CITY = ACTS[4];
+const pan = new Vector3();
+const lookAt = new Vector3();
 
 export function CameraRig() {
   const reducedMotion = useReducedMotion();
@@ -44,7 +51,13 @@ export function CameraRig() {
 
     const { camera, pointer } = state;
     camera.position.copy(position.current);
-    camera.lookAt(target.current);
+    // Acto 5: lo que el usuario arrastró, fuera del suavizado para que la placa siga al puntero.
+    // Se desvanece al avanzar hacia el buzón (panWeightAt).
+    const inCity = progress >= CITY.start;
+    const panWeight = inCity ? panWeightAt(cityLocal(progress)) : 0;
+    pan.set(cityPan.x * panWeight, 0, cityPan.z * panWeight);
+    camera.position.add(pan);
+    camera.lookAt(lookAt.copy(target.current).add(pan));
 
     // Ojo de pez de la construcción del muelle (Acto 3); con reduced motion el FOV no cambia.
     // En el Acto 5 la cámara pasa a telefoto (casi ortográfica), sin importar reduced motion.
@@ -60,8 +73,8 @@ export function CameraRig() {
     }
 
     if (!reducedMotion) {
-      // Frente al álbum el puntero pasa hojas: la cámara deja de seguirlo.
-      const free = 1 - albumAt(lighthouseLocal(progress));
+      // Frente al álbum el puntero pasa hojas y en la placa arrastra: la cámara deja de seguirlo.
+      const free = inCity ? 0 : 1 - albumAt(lighthouseLocal(progress));
       look.current.x = MathUtils.damp(look.current.x, pointer.x * free, 3, delta);
       look.current.y = MathUtils.damp(look.current.y, pointer.y * free, 3, delta);
       // Con la telefoto del Acto 5 el mismo giro movería media ciudad: se escala con el FOV.

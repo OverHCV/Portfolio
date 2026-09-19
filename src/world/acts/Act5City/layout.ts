@@ -49,25 +49,5 @@ const ROWS: XZ[][] = Array.from({ length: GRID * 2 - 1 }, (_, s) => {
   return row.map(([i, j]) => [center(i), center(j)] as XZ);
 });
 
-/** Zócalos en orden de recorrido: el proyecto n ocupa `SLOTS[n]`. */
+/** Zócalos en orden de la placa: el proyecto n ocupa `SLOTS[n]` (el primero es donde se acerca la vista). */
 export const SLOTS: XZ[] = ROWS.flat();
-
-const mean = (points: XZ[]): XZ => [
-  points.reduce((sum, p) => sum + p[0], 0) / points.length,
-  points.reduce((sum, p) => sum + p[1], 0) / points.length,
-];
-
-/**
- * Puntos que mira la cámara durante el recorrido. Las filas de 1–2 distritos se ven de un vistazo;
- * las de 3–4 se recorren en dos tramos, sin llegar a centrar cada chip (el vaivén marearía).
- */
-const SWAY = 0.65;
-export const ROUTE: XZ[] = ROWS.flatMap((row) => {
-  const mid = mean(row);
-  if (row.length <= 2) return [mid];
-  const half = Math.ceil(row.length / 2);
-  return [row.slice(0, half), row.slice(half)].map((part) => {
-    const c = mean(part);
-    return [mid[0] + (c[0] - mid[0]) * SWAY, mid[1] + (c[1] - mid[1]) * SWAY] as XZ;
-  });
-});

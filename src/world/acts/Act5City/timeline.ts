@@ -8,15 +8,15 @@ import { smoothstep } from '../../lib/motion';
  *   0 ─ BOOT_START        bajo el velo dorado del `dive` (≈ 0.12 del acto): la placa entera, apagada
  *   BOOT_START ─ BOOT_END encendido: las trazas se encienden desde el centro y los componentes se
  *                         levantan, con la placa entera a la vista
- *   BOOT_END ─ PAN_START  baja hacia el primer distrito
- *   PAN_START ─ PAN_END   recorrido por los distritos (filas diagonales, layout.ts → ROUTE)
- *   PAN_END ─ MAIL_AT     se acerca al buzón
+ *   BOOT_END ─ FOCUS_AT   acerca la vista al primer proyecto (SLOTS[0])
+ *   FOCUS_AT ─ MAIL_AT    exploración libre: se arrastra en XY (pan.ts) y el scroll solo acerca o
+ *                         aleja; bajando, la vista se va hacia el buzón y el desplazamiento del
+ *                         usuario se desvanece (panWeightAt), subiendo vuelve al primer proyecto
  *   MAIL_AT ─ 1           quieta frente al buzón
  */
 export const BOOT_START = 0.1;
 export const BOOT_END = 0.22;
-export const PAN_START = 0.28;
-export const PAN_END = 0.86;
+export const FOCUS_AT = 0.32;
 export const MAIL_AT = 0.94;
 
 const ACT = ACTS[4];
@@ -34,10 +34,18 @@ export function bootAt(local: number): number {
 
 /** Cercanía al buzón (0..1): la bandera sube y el overlay invita a escribir. */
 export function mailboxAt(local: number): number {
-  return smoothstep(PAN_END + 0.02, MAIL_AT - 0.01, local);
+  return smoothstep(MAIL_AT - 0.08, MAIL_AT - 0.01, local);
 }
 
-/** Tramo en que la tarjeta breve sigue al chip más cercano al centro de la pantalla. */
-export function touringAt(local: number): boolean {
-  return local > PAN_START - 0.03 && local < PAN_END + 0.03;
+/** Tramo de exploración: la tarjeta sigue al chip cercano al cursor (o al centro, sin cursor). */
+export function exploringAt(local: number): boolean {
+  return local > FOCUS_AT - 0.05 && local < MAIL_AT - 0.03;
+}
+
+/**
+ * Cuánto pesa el desplazamiento del usuario en la cámara (0..1): entra al llegar al primer
+ * proyecto y se desvanece en proporción al avance hacia el buzón, así el scroll siempre lleva a él.
+ */
+export function panWeightAt(local: number): number {
+  return smoothstep(BOOT_END, FOCUS_AT, local) * (1 - clamp01((local - FOCUS_AT) / (MAIL_AT - FOCUS_AT)));
 }

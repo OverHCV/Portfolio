@@ -5,8 +5,8 @@
 export const cityAnchor = {
   /** Índice del proyecto de la tarjeta (−1 sin tarjeta). */
   project: -1,
-  /** El puntero está sobre la burbuja: la tarjeta se queda en su chip aunque deje el hover. */
-  held: false,
+  /** El cursor está justo sobre el chip de la tarjeta: la burbuja resalta «clic para abrir». */
+  onChip: false,
   visible: false,
   left: 0,
   top: 0,

@@ -4,8 +4,8 @@ import { EYE, PIER, PIER_FAR } from '../acts/Act3Pier/layout';
 import { ARRIVE_END, BUILD_END, WALK_END, fisheyeAt, pierLocal } from '../acts/Act3Pier/timeline';
 import { BOOK_AIM, BOOK_DISTANCE, BOOK_NORMAL, PAGE } from '../acts/Act4Lighthouse/layout';
 import { ALBUM_END, ENTER_END, PIANO_END, STAND, albumAt, lighthouseLocal } from '../acts/Act4Lighthouse/timeline';
-import { CITY_DISTANCE, CITY_FOV, CITY_NEAR, ISO_DIR, MAILBOX, ROUTE, type XZ } from '../acts/Act5City/layout';
-import { BOOT_END, MAIL_AT, PAN_END, PAN_START } from '../acts/Act5City/timeline';
+import { CITY_DISTANCE, CITY_FOV, CITY_NEAR, ISO_DIR, MAILBOX, SLOTS, type XZ } from '../acts/Act5City/layout';
+import { BOOT_END, FOCUS_AT, MAIL_AT } from '../acts/Act5City/timeline';
 
 /** Centro de cada acto en el mundo. Las escenas se construyen alrededor de su ancla. */
 export const ACT_ANCHORS: Record<ActId, Vector3> = {
@@ -95,12 +95,12 @@ const SHOTS: Record<ActId, Shot[]> = {
     { t: 0.93, position: [0.3, 4.6, 0.5], target: [0, 0.8, -0.1] },
     { t: 1, position: [0, 1.3, 0], target: [0, 0.2, -0.1] },
   ],
-  // Tras el fundido dorado se ve la placa entera mientras se enciende → baja al primer distrito →
-  // recorre las filas diagonales (layout.ts, ROUTE) → se acerca al buzón y se queda frente a él.
+  // Tras el fundido dorado se ve la placa entera mientras se enciende → se acerca al primer proyecto
+  // → de ahí el scroll solo acerca hacia el buzón (el XY lo mueve el usuario: CameraRig + pan.ts).
   5: [
     isoShot(0, [0, 2], 2.9),
     isoShot(BOOT_END, [-2, -1], 2.6),
-    ...ROUTE.map((p, i) => isoShot(PAN_START + ((PAN_END - PAN_START) * i) / (ROUTE.length - 1), p)),
+    isoShot(FOCUS_AT, SLOTS[0]),
     isoShot(MAIL_AT, [MAILBOX[0] - 1.5, MAILBOX[1] - 1.5], 0.62),
     isoShot(1, [MAILBOX[0] - 1.5, MAILBOX[1] - 1.5], 0.6),
   ],

@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { MathUtils, Vector3 } from 'three';
+import { MathUtils, Vector3, type Camera } from 'three';
 import { ACTS } from '../../acts.config';
 import { ACT_ANCHORS } from '../../camera/path';
 import { useWorld } from '../../store';
@@ -8,7 +8,7 @@ import { useReducedMotion } from '../../lib/motion';
 import { QUALITY } from '../../lib/quality';
 import type { ActProps } from '../types';
 import { BOOT_ORIGIN, BOOT_RADIUS, CITY_SLOTS } from './layout';
-import { bootAt, cityLocal, mailboxAt, touringAt } from './timeline';
+import { bootAt, cityLocal, exploringAt, mailboxAt } from './timeline';
 import { buildBoard } from './board';
 import { createCityFrame } from './frame';
 import { Substrate } from './Substrate';
@@ -19,17 +19,20 @@ import { Parts } from './Parts';
 import { Buildings, type CityHover } from './Buildings';
 import { Mailbox } from './Mailbox';
 import { cityAnchor } from './anchor';
+import { resetPan } from './pan';
+import { useBoardDrag } from './useBoardDrag';
 
 const ACT = ACTS[4];
-/** Distancia (en la placa) a la que un chip pasa a la tarjeta sin hover. */
+/** Sin mouse (táctil): distancia (en la placa) desde el centro de la pantalla a la que un chip da tarjeta. */
 const NEAR_RANGE = 8;
-/** Segundos que la tarjeta sigue en el último chip apuntado: da tiempo a llevar el puntero a la burbuja. */
-const HOVER_GRACE = 0.6;
+/** Con mouse: distancia en pantalla (px) del cursor al centro de un chip a la que aparece su tarjeta. */
+const PROXIMITY_PX = 110;
 /** Cuánto sube un chip en hover o en foco. */
 const LIFT = 0.6;
 
 const forward = new Vector3();
 const corner = new Vector3();
+const center = new Vector3();
 
 /**
  * Dentro del piano: una PCB en isométrico. Cada proyecto es un chip en su zócalo y cada conexión
@@ -44,10 +47,42 @@ export default function Act5City({ content }: ActProps) {
   const board = useMemo(() => buildBoard(projects.slice(0, CITY_SLOTS), QUALITY[quality].density), [projects, quality]);
   const frame = useMemo(createCityFrame, []);
   const hover = useMemo<CityHover>(() => ({ project: -1, mailbox: false }), []);
-  const lastPointed = useMemo(() => ({ project: -1, at: -Infinity }), []);
   const populated = useMemo(() => board.chips.filter((c) => c.project >= 0), [board]);
+  const pointer = useBoardDrag(anchor.y);
+  // Con mouse la tarjeta es la del chip cercano al cursor; en táctil, la del chip cercano al centro.
+  const canHover = useMemo(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches, []);
+  const cursor = useMemo(() => ({ current: '' }), []);
 
-  useFrame(({ camera, size, clock }, rawDelta) => {
+  /** Chip cuyo centro en pantalla está más cerca del cursor, dentro de PROXIMITY_PX; −1 si ninguno. */
+  function closestToCursor(camera: Camera, width: number, height: number) {
+    let best = PROXIMITY_PX;
+    let found = -1;
+    for (const chip of populated) {
+      center.set(chip.x, chip.top, chip.z).add(anchor).project(camera);
+      const d = Math.hypot((center.x * 0.5 + 0.5) * width - pointer.x, (0.5 - center.y * 0.5) * height - pointer.y);
+      if (d < best) {
+        best = d;
+        found = chip.project;
+      }
+    }
+    return found;
+  }
+
+  /** Chip más cercano al punto de la placa en el centro de la pantalla, dentro de NEAR_RANGE. */
+  function closestToCenter(cx: number, cz: number) {
+    let best = NEAR_RANGE;
+    let found = -1;
+    for (const chip of populated) {
+      const d = Math.hypot(chip.x - cx, chip.z - cz);
+      if (d < best) {
+        best = d;
+        found = chip.project;
+      }
+    }
+    return found;
+  }
+
+  useFrame(({ camera, size }, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1);
     const u = frame.uniforms;
     frame.time += delta * (reducedMotion ? 0.3 : 1);
@@ -71,28 +106,24 @@ export default function Act5City({ content }: ActProps) {
     u.uFog.value.set(t * 1.04, t * 1.45);
 
     const inAct = progress >= ACT.start && progress <= ACT.end;
-    let near = -1;
-    if (inAct && touringAt(local)) {
-      let best = NEAR_RANGE;
-      for (const chip of populated) {
-        const d = Math.hypot(chip.x - cx, chip.z - cz);
-        if (d < best) {
-          best = d;
-          near = chip.project;
-        }
-      }
-    }
+    const exploring = inAct && exploringAt(local);
+    let card = inAct ? hover.project : -1;
+    if (card < 0 && exploring) card = canHover ? (pointer.inside ? closestToCursor(camera, size.width, size.height) : -1) : closestToCenter(cx, cz);
     const focused = focus?.kind === 'project' ? projects.findIndex((p) => p.id === focus.id) : -1;
-    const now = clock.elapsedTime;
-    if (hover.project >= 0 || cityAnchor.held) Object.assign(lastPointed, { project: hover.project >= 0 ? hover.project : cityAnchor.project, at: now });
-    const pointed = now - lastPointed.at < HOVER_GRACE ? lastPointed.project : -1;
-    const card = inAct ? (pointed >= 0 ? pointed : near) : -1;
     cityAnchor.project = card;
+    cityAnchor.onChip = card >= 0 && hover.project === card;
     setNearProject(card >= 0 ? projects[card].id : null);
 
+    // Cursor: mano abierta para arrastrar, cerrada al arrastrar, dedo sobre algo que se abre.
+    const wanted = pointer.dragging ? 'grabbing' : hover.project >= 0 || hover.mailbox ? 'pointer' : exploring ? 'grab' : '';
+    if (wanted !== cursor.current) {
+      document.body.style.cursor = wanted;
+      cursor.current = wanted;
+    }
+
     for (let i = 0; i < CITY_SLOTS; i++) {
-      const lift = i === pointed || i === focused ? LIFT : 0;
-      const glow = i === focused ? 1 : i === pointed ? 0.8 : i === near ? 0.4 : 0;
+      const lift = i === card || i === focused ? LIFT : 0;
+      const glow = i === focused || (i === card && i === hover.project) ? 1 : i === card ? 0.8 : 0;
       u.uLift.value[i] = MathUtils.damp(u.uLift.value[i], reducedMotion ? 0 : lift, 8, delta);
       u.uGlow.value[i] = MathUtils.damp(u.uGlow.value[i], glow, 6, delta);
     }
@@ -125,7 +156,8 @@ export default function Act5City({ content }: ActProps) {
   useEffect(
     () => () => {
       useWorld.getState().setNearProject(null);
-      Object.assign(cityAnchor, { visible: false, held: false, project: -1 });
+      Object.assign(cityAnchor, { visible: false, onChip: false, project: -1 });
+      resetPan();
       document.body.style.cursor = '';
     },
     [],

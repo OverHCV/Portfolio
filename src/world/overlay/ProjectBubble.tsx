@@ -66,7 +66,8 @@ function place(w: number, h: number, prev: Side | null): Placement {
 
 /**
  * Burbuja que sale del chip del Acto 5: sigue su rectángulo en pantalla (`cityAnchor`, escrito por
- * la escena) en un rAF propio, sin renders de React, y apunta al chip con una cola.
+ * la escena) en un rAF propio, sin renders de React, y apunta al chip con una cola. Solo informa:
+ * no recibe el puntero, así nunca tapa la interacción con los chips (se abre con clic en el chip).
  */
 export function ProjectBubble({ visible, children }: { visible: boolean; children: ReactNode }) {
   const reduced = useReducedMotion();
@@ -105,16 +106,15 @@ export function ProjectBubble({ visible, children }: { visible: boolean; childre
 
       const w = el.offsetWidth;
       const h = el.offsetHeight;
-      // Con el puntero encima se queda quieta (la cámara deriva con el puntero y moverla haría huir el botón).
-      if (!pos || !side || !cityAnchor.held) {
-        const target = place(w, h, side);
-        side = target.side;
-        if (!target.fits && shots && !compact) compact = true;
-        const k = reduced || !pos ? 1 : 1 - Math.exp(-dt * FOLLOW);
-        pos = pos ?? { x: target.x, y: target.y };
-        pos.x += (target.x - pos.x) * k;
-        pos.y += (target.y - pos.y) * k;
-      }
+      const target = place(w, h, side);
+      side = target.side;
+      if (!target.fits && shots && !compact) compact = true;
+      const k = reduced || !pos ? 1 : 1 - Math.exp(-dt * FOLLOW);
+      pos = pos ?? { x: target.x, y: target.y };
+      pos.x += (target.x - pos.x) * k;
+      pos.y += (target.y - pos.y) * k;
+      // «Clic para abrir» se enciende cuando el cursor está justo sobre el chip.
+      el.querySelector('[data-click-hint]')?.classList.toggle('text-ink', cityAnchor.onChip);
       el.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, 0)`;
 
       const cx = (cityAnchor.left + cityAnchor.right) / 2 - pos.x;
@@ -137,10 +137,7 @@ export function ProjectBubble({ visible, children }: { visible: boolean; childre
       dot.current?.setAttribute('cy', y2.toFixed(1));
     };
     frame = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(frame);
-      cityAnchor.held = false;
-    };
+    return () => cancelAnimationFrame(frame);
   }, [reduced]);
 
   const fade = `transition-opacity duration-300 motion-reduce:transition-none ${visible ? 'opacity-100' : 'opacity-0'}`;
@@ -153,11 +150,7 @@ export function ProjectBubble({ visible, children }: { visible: boolean; childre
       </svg>
       <div ref={box} className="pointer-events-none fixed left-0 top-0 z-[15] w-[min(360px,calc(100vw-32px))]">
         <div
-          onPointerEnter={() => (cityAnchor.held = true)}
-          onPointerLeave={() => (cityAnchor.held = false)}
-          className={`relative rounded-2xl border border-glow/60 bg-void/90 p-4 shadow-[0_0_40px_-12px_var(--color-glow)] backdrop-blur-md md:p-5 ${fade} ${
-            visible ? 'pointer-events-auto' : ''
-          }`}
+          className={`relative rounded-2xl border border-glow/60 bg-void/90 p-4 shadow-[0_0_40px_-12px_var(--color-glow)] backdrop-blur-md md:p-5 ${fade}`}
         >
           {children}
           <div ref={tail} aria-hidden className="absolute left-0 top-0">
